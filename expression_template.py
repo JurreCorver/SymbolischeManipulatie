@@ -176,10 +176,14 @@ class Variable(Expression):
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
     
-    def __init__(self, lhs, rhs, op_symbol):
+    def __init__(self, lhs, rhs, op_symbol,precedence=15,leftass=False,rightass=False):
         self.lhs = lhs
         self.rhs = rhs
         self.op_symbol = op_symbol
+        
+        self.precedence = precedence #the higher the precedence, the higher the 'priority' of the operator.
+        self.leftass = leftass #left associativity, e.g. a/b/c = (a/b)/c != a/(b/c)
+        self.rightass = rightass #right associativity, e.g. a**b**c = a**(b**c) != (a**b)**c
     
     # TODO: what other properties could you need? Precedence, associativity, identity, etc.
     # Done: precedence and associativity
@@ -194,13 +198,13 @@ class BinaryNode(Expression):
         lstring = str(self.lhs)
         if self.lhs.precedence>self.precedence: #add brackets if the lhs has higher precedence
             lstring = '(%s)' % lstring
-        elif not self.leftass and self.lhs.precedence==self.precedence:
+        elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
             lstring = '(%s)' % lstring
             
         rstring = str(self.rhs)
         if self.rhs.precedence>self.precedence: #add brackets if the rhs has higher precedence
             rstring = '(%s)' % rstring
-        elif not self.rightass and self.rhs.precedence==self.precedence: 
+        elif not self.rightass and self.rhs.precedence==self.precedence: #consider associativity
             rstring = '(%s)' % rstring
             
         return "%s %s %s" % (lstring, self.op_symbol, rstring)
@@ -208,41 +212,26 @@ class BinaryNode(Expression):
 class AddNode(BinaryNode):
     """Represents the addition operator"""
     def __init__(self, lhs, rhs):
-        super(AddNode, self).__init__(lhs, rhs, '+')
-        self.precedence = 4 #define precedence and associativity
-        self.leftass = True
-        self.rightass = True
+        super(AddNode, self).__init__(lhs, rhs, '+',4,True,True)
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     def __init__(self, lhs, rhs):
-        super(SubNode, self).__init__(lhs, rhs, '-')
-        self.precedence = 4
-        self.leftass = True #subtraction is only left associative, i.e. a-b-c = (a-b)-c, but not = a-(b-c)
-        self.rightass = False 
+        super(SubNode, self).__init__(lhs, rhs, '-',4,True,False)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
     def __init__(self, lhs, rhs):
-        super(MulNode, self).__init__(lhs, rhs, '*')
-        self.precedence = 3
-        self.leftass = True
-        self.rightass = False
+        super(MulNode, self).__init__(lhs, rhs, '*',3,True,False)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
     def __init__(self, lhs, rhs):
-        super(DivNode, self).__init__(lhs, rhs, '/')
-        self.precedence = 3
-        self.leftass = True #division is only left associative a/b/c = (a/b)/c, but not = a/(b/c)
-        self.rightass = False
+        super(DivNode, self).__init__(lhs, rhs, '/',3,True,False)
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
     def __init__(self, lhs, rhs):
-        super(PowNode, self).__init__(lhs, rhs, '**')
-        self.precedence = 2
-        self.leftass = False #exponentiation is only right associative, i.e. a**b**c = a**(b**c) but not = (a**b)**c
-        self.rightass = True 
+        super(PowNode, self).__init__(lhs, rhs, '**',2,False,True)
         
 # TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
