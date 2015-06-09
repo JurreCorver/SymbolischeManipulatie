@@ -139,7 +139,6 @@ class Constant(Expression):
     """Represents a constant value"""
     def __init__(self, value):
         self.value = value
-        self.precedence = 0 #never add brackets for constants
         
     def __eq__(self, other):
         if isinstance(other, Constant):
@@ -182,7 +181,6 @@ class BinaryNode(Expression):
         self.op_symbol = op_symbol
     
     # TODO: what other properties could you need? Precedence, associativity, identity, etc.
-    # Done: precedence and associativity
             
     def __eq__(self, other):
         if type(self) == type(other):
@@ -192,57 +190,34 @@ class BinaryNode(Expression):
             
     def __str__(self):
         lstring = str(self.lhs)
-        if self.lhs.precedence>self.precedence: #add brackets if the lhs has higher precedence
-            lstring = '(%s)' % lstring
-        elif not self.leftass and self.lhs.precedence==self.precedence:
-            lstring = '(%s)' % lstring
-            
         rstring = str(self.rhs)
-        if self.rhs.precedence>self.precedence: #add brackets if the rhs has higher precedence
-            rstring = '(%s)' % rstring
-        elif not self.rightass and self.rhs.precedence==self.precedence: 
-            rstring = '(%s)' % rstring
-            
-        return "%s %s %s" % (lstring, self.op_symbol, rstring)
+        
+        # TODO: do we always need parantheses?
+        return "(%s %s %s)" % (lstring, self.op_symbol, rstring)
         
 class AddNode(BinaryNode):
     """Represents the addition operator"""
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs, '+')
-        self.precedence = 4 #define precedence and associativity
-        self.leftass = True
-        self.rightass = True
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     def __init__(self, lhs, rhs):
-        super(SubNode, self).__init__(lhs, rhs, '-')
-        self.precedence = 4
-        self.leftass = True #subtraction is only left associative, i.e. a-b-c = (a-b)-c, but not = a-(b-c)
-        self.rightass = False 
+        super(SubNode, self).__init__(lhs, rhs, '-')     
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
     def __init__(self, lhs, rhs):
         super(MulNode, self).__init__(lhs, rhs, '*')
-        self.precedence = 3
-        self.leftass = True
-        self.rightass = False
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
     def __init__(self, lhs, rhs):
-        super(DivNode, self).__init__(lhs, rhs, '/')
-        self.precedence = 3
-        self.leftass = True #division is only left associative a/b/c = (a/b)/c, but not = a/(b/c)
-        self.rightass = False
+        super(DivNode, self).__init__(lhs, rhs, '/')        
         
 class PowNode(BinaryNode):
-    """Represents the exponentiation (power) operator"""
+    """Represents the power operator"""
     def __init__(self, lhs, rhs):
-        super(PowNode, self).__init__(lhs, rhs, '**')
-        self.precedence = 2
-        self.leftass = False #exponentiation is only right associative, i.e. a**b**c = a**(b**c) but not = (a**b)**c
-        self.rightass = True 
+        super(PowNode, self).__init__(lhs, rhs, '**')        
         
 # TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
