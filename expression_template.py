@@ -181,7 +181,7 @@ class BinaryNode(Expression):
         self.rhs = rhs
         self.op_symbol = op_symbol
         
-        self.precedence = precedence #the higher the precedence, the higher the 'priority' of the operator.
+        self.precedence = precedence #the higher the precedence, the lower the 'priority' of the operator.
         self.leftass = leftass #left associativity, e.g. a/b/c = (a/b)/c != a/(b/c)
         self.rightass = rightass #right associativity, e.g. a**b**c = a**(b**c) != (a**b)**c
     
