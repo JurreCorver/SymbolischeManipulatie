@@ -156,22 +156,32 @@ class Constant(Expression):
         
     def __float__(self):
         return float(self.value)
+
+    def evaluate(self,dic={}):
+        return float(self)
         
 class Variable(Expression):
     """Represents a variable"""
-    def __init__(self, value):
+    def __init__(self, symbol):
         #TODO: check whether the value is a string
-        self.value = value
+        self.symbol = symbol
         self.precedence = 0 #never add brackets for variables
         
     def __eq__(self, other):
         if isinstance(other, Variable):
-            return self.value == other.value
+            return self.symbol == other.symbol
         else:
             return False        
         
     def __str__(self):
-        return self.value     
+        return self.symbol
+
+    def evaluate(self,dic={}):
+        if self.symbol in dic:
+            return dic[self.symbol]
+        else:
+            print('Error, variable',self.symbol,'has no value specified. Setting',self.symbol,'= 0.')
+            return 0
         
         
         
@@ -215,25 +225,80 @@ class AddNode(BinaryNode):
     """Represents the addition operator"""
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs, '+',4,True,True)
+        
+    # allow conversion to numerical values
+    def __float__(self): 
+        return float(self.lhs)+float(self.rhs)
+
+    def __int__(self):
+        return int(self.lhs)+int(self.rhs)
+
+    def evaluate(self,dic={}):
+        return self.lhs.evaluate(dic)+self.rhs.evaluate(dic)
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     def __init__(self, lhs, rhs):
         super(SubNode, self).__init__(lhs, rhs, '-',4,True,False)
+
+    # allow conversion to numerical values    
+    def __float__(self):
+        return float(self.lhs)-float(self.rhs)
+    
+    def __int__(self):
+        return int(self.lhs)-int(self.rhs)
+    
+    def evaluate(self,dic={}):
+        return self.lhs.evaluate(dic)-self.rhs.evaluate(dic)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
     def __init__(self, lhs, rhs):
         super(MulNode, self).__init__(lhs, rhs, '*',3,True,False)
+
+    # allow conversion to numerical values        
+    def __float__(self):
+        return float(self.lhs)*float(self.rhs)
+    
+    def __int__(self):
+        return int(self.lhs)*int(self.rhs)
+    
+    def evaluate(self,dic={}):
+        return self.lhs.evaluate(dic)*self.rhs.evaluate(dic)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
     def __init__(self, lhs, rhs):
         super(DivNode, self).__init__(lhs, rhs, '/',3,True,False)
+
+    # allow conversion to numerical values        
+    def __float__(self):
+        return float(self.lhs)/float(self.rhs)
+    
+    def __int__(self):
+        return int(self.lhs)/int(self.rhs)
+    
+    def evaluate(self,dic={}):
+        return self.lhs.evaluate(dic)/self.rhs.evaluate(dic)
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
     def __init__(self, lhs, rhs):
         super(PowNode, self).__init__(lhs, rhs, '**',2,False,True)
+
+    # allow conversion to numerical values        
+    def __float__(self):
+        return float(self.lhs)**float(self.rhs)
+    
+    def __int__(self):
+        return int(self.lhs)**int(self.rhs)
+    
+    def evaluate(self,dic={}):
+        return self.lhs.evaluate(dic)**self.rhs.evaluate(dic)
         
 # TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
+# TODO: LaTeX conversion
+# TODO: converting strings to expressions
+# TODO: adding standard functions (e.g. sin, cos, tan, exp)
+# TODO: integration
+# TODO: differentiation

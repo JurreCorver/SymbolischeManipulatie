@@ -1,17 +1,9 @@
 #mijn klad, afblijven jongens
 from expression_template import *
-x = Expression()
-a = Constant(1)
-b = Constant(2)
-c = Constant(3)
-d = Constant(4)
-e= Constant(5)
-g=c**d
-exp  = e/g
-print(exp)
-print((a/b)/c)
-print(a-b-c)
-print(a-(b-c))
-print((a-b)-c)
-print((a+b)*c)
-print((a*b)*c)
+
+x = Constant(2)
+y = Constant(10)
+z = Constant(1)
+c = Variable('c')
+
+print((c+x*y).evaluate({'c':2}))
