@@ -160,7 +160,9 @@ class Constant(Expression):
 class Variable(Expression):
     """Represents a variable"""
     def __init__(self, value):
+        #TODO: check whether the value is a string
         self.value = value
+        self.precedence = 0 #never add brackets for variables
         
     def __eq__(self, other):
         if isinstance(other, Variable):
