@@ -4,7 +4,7 @@ import math
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),")
+    splitchars = list("+-*/(),%")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -69,12 +69,14 @@ class Expression():
         return DivNode(self, other)        
         
     def __pow__(self, other):
-        return PowNode(self, other)         
-        
+        return PowNode(self, other)
 
+    def __mod__(self, other):
+        return ModNode(self, other)
+    
     
     # basic Shunting-yard algorithm
-    def fromString(self, string):
+    def fromString(string):
         # split into tokens
         tokens = tokenize(string)
         
@@ -85,7 +87,7 @@ class Expression():
         output = []
         
         # list of operators
-        oplist = ['+']
+        oplist = ['+','*','-','/','**','%']
         
         for token in tokens:
             if isnumber(token):
@@ -220,82 +222,49 @@ class BinaryNode(Expression):
             rstring = '(%s)' % rstring
             
         return "%s %s %s" % (lstring, self.op_symbol, rstring)
+    
+    #allow for evaluation
+    def __float__(self): #let eval figure out what the op_symbol does on floats
+        return eval('float(self.lhs) %s float(self.rhs)' % self.op_symbol)
+
+    def __int__(self): #let eval figure out what the op_symbol does on ints
+        return eval('int(self.lhs) %s int(self.rhs)' % self.op_symbol)
+    
+    def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
+        l = self.lhs.evaluate(dic)
+        r = self.rhs.evaluate(dic)
+        return eval('%s %s %s' % (l, self.op_symbol, r))
         
 class AddNode(BinaryNode):
     """Represents the addition operator"""
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs, '+',4,True,True)
-        
-    # allow conversion to numerical values
-    def __float__(self): 
-        return float(self.lhs)+float(self.rhs)
-
-    def __int__(self):
-        return int(self.lhs)+int(self.rhs)
-
-    def evaluate(self,dic={}):
-        return self.lhs.evaluate(dic)+self.rhs.evaluate(dic)
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     def __init__(self, lhs, rhs):
         super(SubNode, self).__init__(lhs, rhs, '-',4,True,False)
-
-    # allow conversion to numerical values    
-    def __float__(self):
-        return float(self.lhs)-float(self.rhs)
-    
-    def __int__(self):
-        return int(self.lhs)-int(self.rhs)
-    
-    def evaluate(self,dic={}):
-        return self.lhs.evaluate(dic)-self.rhs.evaluate(dic)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
     def __init__(self, lhs, rhs):
-        super(MulNode, self).__init__(lhs, rhs, '*',3,True,False)
-
-    # allow conversion to numerical values        
-    def __float__(self):
-        return float(self.lhs)*float(self.rhs)
-    
-    def __int__(self):
-        return int(self.lhs)*int(self.rhs)
-    
-    def evaluate(self,dic={}):
-        return self.lhs.evaluate(dic)*self.rhs.evaluate(dic)
+        super(MulNode, self).__init__(lhs, rhs, '*',3,True,True)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
     def __init__(self, lhs, rhs):
         super(DivNode, self).__init__(lhs, rhs, '/',3,True,False)
-
-    # allow conversion to numerical values        
-    def __float__(self):
-        return float(self.lhs)/float(self.rhs)
-    
-    def __int__(self):
-        return int(self.lhs)/int(self.rhs)
-    
-    def evaluate(self,dic={}):
-        return self.lhs.evaluate(dic)/self.rhs.evaluate(dic)
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
     def __init__(self, lhs, rhs):
         super(PowNode, self).__init__(lhs, rhs, '**',2,False,True)
 
-    # allow conversion to numerical values        
-    def __float__(self):
-        return float(self.lhs)**float(self.rhs)
-    
-    def __int__(self):
-        return int(self.lhs)**int(self.rhs)
-    
-    def evaluate(self,dic={}):
-        return self.lhs.evaluate(dic)**self.rhs.evaluate(dic)
-        
+class ModNode(BinaryNode):
+    """Represents the modulo opertor"""
+    def __init__(self,lhs,rhs):
+        super(ModNode, self).__init__(lhs,rhs,'%',2,True,False)
+
 # TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
 # TODO: LaTeX conversion
 # TODO: converting strings to expressions

@@ -3,7 +3,7 @@ from expression_template import *
 
 x = Constant(2)
 y = Constant(10)
-z = Constant(1)
-c = Variable('c')
 
-print((c+x*y).evaluate({'c':2}))
+expr = Expression.fromString('2**10-24%3')
+print(expr)
+print(float(expr))
