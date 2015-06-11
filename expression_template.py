@@ -204,6 +204,11 @@ class Variable(Expression):
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
+
+    #define standard values for BinaryNodes
+    leftass = False
+    rightass = False
+    precedence = 0 #always add brackets
     
     def __init__(self, lhs, rhs):
         self.lhs = lhs
@@ -243,13 +248,15 @@ class BinaryNode(Expression):
     def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
         l = self.lhs.evaluate(dic)
         r = self.rhs.evaluate(dic)
+
+        #if there is a variable class that is not being evaluated, evaluate() does not return a float but rather an expression object
+        #therefore we won't process this expression object any further
         if not (type(l)==float and type(r)==float):
-            print('foo')
             if type(l)==float:
                 l=Constant(l)
             if type(r)==float:
                 r=Constant(r)
-            return self.__class__(l,r)
+            return self.__class__(l,r) 
         else:
             return eval('%s %s %s' % (l, self.op_symbol, r))
         
@@ -319,10 +326,3 @@ class ModNode(BinaryNode):
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
-
-# TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
-# TODO: LaTeX conversion
-# DONE: converting strings to expressions 
-# TODO: adding standard functions (e.g. sin, cos, tan, exp)
-# TODO: integration
-# TODO: differentiation
