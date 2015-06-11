@@ -5,5 +5,7 @@ b = Constant(3)
 c = Constant(4)
 x = Variable('x')
 d = a+b**c-x
-print(d)
-print(c)
+#print(d)
+#print(c)
+
+print(Expression.fromString('5+2*3' )   )

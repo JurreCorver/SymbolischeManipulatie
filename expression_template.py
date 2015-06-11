@@ -88,6 +88,8 @@ class Expression():
         
         # list of operators
         oplist = ['+','*','-','/','**','%']
+        preclist = [2, 3, 2, 3, 4, 3]
+        asslist = ['L', 'L', 'L', 'L', 'R', 'L'] #L is left and R is right associative
         
         for token in tokens:
             if isnumber(token):
@@ -96,14 +98,26 @@ class Expression():
                     output.append(Constant(int(token)))
                 else:
                     output.append(Constant(float(token)))
+                
+                #TODO: functies moeten hier worden toegevoegd    
+                    
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
                 while True:
-                    # TODO: when there are more operators, the rules are more complicated
-                    # look up the shunting yard-algorithm
+                    # DONE: when there are more operators, the rules are more complicated
+                    # DONE: look up the shunting yard-algorithm
                     if len(stack) == 0 or stack[-1] not in oplist:
                         break
-                    output.append(stack.pop())
+                    tokenindex=oplist.index(token)
+                    token2=stack[-1]
+                    tokenindex2=oplist.index(token2)
+                    if (
+                        (asslist[tokenindex]=='L' and preclist[tokenindex]<=preclist[tokenindex2]) or
+                        (asslist[tokenindex]=='R' and preclist[tokenindex]< preclist[tokenindex2])
+                        ):
+                        output.append(stack.pop())
+                    else:
+                        break
                 # push the new operator onto the stack
                 stack.append(token)
             elif token == '(':
@@ -118,7 +132,7 @@ class Expression():
             # TODO: do we need more kinds of tokens?
             else:
                 # unknown token
-                raise ValueError('Unknown token: %s' % token)
+                output.append(Variable(token))
             
         # pop any tokens still on the stack to the output
         while len(stack) > 0:
@@ -141,7 +155,7 @@ class Constant(Expression):
     """Represents a constant value"""
     def __init__(self, value):
         self.value = value
-        self.precedence = 0 #never add brackets for constants
+        self.precedence = 15 #never add brackets for constants
         
     def __eq__(self, other):
         if isinstance(other, Constant):
@@ -167,7 +181,7 @@ class Variable(Expression):
     def __init__(self, symbol):
         #TODO: check whether the value is a string
         self.symbol = symbol
-        self.precedence = 0 #never add brackets for variables
+        self.precedence = 15 #never add brackets for variables
         
     def __eq__(self, other):
         if isinstance(other, Variable):
@@ -183,14 +197,14 @@ class Variable(Expression):
             return dic[self.symbol]
         else:
             print('Error, variable',self.symbol,'has no value specified. Setting',self.symbol,'= 0.')
-            return 0
+            return self.symbol
         
         
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
     
-    def __init__(self, lhs, rhs, op_symbol,precedence=15,leftass=False,rightass=False):
+    def __init__(self, lhs, rhs, op_symbol,precedence=0,leftass=False,rightass=False):
         self.lhs = lhs
         self.rhs = rhs
         self.op_symbol = op_symbol
@@ -210,13 +224,13 @@ class BinaryNode(Expression):
             
     def __str__(self):
         lstring = str(self.lhs)
-        if self.lhs.precedence>self.precedence: #add brackets if the lhs has higher precedence
+        if self.lhs.precedence<self.precedence: #add brackets if the lhs has higher precedence
             lstring = '(%s)' % lstring
         elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
             lstring = '(%s)' % lstring
             
         rstring = str(self.rhs)
-        if self.rhs.precedence>self.precedence: #add brackets if the rhs has higher precedence
+        if self.rhs.precedence<self.precedence: #add brackets if the rhs has higher precedence
             rstring = '(%s)' % rstring
         elif not self.rightass and self.rhs.precedence==self.precedence: #consider associativity
             rstring = '(%s)' % rstring
@@ -238,12 +252,16 @@ class BinaryNode(Expression):
 class AddNode(BinaryNode):
     """Represents the addition operator"""
     def __init__(self, lhs, rhs):
-        super(AddNode, self).__init__(lhs, rhs, '+',4,True,True)
+        super(AddNode, self).__init__(lhs, rhs, '+',2,True,True) 
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
+    leftass = True
+    rightass = False
+    
+    
     def __init__(self, lhs, rhs):
-        super(SubNode, self).__init__(lhs, rhs, '-',4,True,False)
+        super(SubNode, self).__init__(lhs, rhs, '-',2,True,False)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -255,19 +273,21 @@ class DivNode(BinaryNode):
     def __init__(self, lhs, rhs):
         super(DivNode, self).__init__(lhs, rhs, '/',3,True,False)
         
+        
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
     def __init__(self, lhs, rhs):
-        super(PowNode, self).__init__(lhs, rhs, '**',2,False,True)
+        super(PowNode, self).__init__(lhs, rhs, '**',4,False,True)
 
 class ModNode(BinaryNode):
     """Represents the modulo opertor"""
+    
     def __init__(self,lhs,rhs):
-        super(ModNode, self).__init__(lhs,rhs,'%',2,True,False)
+        super(ModNode, self).__init__(lhs,rhs,'%',3,True,False)
 
 # TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
 # TODO: LaTeX conversion
-# TODO: converting strings to expressions
+# DONE: converting strings to expressions 
 # TODO: adding standard functions (e.g. sin, cos, tan, exp)
 # TODO: integration
 # TODO: differentiation

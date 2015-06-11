@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------------------------------------------------------------------
+#DONE Mandatory
+
+1. Het vertalen van een Expression naar een string, waarbij er niet meer haakjes worden gebruikt dan
+nodig (zoals in opdracht G van de midterm).
+2. In plaats van constanten moet je ook variabelen (zoals ‘x’ of ‘a’) in je expressie-boom ondersteunen.
+3. Het berekenen van de numerieke waarde van een expressie. Hierbij worden de numerieke waarden van
+variabelen aangeleverd met een dictionary.
+
+
+#TODO Mandatory
+
+• Overload van de gelijkheidsoperator om te checken of twee expressiebomen dezelfde berekening voorstellen. <--- 
+• Het vertalen van een string naar een Expression met behulp van het Shunting-yard algoritme.
+(Bij het aanroepen van fromString() staat er geen self als paramater. Waarom is dit??)
+---------------------------------------------------------------------------------------------------------------------------------------
+#DONE EXTRA
+
+#DONE EXTRA
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
