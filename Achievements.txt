@@ -6,15 +6,23 @@ nodig (zoals in opdracht G van de midterm).
 2. In plaats van constanten moet je ook variabelen (zoals ‘x’ of ‘a’) in je expressie-boom ondersteunen.
 3. Het berekenen van de numerieke waarde van een expressie. Hierbij worden de numerieke waarden van
 variabelen aangeleverd met een dictionary.
+4. Overload van de gelijkheidsoperator om te checken of twee expressiebomen dezelfde berekening voorstellen.
+5. Het vertalen van een string naar een Expression met behulp van het Shunting-yard algoritme.
 
 
-#TODO Mandatory
-
-• Overload van de gelijkheidsoperator om te checken of twee expressiebomen dezelfde berekening voorstellen. <--- 
-• Het vertalen van een string naar een Expression met behulp van het Shunting-yard algoritme.
-(Bij het aanroepen van fromString() staat er geen self als paramater. Waarom is dit??)
+#TODO Mandatory (DONE)
 ---------------------------------------------------------------------------------------------------------------------------------------
-#DONE EXTRA
+#TODO EXTRA
+1. Functies implementeren
+2. Differentiëren
+3. Numeriek integreren & exact integreren polynomen
+4. Grafieken genereren
+5. Grafische userinterface
+6. LaTeX
+7. evaluate als x niet gegeven
+8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
+9. modulo op polynomen
+10. pi, e, phi ondersteunen
 
 #DONE EXTRA
 
