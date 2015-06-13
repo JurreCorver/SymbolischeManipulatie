@@ -176,7 +176,7 @@ class Constant(Expression):
         return float(self.value)
 
     def evaluate(self,dic={}):
-        return float(self)
+        return self
         
 class Variable(Expression):
     """Represents a variable"""
@@ -196,7 +196,7 @@ class Variable(Expression):
 
     def evaluate(self,dic={}):
         if self.symbol in dic:
-            return dic[self.symbol]
+            return Constant(dic[self.symbol])
         else:
             return self
         
@@ -249,16 +249,14 @@ class BinaryNode(Expression):
         l = self.lhs.evaluate(dic)
         r = self.rhs.evaluate(dic)
 
-        #if there is a variable class that is not being evaluated, evaluate() does not return a float but rather an expression object
-        #therefore we won't process this expression object any further
-        if not (type(l)==float and type(r)==float):
-            if type(l)==float:
-                l=Constant(l)
-            if type(r)==float:
-                r=Constant(r)
-            return self.__class__(l,r) 
+        if type(l)==Constant and type(r)==Constant:
+            val =  eval('%s %s %s' % (float(l),self.op_symbol,float(r)))
+            if float(int(val)) == val:
+                return Constant(int(val))
+            else:
+                return Constant(val)
         else:
-            return eval('%s %s %s' % (l, self.op_symbol, r))
+            return self.__class__(l,r)
         
 class AddNode(BinaryNode):
     """Represents the addition operator"""
@@ -326,3 +324,6 @@ class ModNode(BinaryNode):
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
+
+def frost(string):
+    return Expression.fromString(string)
