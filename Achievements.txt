@@ -19,14 +19,14 @@ variabelen aangeleverd met een dictionary.
 4. Grafieken genereren
 5. Grafische userinterface
 6. LaTeX
-7. Versimpelen van symbolische uitrukkingen (bijna klaar)
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
 9. modulo op polynomen
 10. pi, e, phi ondersteunen
 
 #DONE EXTRA
 
- evaluate als x niet gegeven
+(7.)  evaluate als x niet gegeven
+7.  versimpeling symbolische uitdrukkingen
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------
