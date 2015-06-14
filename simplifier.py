@@ -271,7 +271,7 @@ def simplifyStep(exp):
     exp = removeZero(exp)
     exp = removeUnits(exp) #remove accidentally added unit operations
     if exp==oldExp and  issubclass(type(exp),BinaryNode):
-            return exp.__class__(simplifyStep(exp.lhs),simplifyStep(exp.rhs))
+        return exp.__class__(simplifyStep(exp.lhs),simplifyStep(exp.rhs))
     else:
         return exp
 
