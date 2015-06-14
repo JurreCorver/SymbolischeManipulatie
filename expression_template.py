@@ -44,6 +44,51 @@ def isint(string):
 
 binNodeList=[]
 funcList=[]
+
+class DNode(Expression):
+    precedence = 15
+    funcList.append('DNode')
+    name = 'd'
+    numargs = 2
+    
+    def __init__(self,exp, var):
+        self.exp = exp
+        self.var = var
+
+    def __str__(self):
+        return 'd(%s)/d%s' % (str(self.exp),self.var)
+
+    def evaluate(self,dic={}):
+        #Standard differentiation formulas for ** + * / -, constants and variables
+        if self.exp == self.var:
+            return Constant(1)
+        
+        if type(self.exp)==Variable:
+            if self.exp == self.var:
+                return Constant(1)
+            else: return Constant(0)
+
+        if type(self.exp)==PowNode:
+            return (self.exp*(self.exp.rhs*DNode(self.exp.lhs,self.var)/self.exp.lhs+LnNode(self.exp.lhs)*DNode(self.exp.rhs,self.var))).evaluate(dic)
+
+        if type(self.exp)==Constant:
+            return Constant(0)
+
+        if type(self.exp)==AddNode or type(self.exp)==SubNode:
+            return self.__class__(DNode(self.exp.lhs),DNode(self.exp.rhs)).evaluate(dic)
+        if type(self.exp)==MulNode:
+            return (DNode(self.exp.lhs,self.var)*self.exp.rhs+self.exp.lhs*DNode(self.exp.rhs,self.var)).evaluate(dic)
+
+        if type(self.exp)==DivNode:
+            return (DNode(self.exp.lhs,self.var)/self.exp.rhs - (self.exp.lhs * DNode(self.exp.rhs,self.var))/(self.exp.rhs**Constant(2))).evaluate(dic)
+
+        if issubclass(type(self.exp),FuncNode):
+            if self.exp.hasDerivative and self.exp.numargs==1: #currently only support one variable
+                return (self.exp.derivative()*DNode(self.exp.args[0],self.var)).evaluate(dic)
+        
+
+        return DNode(self.exp,self.var) #do nothing if it matches none of the cases
+
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -141,7 +186,7 @@ class Expression():
                     output.append(stack.pop())
                 # pop the left paranthesis from the stack (but not to the output)
                 stack.pop()
-                if stack[-1] in funcnamelist:
+                if len(stack)>0 and stack[-1] in funcnamelist:
                     output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
             else:
@@ -158,7 +203,7 @@ class Expression():
                 args = []
                 while len(args)<funcdic[t].numargs:
                     args.append(stack.pop())
-                stack.append(funcdic[t](*args))
+                stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
@@ -175,6 +220,7 @@ class FuncNode(Expression):
     """A node in the expression tree representing a function."""
     numargs = 1
     precedence = 15
+    hasDerivative=False
     
     def __init__(self, *args):
         self.args=args
@@ -215,8 +261,13 @@ class SinNode(FuncNode):
     funcList.append("SinNode")
     name = 'sin'
     func = math.sin
+
     def __init__(self, arg):
-        super(SinNode, self).__init__(arg)  
+        super(SinNode, self).__init__(arg)
+
+    hasDerivative = True
+    def derivative(self):
+        return CosNode(self.args[0])
         
 class ArcSinNode(FuncNode):
     """Represents the sine function"""
@@ -224,7 +275,11 @@ class ArcSinNode(FuncNode):
     name = 'arcsin'
     func = math.asin
     def __init__(self, arg):
-        super(ArcSinNode, self).__init__(arg)         
+        super(ArcSinNode, self).__init__(arg)
+
+    hasDerivative = True
+    def derivative(self):
+        return (Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
        
 class CosNode(FuncNode):
     """Represents the cosine function"""
@@ -234,13 +289,21 @@ class CosNode(FuncNode):
     def __init__(self, arg):
         super(CosNode, self).__init__(arg)
         
+    hasDerivative = True
+    def derivative(self):
+        return Constant(-1)*SinNode(self.args[0])
+        
 class ArcCosNode(FuncNode):
     """Represents the arccosine function"""
     funcList.append("ArcSinNode")
     name ='arccos'
     func = math.acos
     def __init__(self, arg):
-        super(ArcCosNode, self).__init__(arg)         
+        super(ArcCosNode, self).__init__(arg)
+        
+    hasDerivative = True
+    def derivative(self):
+        return Constant(-1)*(Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
 
 class TanNode(FuncNode):
     """Represents the tan function"""
@@ -249,7 +312,10 @@ class TanNode(FuncNode):
     func = math.tan
     def __init__(self, arg):
         super(TanNode, self).__init__(arg)               
-        
+            
+    hasDerivative = True
+    def derivative(self):
+        return CosNode(self.args[0])**Constant(-2) 
         
 class LogNode(FuncNode):
     """Represents the logarithm"""
@@ -259,6 +325,7 @@ class LogNode(FuncNode):
     numarg = 2
     def __init__(self, arg1, arg2):
         super(LogNode, self).__init__(arg1, arg2)
+    #need to define derivatives for two arguments first
 
 class LnNode(FuncNode):
     """Represents the natural logarithm"""
@@ -267,6 +334,10 @@ class LnNode(FuncNode):
     func = math.log
     def __init__(self, arg):
         super(LnNode, self).__init__(arg)
+            
+    hasDerivative = True
+    def derivative(self):
+        return self.args[0]**Constant(-1)
         
 class ExpNode(FuncNode):
     """Represents the exponent function"""
@@ -275,6 +346,10 @@ class ExpNode(FuncNode):
     funcList.append("ExpNode")
     def __init__(self, arg):
         super(ExpNode, self).__init__(arg)
+            
+    hasDerivative = True
+    def derivative(self):
+        return self
     
 def frost(string):
     return Expression.fromString(string)
@@ -449,4 +524,3 @@ class ModNode(BinaryNode):
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
-
