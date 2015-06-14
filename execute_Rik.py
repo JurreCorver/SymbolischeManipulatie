@@ -1,9 +1,5 @@
 #mijn klad, afblijven jongens
 from expression_template import *
 
-x = Constant(2)
-y = Constant(10)
+print(Expression.fromString('5+2+2').evaluate())
 
-expr = Expression.fromString('2**10-24%3')
-print(expr)
-print(float(expr))

@@ -42,6 +42,8 @@ def isint(string):
     except ValueError:
         return False
 
+binNodeList=[]
+    
 class Expression():
     """A mathematical expression, represented as an expression tree"""
     
@@ -87,9 +89,9 @@ class Expression():
         output = []
         
         # list of operators
-        oplist = ['+','*','-','/','**','%']
-        preclist = [2, 3, 2, 3, 4, 3]
-        asslist = ['L', 'L', 'L', 'L', 'R', 'L'] #L is left and R is right associative
+        oplist = [eval(op).op_symbol for op in binNodeList]
+        preclist = [eval(op).precedence for op in binNodeList]
+        asslist = [eval(op).leftass for op in binNodeList]
         
         for token in tokens:
             if isnumber(token):
@@ -112,8 +114,8 @@ class Expression():
                     token2=stack[-1]
                     tokenindex2=oplist.index(token2)
                     if (
-                        (asslist[tokenindex]=='L' and preclist[tokenindex]<=preclist[tokenindex2]) or
-                        (asslist[tokenindex]=='R' and preclist[tokenindex]< preclist[tokenindex2])
+                        (asslist[tokenindex] and preclist[tokenindex]<=preclist[tokenindex2]) or
+                        (not asslist[tokenindex] and preclist[tokenindex]< preclist[tokenindex2])
                         ):
                         output.append(stack.pop())
                     else:
@@ -174,7 +176,7 @@ class Constant(Expression):
         return float(self.value)
 
     def evaluate(self,dic={}):
-        return float(self)
+        return self
         
 class Variable(Expression):
     """Represents a variable"""
@@ -194,24 +196,23 @@ class Variable(Expression):
 
     def evaluate(self,dic={}):
         if self.symbol in dic:
-            return dic[self.symbol]
+            return Constant(dic[self.symbol])
         else:
-            print('Error, variable',self.symbol,'has no value specified. Setting',self.symbol,'= 0.')
-            return self.symbol
+            return self
         
         
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
+
+    #define standard values for BinaryNodes
+    leftass = False
+    rightass = False
+    precedence = 0 #always add brackets
     
-    def __init__(self, lhs, rhs, op_symbol,precedence=0,leftass=False,rightass=False):
+    def __init__(self, lhs, rhs):
         self.lhs = lhs
         self.rhs = rhs
-        self.op_symbol = op_symbol
-        
-        self.precedence = precedence #the higher the precedence, the lower the 'priority' of the operator.
-        self.leftass = leftass #left associativity, e.g. a/b/c = (a/b)/c != a/(b/c)
-        self.rightass = rightass #right associativity, e.g. a**b**c = a**(b**c) != (a**b)**c
     
     # TODO: what other properties could you need? Precedence, associativity, identity, etc.
     # Done: precedence and associativity
@@ -247,47 +248,82 @@ class BinaryNode(Expression):
     def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
         l = self.lhs.evaluate(dic)
         r = self.rhs.evaluate(dic)
-        return eval('%s %s %s' % (l, self.op_symbol, r))
+
+        if type(l)==Constant and type(r)==Constant:
+            val =  eval('%s %s %s' % (float(l),self.op_symbol,float(r)))
+            if float(int(val)) == val:
+                return Constant(int(val))
+            else:
+                return Constant(val)
+        else:
+            return self.__class__(l,r)
         
 class AddNode(BinaryNode):
     """Represents the addition operator"""
+    leftass = True
+    rightass = False
+    precedence = 2
+    op_symbol='+'
+    
+    binNodeList.append("AddNode")
     def __init__(self, lhs, rhs):
-        super(AddNode, self).__init__(lhs, rhs, '+',2,True,True) 
+        super(AddNode, self).__init__(lhs, rhs) 
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     leftass = True
     rightass = False
-    
-    
+    precedence = 2
+    op_symbol='-'
+
+    binNodeList.append("SubNode")
     def __init__(self, lhs, rhs):
-        super(SubNode, self).__init__(lhs, rhs, '-',2,True,False)
+        super(SubNode, self).__init__(lhs, rhs)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
+    leftass = True
+    rightass = True
+    precedence = 3
+    op_symbol='*'
+
+    binNodeList.append("MulNode")
     def __init__(self, lhs, rhs):
-        super(MulNode, self).__init__(lhs, rhs, '*',3,True,True)
+        super(MulNode, self).__init__(lhs, rhs)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
+    leftass = True
+    rightass = False
+    precedence =3
+    op_symbol='/'
+
+    binNodeList.append("DivNode")
     def __init__(self, lhs, rhs):
-        super(DivNode, self).__init__(lhs, rhs, '/',3,True,False)
+        super(DivNode, self).__init__(lhs, rhs)
         
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
+    leftass = False
+    rightass = True
+    precedence = 3
+    op_symbol='**'
+
+    binNodeList.append("PowNode")
     def __init__(self, lhs, rhs):
-        super(PowNode, self).__init__(lhs, rhs, '**',4,False,True)
+        super(PowNode, self).__init__(lhs, rhs)
 
 class ModNode(BinaryNode):
     """Represents the modulo opertor"""
-    
-    def __init__(self,lhs,rhs):
-        super(ModNode, self).__init__(lhs,rhs,'%',3,True,False)
+    leftass = True
+    rightass = False
+    precedence = 3
+    op_symbol='%'
 
-# TODO: add more subclasses of Expression to represent operators, variables, functions, etc.
-# TODO: LaTeX conversion
-# DONE: converting strings to expressions 
-# TODO: adding standard functions (e.g. sin, cos, tan, exp)
-# TODO: integration
-# TODO: differentiation
+    binNodeList.append("ModNode")
+    def __init__(self,lhs,rhs):
+        super(ModNode, self).__init__(lhs,rhs)
+
+def frost(string):
+    return Expression.fromString(string)

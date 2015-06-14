@@ -19,13 +19,29 @@ variabelen aangeleverd met een dictionary.
 4. Grafieken genereren
 5. Grafische userinterface
 6. LaTeX
+<<<<<<< HEAD:Achievements2.txt
 7. evaluate als x niet gegeven
+=======
+>>>>>>> cbdb290198c9bccf2b94e15b1b1c1774741852a2:Achievements.txt
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
 9. modulo op polynomen
 10. pi, e, phi ondersteunen
 
 #DONE EXTRA
 
+(7.)  evaluate als x niet gegeven
+7.  versimpeling symbolische uitdrukkingen
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------
 
+#Bugs:
 
+--
+negatieve getallen in de fromString functie, e.g.
+Expression.fromString('1+(-1)*2') geeft een error,
+Expression.fromString('1+(0-1)*2') werkt wel.
+
+--
+Haakjes weg werken gaat soms mis
+'1+(2-3)+4' en '1+(2+1*3)+4' worden niet verder versimpeld
