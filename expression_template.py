@@ -73,7 +73,7 @@ class Expression():
 
     def __mod__(self, other):
         return ModNode(self, other)
-    
+
     
     # basic Shunting-yard algorithm
     def fromString(string):
