@@ -255,6 +255,8 @@ def simplifyStep(exp):
     exp = exp.evaluate() #try to simplify using the evaluate method. If this returns a float, stop
     if type(exp)==Constant:
         return exp
+    if issubclass(type(exp),FuncNode): #if the node is a function, simplify its arguments
+        return exp.__class__(*[simplifyStep(arg) for arg in exp.args])
     oldExp = exp
     exp = subtoadd(exp) #turn a-b into a+(-1)*b to more easily use commutativity of addition operator
     exp = divtomul(exp)
@@ -268,8 +270,8 @@ def simplifyStep(exp):
     exp = multodiv(exp)
     exp = removeZero(exp)
     exp = removeUnits(exp) #remove accidentally added unit operations
-    if exp==oldExp and issubclass(type(exp),BinaryNode):
-        return exp.__class__(simplifyStep(exp.lhs),simplifyStep(exp.rhs))
+    if exp==oldExp and  issubclass(type(exp),BinaryNode):
+            return exp.__class__(simplifyStep(exp.lhs),simplifyStep(exp.rhs))
     else:
         return exp
 
@@ -336,6 +338,5 @@ def expand(exp):
 #DONE: factorize x**a * x**b into x**(a+b)
 #DONE: Add an expand method taking e.g. (x+2)*(x-3) to x**2-x-6
 #DONE: Support division
-
-#TODO: Support for functions
+#DONE: Support for functions
 

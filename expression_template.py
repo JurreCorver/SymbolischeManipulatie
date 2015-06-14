@@ -43,6 +43,7 @@ def isint(string):
         return False
 
 binNodeList=[]
+funcList=[]
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -92,6 +93,10 @@ class Expression():
         oplist = [eval(op).op_symbol for op in binNodeList]
         preclist = [eval(op).precedence for op in binNodeList]
         asslist = [eval(op).leftass for op in binNodeList]
+
+        #list of functions
+        funcdic = {eval(func).name:eval(func) for func in funcList}
+        funcnamelist = [eval(func).name for func in funcList]
         
         for token in tokens:
             if isnumber(token):
@@ -101,7 +106,12 @@ class Expression():
                 else:
                     output.append(Constant(float(token)))
                 
-                #TODO: functies moeten hier worden toegevoegd    
+            elif token in funcnamelist:
+                stack.append(token)
+
+            elif token == ',':
+                while not stack[-1] == '(':
+                    output.append(stack.pop())
                     
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
@@ -131,6 +141,8 @@ class Expression():
                     output.append(stack.pop())
                 # pop the left paranthesis from the stack (but not to the output)
                 stack.pop()
+                if stack[-1] in funcnamelist:
+                    output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
             else:
                 # unknown token
@@ -142,7 +154,12 @@ class Expression():
         
         # convert RPN to an actual expression tree
         for t in output:
-            if t in oplist:
+            if t in funcnamelist:
+                args = []
+                while len(args)<funcdic[t].numargs:
+                    args.append(stack.pop())
+                stack.append(funcdic[t](*args))
+            elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
                 x = stack.pop()
@@ -152,6 +169,115 @@ class Expression():
                 stack.append(t)
         # the resulting expression tree is what's left on the stack
         return stack[0]
+
+
+class FuncNode(Expression):
+    """A node in the expression tree representing a function."""
+    numargs = 1
+    precedence = 15
+    
+    def __init__(self, *args):
+        self.args=args
+        
+    def __eq__(self, other):
+        if type(self) == type(other):
+            for i in range(self.numargs):
+                if self.args[i]!=other.args[i]:
+                    return False
+            return True
+        else:
+            return False
+            
+    def __str__(self):
+        return '%s(%s)' % (self.name, ", ".join(map(str,self.args)))
+    
+    #allow for evaluation
+    def __float__(self): #let eval figure out what the op_symbol does on floats
+        return self.func(*map(float,args))
+
+    def __int__(self): #let eval figure out what the op_symbol does on ints
+        return int(self.func(*map(float,args)))
+    
+    def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
+        onlyConstants = True
+        newArgs = [arg.evaluate(dic) for arg in self.args]
+        for arg in newArgs:
+            if type(arg)!=Constant:
+                onlyConstants = False
+                break
+        if onlyConstants:
+            argVals = [float(arg) for arg in newArgs]
+            return Constant(self.func(*argVals))
+        return self.__class__(*newArgs)
+        
+class SinNode(FuncNode):
+    """Represents the sine function"""
+    funcList.append("SinNode")
+    name = 'sin'
+    func = math.sin
+    def __init__(self, arg):
+        super(SinNode, self).__init__(arg)  
+        
+class ArcSinNode(FuncNode):
+    """Represents the sine function"""
+    funcList.append("ArcSinNode")
+    name = 'arcsin'
+    func = math.asin
+    def __init__(self, arg):
+        super(ArcSinNode, self).__init__(arg)         
+       
+class CosNode(FuncNode):
+    """Represents the cosine function"""
+    funcList.append("CosNode")
+    name = 'cos'
+    func = math.cos
+    def __init__(self, arg):
+        super(CosNode, self).__init__(arg)
+        
+class ArcCosNode(FuncNode):
+    """Represents the arccosine function"""
+    funcList.append("ArcSinNode")
+    name ='arccos'
+    func = math.acos
+    def __init__(self, arg):
+        super(ArcCosNode, self).__init__(arg)         
+
+class TanNode(FuncNode):
+    """Represents the tan function"""
+    funcList.append("TanNode")
+    name= 'tan'
+    func = math.tan
+    def __init__(self, arg):
+        super(TanNode, self).__init__(arg)               
+        
+        
+class LogNode(FuncNode):
+    """Represents the logarithm"""
+    funcList.append("LogNode")
+    name = 'log'
+    func = math.log
+    numarg = 2
+    def __init__(self, arg1, arg2):
+        super(LogNode, self).__init__(arg1, arg2)
+
+class LnNode(FuncNode):
+    """Represents the natural logarithm"""
+    funcList.append("LnNode")
+    name = 'ln'
+    func = math.log
+    def __init__(self, arg):
+        super(LnNode, self).__init__(arg)
+        
+class ExpNode(FuncNode):
+    """Represents the exponent function"""
+    name = 'exp'
+    func = math.exp
+    funcList.append("ExpNode")
+    def __init__(self, arg):
+        super(ExpNode, self).__init__(arg)
+    
+def frost(string):
+    return Expression.fromString(string)
     
 class Constant(Expression):
     """Represents a constant value"""
@@ -199,8 +325,7 @@ class Variable(Expression):
             return Constant(dic[self.symbol])
         else:
             return self
-        
-        
+            
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
@@ -325,5 +450,3 @@ class ModNode(BinaryNode):
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
 
-def frost(string):
-    return Expression.fromString(string)
