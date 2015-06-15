@@ -1,4 +1,4 @@
----------------------------------------------------------------------------------------------------------------------------------------
+﻿---------------------------------------------------------------------------------------------------------------------------------------
 #DONE Mandatory
 
 1. Het vertalen van een Expression naar een string, waarbij er niet meer haakjes worden gebruikt dan
@@ -25,9 +25,10 @@ variabelen aangeleverd met een dictionary.
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
 9. Polynoomdeling en modulo op polynomen
 10. pi, e, phi ondersteunen
-11. Vectoren
+11. Vectoren en lineaire algebra
 12. Ondersteuning goniometrische identiteiten voor simplifier.py
-13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi)
+13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme)
+14. Informatieve errors bij foute input van de gebruiker
 
 
 #DONE EXTRA
@@ -50,5 +51,6 @@ Expression.fromString('1+(0-1)*2') werkt wel.
 Haakjes weg werken gaat soms mis
 '1+(2-3)+4' en '1+(2+1*3)+4' worden niet verder versimpeld
 
---
+
+#Fixed bugs:
 simplify versimpeld '(0-1)*1/x' niet naar '1/x'

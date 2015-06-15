@@ -28,12 +28,12 @@ DivNode.unit = Constant(1)
 DivNode.hasRUnit = True
 DivNode.hasLUnit = False
 
-def num(x):
+def num(x): #short command to make numbers looks nicer than just float()
     if float(int(x))==float(x):
         return int(x)
     else: return float(x)
 
-def subtoadd(node):
+def subtoadd(node): #convert a-b to a+(-b) to process it as if it were addition
     if not type(node)==SubNode: #Check if the supplied node really is a SubNode
         if issubclass(type(node),BinaryNode):
             return node.__class__(subtoadd(node.lhs),subtoadd(node.rhs))
@@ -58,12 +58,12 @@ def addtosub(node): #replace a+(-b)*c with a-b*c
             rhs = node.lhs.rhs.evaluate()
             lhs = node.lhs.lhs.evaluate()
             if type(rhs)==Constant and float(rhs) < 0:
-                return SubNode(addtosub(node.rhs),Constant(-num(rhs))*addtosub(node.rhs.lhs))
+                return SubNode(addtosub(node.rhs),Constant(-num(rhs))*addtosub(node.lhs.lhs))
             elif type(lhs)==Constant and float(lhs) < 0:
-                return SubNode(addtosub(node.rhs),Constant(-num(lhs))*addtosub(node.rhs.rhs))
+                return SubNode(addtosub(node.rhs),Constant(-num(lhs))*addtosub(node.lhs.rhs))
         return AddNode(addtosub(node.lhs),addtosub(node.rhs))
 
-def removeUnits(node):
+def removeUnits(node): #remove unit operations, e.g. 1*a = 1 or a**1 = a
     if issubclass(type(node),BinaryNode):
         if node.hasLUnit:
             if node.lhs.evaluate()==node.unit:
@@ -71,28 +71,34 @@ def removeUnits(node):
         if node.hasRUnit:
             if node.rhs.evaluate()==node.unit:
                 return removeUnits(node.lhs)
-        return node.__class__(removeUnits(node.lhs),removeUnits(node.rhs))
+        return node.__class__(removeUnits(node.lhs),removeUnits(node.rhs)) #iterate over tree
     else:
         return node
 
-def removeZero(node):
-    if type(node)==MulNode:
+def removeZero(node): #remove zero-like expressions
+    if type(node)==MulNode: #0*a = a*0 = 0
         if node.lhs == Constant(0) or node.rhs==Constant(0):
             return Constant(0)
     if type(node)==PowNode:
-        if node.lhs == Constant(0):
+        if node.lhs == Constant(0): #0**a = 0
             return Constant(0)
-        if node.rhs == Constant(0):
+        if node.rhs == Constant(0): #a**0 = 1
             return Constant(1)
-        if node.rhs == Constant(0):
-            return node.lhs
-        if node.lhs == Constant(1):
+        if node.lhs == Constant(1): #1**a = 1
             return Constant(1)
     if issubclass(type(node),BinaryNode):
-        return node.__class__(removeZero(node.lhs),removeZero(node.rhs))
+        return node.__class__(removeZero(node.lhs),removeZero(node.rhs)) #iterate over tree
     return node
 
-def isMultiple(exp1,exp2):
+def simplifyPower(node): #turn (a**b)**c to a**(b*c)
+    if type(node)==PowNode:
+        if type(node.lhs)==PowNode:
+            return simplifyPower(node.lhs.lhs)**(simplifyPower(node.lhs.rhs)*simplifyPower(node.rhs)).evaluate()
+    elif issubclass(type(node),BinaryNode):
+        return node.__class__(simplifyPower(node.lhs),simplifyPower(node.rhs))
+    return node
+
+def isMultiple(exp1,exp2): #check if two expressions are multiples of each other. 
     x = exp1
     y = exp2
     if type(x)==MulNode: #if x = a*s with s Constant, replace x with s*a
@@ -112,11 +118,10 @@ def isMultiple(exp1,exp2):
         y = MulNode(Constant(1),y)
     if x.rhs.evaluate() == y.rhs.evaluate():
         if type(x.lhs.evaluate())==Constant and type(y.lhs.evaluate())==Constant:
-            return (True,((x.lhs+y.lhs).evaluate())*x.rhs)
-        # return (True,simplifyStep(x.lhs+y.lhs)*x.rhs) 
-    return (False, None)
+            return (True,((x.lhs+y.lhs).evaluate())*x.rhs) #return True and the sum of the two
+    return (False, None) #return False
 
-def isPower(exp1,exp2):
+def isPower(exp1,exp2): #check if the two expression are the same up to exponent
     x = exp1
     y = exp2
     if type(x)!= PowNode:
@@ -124,61 +129,53 @@ def isPower(exp1,exp2):
     if type(y)!= PowNode:
         y = y**Constant(1)
     if x.lhs.evaluate() == y.lhs.evaluate():
-        return (True,x.lhs**(x.rhs+y.rhs).evaluate())
+        return (True,x.lhs**(x.rhs+y.rhs).evaluate()) #return True with exponents added
     else:
-        return (False,None)
+        return (False,None) #return False
 
-def simplifyByComm(exp):    
+def simplifyByComm(exp): #try to use commutativity to simplify the expression
     if issubclass(type(exp),BinaryNode):
-        if exp.comm: #try to use commutativity
+        if exp.comm: #only evaluate code if the operator is commutative (i.e. multiplication and addition only
 
             #find all children expression of the same type
-            #e.g. turn 5+3+2+x+y into a list [5,3,2,x,y]
-            global commList
-            commList = []
-            findSameChildren(exp)
+            commList = getCommList(exp)
 
-            #evaluate the operator applied to all the constants, and leave the compound expressions as-is
+            #split the list into constants and compound expressions
             consts = []
             compounds = []
-            variables = []
+
             for node in commList:
-                
                 if type(node.evaluate())==Constant:
                     consts.append(node.evaluate())
-                elif type(node)==Variable:
-                    variables.append(node)
                 else:
                     compounds.append(node)
+                    
+            #deprecated by code that comes after this
+            # if type(exp)==MulNode: #turn expressions like x*x*x into x**3
+            #     for node in variables:
+            #         i = variables.index(node)
+            #         j = 1
+            #         while i+1<len(variables) and variables[i]==variables[i+1]:
+            #             j+=1
+            #             del variables[i+1]
+            #         if j!=1:
+            #             variables[i]=node**Constant(j)
 
-            variables.sort(key=lambda x: x.symbol)
-
-            if type(exp)==MulNode:
-                for node in variables:
-                    i = variables.index(node)
-                    j = 1
-                    while i+1<len(variables) and variables[i]==variables[i+1]:
-                        j+=1
-                        del variables[i+1]
-                    if j!=1:
-                        variables[i]=node**Constant(j)
-
-            compounds = compounds+variables
             if type(exp)==MulNode:
                 for node in compounds:
                     mults = node
-                    compounds.remove(node)
+                    compounds.remove(node) #remove the node
                     for x in compounds:
-                        check = isPower(mults,x)
+                        check = isPower(mults,x) #if the two are a power of each other multiply them together
                         if check[0]:
                             mults = check[1]
-                            compounds.remove(x)
-                    compounds.insert(0,mults)
+                            compounds.remove(x) #remove the node you just multiplied by
+                    compounds.insert(0,mults) #put the product back in
 
-            compounds.sort(key=variableKey)
+            compounds.sort(key=variableKey) #sort the list of compounds
 
                 
-            newExp = exp.unit
+            newExp = exp.unit #factor out constants, start with the unit operand (e.g. 0 for addition)
             for node in consts:
                 newExp = exp.__class__(node,newExp).evaluate()
             for node in compounds:
@@ -186,12 +183,11 @@ def simplifyByComm(exp):
             return newExp
     return exp
 
-def factorTerms(exp):
+def factorTerms(exp): #factorize terms multiples of each other, e.g. x+x = 2*x
     if type(exp)==AddNode:
-        global commList
-        commList = []
-        findSameChildren(exp)
+        commList = getCommList(exp) #get all the children that are also sums, i.e. get all the terms in the sum exp is part of
 
+        #split terms in sum into constants and compound expressions
         consts = []
         compounds = []
         for node in commList:
@@ -200,82 +196,91 @@ def factorTerms(exp):
             else:
                 compounds.append(node)
 
-        for node in compounds:
+        for node in compounds: #simplify all the compound expressions by commutativity first
             compounds[compounds.index(node)]=simplifyByComm(node)
 
         for node in compounds:
             mults = node
-            compounds.remove(node)
+            compounds.remove(node) #remove the current node from the queue
             for x in compounds:
-                check = isMultiple(mults,x)
+                check = isMultiple(mults,x)  #for each node check if each other node is a multiple of it
                 if check[0]:
-                    mults = check[1]
+                    mults = check[1] #add them together if they are
                     compounds.remove(x)
-            compounds.insert(0,mults)
+            compounds.insert(0,mults) #insert the joint term at the beginning of the queue
+
+        compounds.sort(key=variableKey) #sort the compounds    
+            
         newExp = Constant(0)
-        for node in consts:
+        for node in consts: #add all the constants together
             newExp = AddNode(node,newExp).evaluate()
-        for node in compounds:
+        for node in compounds: #add the compounds back
             newExp = AddNode(newExp,node)
 
         return newExp
     return exp
 
     
-def variableKey(exp):
+def variableKey(exp): #sort key used to sort varibales and powers of variables
     if type(exp)==Variable:
         return exp.symbol
     if type(exp)==PowNode:
         if type(exp.lhs)==Variable:
+            if type(exp.rhs)==Constant and float(exp.rhs)<0: #sort negative powers to the right of positive ones
+                return "~" + exp.lhs.symbol # '~' is the last normal character in the ASCII table
             return exp.lhs.symbol
-    return ""
-            
-def getCommList(exp):
-    global commList
-    commList = []
-    findSameChildren(exp)
-    return commList
+    return "" #return empty string to sort compound expressions to the right
 
-def divtomul(exp):
+def divtomul(exp): # convert a/b to a*b**-1 to be able to process the expression as if it were multiplication
     if type(exp)==DivNode:
-        return divtomul(exp.lhs)*(divtomul(exp.rhs)**Constant(-1))
+        return divtomul(exp.lhs)*(simplifyPower(divtomul(exp.rhs)**Constant(-1)))
     elif issubclass(type(exp),BinaryNode):
         return exp.__class__(divtomul(exp.lhs),divtomul(exp.rhs))
     return exp
 
 def multodiv(exp):
-    if type(exp)==PowNode:
+    if type(exp)==MulNode: #convert expressions like -5 * x**-1 to -5/x
+        if type(exp.rhs)==PowNode and type(exp.rhs.rhs)==Constant and float(exp.rhs.rhs)<0:
+            return exp.lhs/(multodiv(exp.rhs.lhs)**Constant(-num(exp.rhs.rhs)))
+        
+    if type(exp)==PowNode: #convert x**-n to 1/x**n
         if type(exp.rhs)==Constant and float(exp.rhs)<0:
-            return Constant(1)/(exp.lhs**Constant(-num(exp.rhs)))
-    if issubclass(type(exp),BinaryNode):
+            return Constant(1)/(multodiv(exp.lhs)**Constant(-num(exp.rhs)))
+        
+    if issubclass(type(exp),BinaryNode):#iterate over tree
         return exp.__class__(multodiv(exp.lhs),multodiv(exp.rhs))
     return exp
 
-def simplifyStep(exp):
-    exp = exp.evaluate() #try to simplify using the evaluate method. If this returns a float, stop
+def simplifyStep(exp,expandEachStep=True):
+    if type(exp)==DNode:
+        return DNode(simplifyStep(exp.exp),exp.var).evaluate()
+    exp = exp.evaluate() #try to simplify using the evaluate method. If this returns a constant, stop
     if type(exp)==Constant:
         return exp
     if issubclass(type(exp),FuncNode): #if the node is a function, simplify its arguments
         return exp.__class__(*[simplifyStep(arg) for arg in exp.args])
-    oldExp = exp
+    oldExp = exp #store the expression to later check if it changed
     exp = subtoadd(exp) #turn a-b into a+(-1)*b to more easily use commutativity of addition operator
-    exp = divtomul(exp)
+    exp = divtomul(exp) #turn a/b to a*b**-1
     exp = removeUnits(exp) #remove unit operations
     exp = removeZero(exp) #remove zero elements
-    exp = simplifyByComm(exp)
-    exp = factorTerms(exp)
-    exp = simplifyByComm(exp)            
-    #if the expression didn't change, but it is a BinaryNode, try to simplify its children
+    exp = simplifyByComm(exp) #try to use commutativity to simplify
+    exp = factorTerms(exp) #factor terms in a sum, e.g. x+x to 2*x
+    if expandEachStep:
+        exp = expand(exp)
+    exp = simplifyPower(exp) #(a**b)**c to a**(b*c)
+    exp = simplifyByComm(exp) #try to use commutativity again
     exp = addtosub(exp) #first remove the intentionally added minusses
-    exp = multodiv(exp)
-    exp = removeZero(exp)
-    exp = removeUnits(exp) #remove accidentally added unit operations
-    if exp==oldExp and  issubclass(type(exp),BinaryNode):
-        return exp.__class__(simplifyStep(exp.lhs),simplifyStep(exp.rhs))
+    exp = multodiv(exp) #turn expressions of form b**-1 back to 1/b
+    exp = removeZero(exp) #remove zeros added by the simplifier
+    exp = removeUnits(exp) #remove unit operators added by the simplifier
+    
+    if issubclass(type(exp),BinaryNode): #try to simplify its children as well
+        return exp.__class__(simplifyStep(exp.lhs,expandEachStep),simplifyStep(exp.rhs,expandEachStep))
     else:
         return exp
 
-def findSameChildren(exp):
+def findSameChildren(exp): #return all the children of the tree that are of the same type of BinaryNode
     global commList
     if issubclass(type(exp),BinaryNode):
         if type(exp)==type(exp.lhs):
@@ -288,32 +293,38 @@ def findSameChildren(exp):
             commList.append(exp.rhs)
     else:
          commList.append(exp)
+            
+def getCommList(exp): #return result of findSameChildren as a list
+    global commList #a bit ugly doing it like this, but it works
+    commList = []
+    findSameChildren(exp)
+    return commList
 
-def simplify(exp,n=100):
+def simplify(exp,expandEachStep=True,n=100):#iterate simplifyStep until there is no change or maximum is exceeded
     for i in range(n):
-        newExp = simplifyStep(exp)
+        newExp = simplifyStep(exp,expandEachStep)
         if exp == newExp:
             break
         exp = newExp
     return exp
 
-def expand(exp):
+def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
     if type(exp) == MulNode:
-        if type(exp.lhs) == AddNode and type(exp.rhs)!=AddNode:
+        if type(exp.lhs) == AddNode and type(exp.rhs)!=AddNode: #(a+b)*c = ac+bc)
             rhs = expand(exp.rhs)
             terms = getCommList(exp.lhs)
             newExp = Constant(0)
             for term in terms:
                 newExp += term*rhs
             return newExp
-        if type(exp.rhs) == AddNode and type(exp.lhs)!=AddNode:
+        if type(exp.rhs) == AddNode and type(exp.lhs)!=AddNode: #a*(b+c) = ab+ac
             lhs = expand(exp.lhs)
             terms = getCommList(exp.rhs)
             newExp = Constant(0)
             for term in terms:
                 newExp += term*lhs
             return newExp
-        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNOde:
+        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNOde: #(a+b)*(c+d) = ac+ad+bc+bd
             lterms = getCommList(exp.lhs)
             rterms = getCommList(exp.rhs)
             newExp = Constant(0)
@@ -322,7 +333,7 @@ def expand(exp):
                     newExp+=lterm*rterm
             return newExp
     if issubclass(type(exp),BinaryNode):
-        return exp.__class__(expand(exp.lhs),expand(exp.rhs))
+        return exp.__class__(expand(exp.lhs),expand(exp.rhs)) #iterate over tree
     return exp
             
             
@@ -338,5 +349,4 @@ def expand(exp):
 #DONE: factorize x**a * x**b into x**(a+b)
 #DONE: Add an expand method taking e.g. (x+2)*(x-3) to x**2-x-6
 #DONE: Support division
-#DONE: Support for functions
-
+#DONE: Support for 
