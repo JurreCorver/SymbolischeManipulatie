@@ -23,9 +23,12 @@ variabelen aangeleverd met een dictionary.
 5. Grafische userinterface
 6. LaTeX
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
-9. modulo op polynomen
+9. Polynoomdeling en modulo op polynomen
 10. pi, e, phi ondersteunen
 11. Vectoren
+12. Ondersteuning goniometrische identiteiten voor simplifier.py
+13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi)
+
 
 #DONE EXTRA
 
