@@ -173,7 +173,8 @@ class Expression():
         return stack[0]
 
 class DNode(Expression):
-    """A node in the expression tree representing a derivative""" #Rik
+    """A node in the expression tree representing a derivative""" #Rik?
+    #We can treat this DNode almost like a FuncNode
     precedence = 15
     funcList.append('DNode') #works like a function, but slightly differently
     name = 'd'
@@ -191,32 +192,42 @@ class DNode(Expression):
 
     def evaluate(self,dic={}):
         #Standard differentiation formulas for ** + * / -, constants and variables
+        #if the variable to which you differentiate is the same as the function, return 1
+        '''Is deze regel wel nodig? Naar een constante differentieren lijkt me niet zo zinnig. Als je niet naar een constante differentieert dan
+           lijkt deze regel me overbodig. Het enige wat je zou kunnen zeggen is dat dit handig is als je naar een lange expressie differentieert. ''' 
+           
+        '''Misschien is het netter om wat vaker elif te gebruiken '''   
         if self.exp == self.var:
             return Constant(1)
         
+        #Rules for differentiating to a variable.
         if type(self.exp)==Variable:
             if self.exp == self.var:
                 return Constant(1)
             else: return Constant(0)
-
+            
+            
+        #Rule for differentiating a power
         if type(self.exp)==PowNode:
             return (self.exp*(self.exp.rhs*DNode(self.exp.lhs,self.var)/self.exp.lhs+LnNode(self.exp.lhs)*DNode(self.exp.rhs,self.var))).evaluate(dic)
 
+        #Rules for differntiating a constant, gives 0
         if type(self.exp)==Constant:
             return Constant(0)
-
+        #Rules for differentiating a sum
         if type(self.exp)==AddNode:
             return (DNode(self.exp.lhs,self.var)+DNode(self.exp.rhs,self.var)).evaluate(dic)
-
+        #Rules for differntiating a substraction
         if type(self.exp)==SubNode:
             return (DNode(self.exp.lhs,self.var)-DNode(self.exp.rhs,self.var)).evaluate(dic)
-        
+        #Rules for differntiating a multiplication -> Product Rule
         if type(self.exp)==MulNode:
             return (DNode(self.exp.lhs,self.var)*self.exp.rhs+self.exp.lhs*DNode(self.exp.rhs,self.var)).evaluate(dic)
-
+        #Rules for differntiating a Division
         if type(self.exp)==DivNode:
             return (DNode(self.exp.lhs,self.var)/self.exp.rhs - (self.exp.lhs * DNode(self.exp.rhs,self.var))/(self.exp.rhs**Constant(2))).evaluate(dic)
 
+        #Rules for differentiating functions. These functions often have their derivative pre defined
         if issubclass(type(self.exp),FuncNode):
             if self.exp.hasDerivative:
                 if self.exp.derivativeException: #make weird functions define their own derivative
