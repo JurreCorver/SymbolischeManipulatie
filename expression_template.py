@@ -42,7 +42,7 @@ def isint(string):
         return True
     except ValueError:
         return False
-
+#create empty lists of binary nodes and functions. They will be filled later
 binNodeList=[]
 funcList=[]
     
@@ -80,6 +80,7 @@ class Expression():
 
     
     # basic Shunting-yard algorithm
+    # Translates a string into an expression-tree
     def fromString(string):
         # split into tokens
         tokens = tokenize(string)
@@ -172,8 +173,9 @@ class Expression():
         return stack[0]
 
 class DNode(Expression):
+    """A node in the expression tree representing a derivative""" #Rik
     precedence = 15
-    funcList.append('DNode') #work like a function, but slightly differently
+    funcList.append('DNode') #works like a function, but slightly differently
     name = 'd'
     numargs = 2
     

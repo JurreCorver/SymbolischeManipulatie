@@ -46,9 +46,10 @@ class DNode(Expression):
         return DNode(self.exp,self.var) #do nothing if it matches none of the cases
 
 
-#define derivatives for the various classes:
+#define derivatives for the various classes: 
+#even een comment er van maken
 print(simplify(DNode(frost('sin(2*x)'),Variable('x'))))
-print(simplify(DNode(frost('ln(2*x)'),Constant(2)*Variable('x'))))
+print(simplify(DNode(frost('ln(2*x)'),Variable('x')))) #FOUT IN KETTINGREGEL
 
 
 print(simplify(DNode(frost('x**a'),Variable('x')).evaluate()))

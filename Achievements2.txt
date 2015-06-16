@@ -53,4 +53,4 @@ Haakjes weg werken gaat soms mis
 
 
 #Fixed bugs:
-simplify versimpeld '(0-1)*1/x' niet naar '1/x'
+simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'
