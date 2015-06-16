@@ -4,8 +4,6 @@ class FuncNode(Expression):
     """A node in the expression tree representing a function."""
     numargs = 1
     precedence = 15
-    hasDerivative=False
-    derivativeException=False
 
     def __init__(self, *args):
         self.args=args
@@ -52,9 +50,8 @@ class SinNode(FuncNode):
     def __init__(self, arg):
         super(SinNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return CosNode(self.args[0])
+    def diff(self,var):
+        return CosNode(self.args[0])*self.args[0].diff(var)
 
 class ArcSinNode(FuncNode):
     """Represents the sine function"""
@@ -64,9 +61,8 @@ class ArcSinNode(FuncNode):
     def __init__(self, arg):
         super(ArcSinNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return (Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
+    def diff(self, var):
+        return ((Constant(1)-self.args[0]*self.args[0])**Constant(-0.5))*self.args[0].diff(var)
 
 class CosNode(FuncNode):
     """Represents the cosine function"""
@@ -76,9 +72,8 @@ class CosNode(FuncNode):
     def __init__(self, arg):
         super(CosNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return Constant(-1)*SinNode(self.args[0])
+    def diff(self, var):
+        return Constant(-1)*SinNode(self.args[0])*self.args[0].diff(var)
 
 class ArcCosNode(FuncNode):
     """Represents the arccosine function"""
@@ -88,9 +83,8 @@ class ArcCosNode(FuncNode):
     def __init__(self, arg):
         super(ArcCosNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return Constant(-1)*(Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
+    def diff(self,var):
+        return (Constant(-1)*(Constant(1)-self.args[0]*self.args[0])**Constant(-0.5))*self.args[0].diff(var)
 
 class TanNode(FuncNode):
     """Represents the tan function"""
@@ -100,9 +94,8 @@ class TanNode(FuncNode):
     def __init__(self, arg):
         super(TanNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return CosNode(self.args[0])**Constant(-2)
+    def diff(self,var):
+        return CosNode(self.args[0])**Constant(-2)*self.args[0].diff(var)
 
 class LogNode(FuncNode):
     """Represents the logarithm"""
@@ -112,7 +105,9 @@ class LogNode(FuncNode):
     numargs = 2
     def __init__(self, arg1, arg2):
         super(LogNode, self).__init__(arg1, arg2)
-    #need to define derivatives for two arguments first
+
+    def diff(self,var):
+        return (LnNode(args[0])/LnNode(args[1])).diff(var)
 
 class LnNode(FuncNode):
     """Represents the natural logarithm"""
@@ -122,9 +117,8 @@ class LnNode(FuncNode):
     def __init__(self, arg):
         super(LnNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return self.args[0]**Constant(-1)
+    def diff(self,var):
+        return self.args[0].diff(var)/self.args[0]
 
 class ExpNode(FuncNode):
     """Represents the exponent function"""
@@ -134,9 +128,8 @@ class ExpNode(FuncNode):
     def __init__(self, arg):
         super(ExpNode, self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return self
+    def diff(self, var):
+        return self*self.args[0].diff(var)
 
 class GammaNode(FuncNode): #feature request from Aldo
     """Represents the gamma function"""
@@ -146,9 +139,8 @@ class GammaNode(FuncNode): #feature request from Aldo
     def __init__(self,arg):
         super(GammaNode,self).__init__(arg)
 
-    hasDerivative = True
-    def derivative(self):
-        return GammaNode(self.args[0])*PolyGammaNode(Constant(0),self.args[0])
+    def diff(self,var):
+        return GammaNode(self.args[0])*PolyGammaNode(Constant(0),self.args[0])*self.args[0].diff(var)
 
 class PolyGammaNode(FuncNode):
     """Represents the polygamma function"""
@@ -157,10 +149,8 @@ class PolyGammaNode(FuncNode):
     numargs=2
     funcList.append("PolyGammaNode")
 
-    def __init__(self,nnn,arg):
-        super(PolyGammaNode,self).__init__(nnn, arg)
+    def __init__(self,arg1,arg2):
+        super(PolyGammaNode,self).__init__(arg1, arg2)
 
-    hasDerivative = True
-    derivativeException = True
-    def derivative(self,var,dic={}):
-        return PolyGammaNode(self.args[0]+Constant(1),self.args[1])*DNode(self.args[1],var).evaluate(dic)
+    def diff(self,var):
+        return PolyGammaNode(self.args[0]+Constant(1),self.args[1])*self.args[1].diff(var)

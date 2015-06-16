@@ -1,5 +1,8 @@
 #mijn klad, afblijven jongens
 from expression_template import *
+from functions import *
+from simplifier import *
+from numintegrate import *
 
-print(Expression.fromString('5+2+2').evaluate())
 
+print(sfrost('x**3','x'))

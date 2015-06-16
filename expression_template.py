@@ -179,6 +179,15 @@ class Expression():
 def frost(string):
     return Expression.fromString(string)
 
+def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
+    if d!='':
+        expr = frost(exp)
+        for i in range(n):
+            expr=simplify(expr.diff(Variable(d)))
+        return expr
+    else:
+        return simplify(frost(exp))
+
     
 class Constant(Expression):
     """Represents a constant value"""
@@ -204,6 +213,9 @@ class Constant(Expression):
 
     def evaluate(self,dic={}):
         return self
+
+    def diff(self,var):
+        return Constant(0)
         
 class Variable(Expression):
     """Represents a variable"""
@@ -226,6 +238,11 @@ class Variable(Expression):
             return Constant(dic[self.symbol])
         else:
             return self
+
+    def diff(self,var):
+        if self == var:
+            return Constant(1)
+        else: return Constant(0)
             
         
 class BinaryNode(Expression):
@@ -292,7 +309,10 @@ class AddNode(BinaryNode):
     
     binNodeList.append("AddNode")
     def __init__(self, lhs, rhs):
-        super(AddNode, self).__init__(lhs, rhs) 
+        super(AddNode, self).__init__(lhs, rhs)
+
+    def diff(self, var):
+        return self.lhs.diff(var)+self.rhs.diff(var)
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
@@ -304,6 +324,9 @@ class SubNode(BinaryNode):
     binNodeList.append("SubNode")
     def __init__(self, lhs, rhs):
         super(SubNode, self).__init__(lhs, rhs)
+
+    def diff(self, var):
+        return self.lhs.diff(var) - self.rhs.diff(var)
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -315,6 +338,9 @@ class MulNode(BinaryNode):
     binNodeList.append("MulNode")
     def __init__(self, lhs, rhs):
         super(MulNode, self).__init__(lhs, rhs)
+
+    def diff(self, var):
+        return self.lhs.diff(var)*self.rhs + self.lhs*self.rhs.diff(var)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
@@ -326,7 +352,9 @@ class DivNode(BinaryNode):
     binNodeList.append("DivNode")
     def __init__(self, lhs, rhs):
         super(DivNode, self).__init__(lhs, rhs)
-        
+
+    def diff(self, var):
+        return self.lhs.diff(var)/self.rhs - (self.lhs * self.rhs.diff(var))/(self.rhs*self.rhs)
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
@@ -339,6 +367,9 @@ class PowNode(BinaryNode):
     def __init__(self, lhs, rhs):
         super(PowNode, self).__init__(lhs, rhs)
 
+    def diff(self, var):
+        return self*(self.rhs*self.lhs.diff(var)/self.lhs+LnNode(self.lhs)*self.rhs.diff(var))
+
 class ModNode(BinaryNode):
     """Represents the modulo opertor"""
     leftass = True
@@ -350,7 +381,9 @@ class ModNode(BinaryNode):
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
 
-from differentiate import *
 from functions import *
 from simplifier import *
 from numintegrate import *
+
+
+

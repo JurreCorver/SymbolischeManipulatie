@@ -13,11 +13,6 @@ variabelen aangeleverd met een dictionary.
 #TODO Mandatory (DONE)
 ---------------------------------------------------------------------------------------------------------------------------------------
 #TODO EXTRA
-2. Differentiëren #Rik
-- Done: basis functionaliteit, operatoren, functies
-- Todo: functies met meerdere argumenten
-- Todo: Joost style
-
 3. - Eerst doen: expressies in variabelen ombouwen tot functies
  - exact integreren polynomen #J-W
 4. Grafieken genereren
@@ -37,6 +32,10 @@ variabelen aangeleverd met een dictionary.
 #DONE EXTRA
 
 1. Functies implementeren
+2. Differentiëren
+- Done: basis functionaliteit, operatoren, functies
+- Done: functies met meerdere argumenten
+- Done: Joost style
 3. Numeriek integreren
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
@@ -54,8 +53,12 @@ Expression.fromString('1+(0-1)*2') werkt wel.
 --
 Haakjes weg werken gaat soms mis
 '1+(2-3)+4' en '1+(2+1*3)+4' worden niet verder versimpeld
---
-2/(2*x) versimpelt niet
+
+Simplifier.py dingen die niet goed worden versimpeld
+- 2/(2*x)
+-  -1 * sin(x) * cos(x) + -1 * sin(x) * cos(x)
+waarschijnlijk versimpeld hij x**-1 * y**-1 niet naar 1/(x*y) (nog niet getest)
+
 
 #Fixed bugs:
 simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'

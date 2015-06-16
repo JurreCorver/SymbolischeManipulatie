@@ -252,8 +252,6 @@ def multodiv(exp):
     return exp
 
 def simplifyStep(exp,expandEachStep=True):
-    if type(exp)==DNode:
-        return DNode(simplifyStep(exp.exp),exp.var).evaluate()
     exp = exp.evaluate() #try to simplify using the evaluate method. If this returns a constant, stop
     if type(exp)==Constant:
         return exp

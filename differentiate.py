@@ -1,6 +1,12 @@
 from expression_template import *
 from functions import *
 
+#NOT USED ANYMORE. PLZ STOP
+print('DO NOT USE THIS THING. PLZ STOP')
+for i in range(50):
+    print('plz. dunt use this.')
+print('Laik seriously')
+
 class DNode(Expression):
     """A node in the expression tree representing a derivative"""
 
@@ -8,7 +14,7 @@ class DNode(Expression):
 
     #We can treat this DNode almost like a FuncNode (below)
     precedence = 15
-    funcList.append('DNode') #add to the list of functions for the shunting-yard algoritm
+    #funcList.append('DNode') #add to the list of functions for the shunting-yard algoritm
     name = 'd'
     numargs = 2
 
