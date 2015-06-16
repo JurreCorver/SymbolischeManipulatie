@@ -197,8 +197,6 @@ class DNode(Expression):
            lijkt deze regel me overbodig. Het enige wat je zou kunnen zeggen is dat dit handig is als je naar een lange expressie differentieert. ''' 
            
         '''Misschien is het netter om wat vaker elif te gebruiken '''   
-        if self.exp == self.var:
-            return Constant(1)
         
         #Rules for differentiating to a variable.
         if type(self.exp)==Variable:
@@ -227,7 +225,7 @@ class DNode(Expression):
         if type(self.exp)==DivNode:
             return (DNode(self.exp.lhs,self.var)/self.exp.rhs - (self.exp.lhs * DNode(self.exp.rhs,self.var))/(self.exp.rhs**Constant(2))).evaluate(dic)
 
-        #Rules for differentiating functions. These functions often have their derivative pre defined
+        #Rules for differentiating functions. These functions often have their derivative pre defined.
         if issubclass(type(self.exp),FuncNode):
             if self.exp.hasDerivative:
                 if self.exp.derivativeException: #make weird functions define their own derivative
@@ -235,6 +233,8 @@ class DNode(Expression):
                 if self.exp.numargs==1: #just use chain rule on regular functions
                     return (self.exp.derivative()*DNode(self.exp.args[0],self.var)).evaluate(dic)
 
+
+        #Add functionality for the derivative of derivatives
         if type(self.exp)==DNode: #have to be careful here, if we first evaluate the child expression and then take the derivative we obiously get 0
             subDNode = self.exp.evaluate()
             if type(subDNode)==DNode: #avoid infinite loops
