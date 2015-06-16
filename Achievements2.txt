@@ -13,23 +13,25 @@ variabelen aangeleverd met een dictionary.
 #TODO Mandatory (DONE)
 ---------------------------------------------------------------------------------------------------------------------------------------
 #TODO EXTRA
-2. Differentiëren
+2. Differentiëren #Rik
 - Done: basis functionaliteit, operatoren, functies
 - Todo: functies met meerdere argumenten
 - Todo: Joost style
 
 3. - Eerst doen: expressies in variabelen ombouwen tot functies
- - exact integreren polynomen
+ - exact integreren polynomen #J-W
 4. Grafieken genereren
-5. Grafische userinterface
-6. LaTeX
-8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave)
-9. Polynoomdeling en modulo op polynomen
+5. Grafische userinterface #Rik
+6. LaTeX  #Rik
+8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
+9. Polynoomdeling en modulo op polynomen #J-W
 10. pi, e, phi ondersteunen
 11. Vectoren en lineaire algebra
-12. Ondersteuning goniometrische identiteiten voor simplifier.py
-13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme)
+12. Ondersteuning goniometrische identiteiten voor simplifier.py #Jurre
+13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme) #J-W
 14. Informatieve errors bij foute input van de gebruiker
+15. Complexe getallen
+16. Taylor
 
 
 #DONE EXTRA
