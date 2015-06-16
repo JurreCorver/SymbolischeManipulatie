@@ -53,9 +53,12 @@ class Expression():
     Any concrete subclass of Expression should have these methods:
      - __str__(): return a string representation of the Expression.
      - __eq__(other): tree-equality, check if other represents the same expression tree.
+     - evaluate(dict={}): evaluate expression with a dictionary
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
-    
+
+    precedence = 0 #by default always add brackets
+
     # operator overloading:
     # this allows us to perform 'arithmetic' with expressions, and obtain another expression
     def __add__(self, other):
@@ -172,246 +175,10 @@ class Expression():
         # the resulting expression tree is what's left on the stack
         return stack[0]
 
-class DNode(Expression):
-    """A node in the expression tree representing a derivative""" #Rik?
-    #We can treat this DNode almost like a FuncNode
-    precedence = 15
-    funcList.append('DNode') #works like a function, but slightly differently
-    name = 'd'
-    numargs = 2
-    
-    def __init__(self,exp, var):
-        self.exp = exp
-        self.var = var
-
-    def __str__(self):
-        if type(self.var)==Variable:
-            return 'd(%s)/d%s' % (str(self.exp),str(self.var))
-        else:
-            return 'd(%s)/d(%s)' % (str(self.exp),str(self.var))
-
-    def evaluate(self,dic={}):
-        #Standard differentiation formulas for ** + * / -, constants and variables
-        #if the variable to which you differentiate is the same as the function, return 1
-        '''Is deze regel wel nodig? Naar een constante differentieren lijkt me niet zo zinnig. Als je niet naar een constante differentieert dan
-           lijkt deze regel me overbodig. Het enige wat je zou kunnen zeggen is dat dit handig is als je naar een lange expressie differentieert. ''' 
-           
-        '''Misschien is het netter om wat vaker elif te gebruiken '''   
-        
-        #Rules for differentiating to a variable.
-        if type(self.exp)==Variable:
-            if self.exp == self.var:
-                return Constant(1)
-            else: return Constant(0)
-            
-            
-        #Rule for differentiating a power
-        if type(self.exp)==PowNode:
-            return (self.exp*(self.exp.rhs*DNode(self.exp.lhs,self.var)/self.exp.lhs+LnNode(self.exp.lhs)*DNode(self.exp.rhs,self.var))).evaluate(dic)
-
-        #Rules for differntiating a constant, gives 0
-        if type(self.exp)==Constant:
-            return Constant(0)
-        #Rules for differentiating a sum
-        if type(self.exp)==AddNode:
-            return (DNode(self.exp.lhs,self.var)+DNode(self.exp.rhs,self.var)).evaluate(dic)
-        #Rules for differntiating a substraction
-        if type(self.exp)==SubNode:
-            return (DNode(self.exp.lhs,self.var)-DNode(self.exp.rhs,self.var)).evaluate(dic)
-        #Rules for differntiating a multiplication -> Product Rule
-        if type(self.exp)==MulNode:
-            return (DNode(self.exp.lhs,self.var)*self.exp.rhs+self.exp.lhs*DNode(self.exp.rhs,self.var)).evaluate(dic)
-        #Rules for differntiating a Division
-        if type(self.exp)==DivNode:
-            return (DNode(self.exp.lhs,self.var)/self.exp.rhs - (self.exp.lhs * DNode(self.exp.rhs,self.var))/(self.exp.rhs**Constant(2))).evaluate(dic)
-
-        #Rules for differentiating functions. These functions often have their derivative pre defined.
-        if issubclass(type(self.exp),FuncNode):
-            if self.exp.hasDerivative:
-                if self.exp.derivativeException: #make weird functions define their own derivative
-                    return self.exp.derivative(self.var)
-                if self.exp.numargs==1: #just use chain rule on regular functions
-                    return (self.exp.derivative()*DNode(self.exp.args[0],self.var)).evaluate(dic)
-
-
-        #Add functionality for the derivative of derivatives
-        if type(self.exp)==DNode: #have to be careful here, if we first evaluate the child expression and then take the derivative we obiously get 0
-            subDNode = self.exp.evaluate()
-            if type(subDNode)==DNode: #avoid infinite loops
-                return DNode(subDnode,self.var)
-            else:
-                return DNode(subDNode,self.var).evaluate(dic)
-        
-        return DNode(self.exp.evaluate(dic),self.var) #do nothing if it matches none of the cases
-
-
-class FuncNode(Expression):
-    """A node in the expression tree representing a function."""
-    numargs = 1
-    precedence = 15
-    hasDerivative=False
-    derivativeException=False
-    
-    def __init__(self, *args):
-        self.args=args
-        
-    def __eq__(self, other):
-        if type(self) == type(other):
-            for i in range(self.numargs):
-                if self.args[i]!=other.args[i]:
-                    return False
-            return True
-        else:
-            return False
-            
-    def __str__(self):
-        return '%s(%s)' % (self.name, ", ".join(map(str,self.args)))
-    
-    #allow for evaluation
-    def __float__(self): #let eval figure out what the function means
-        argVals = [str(float(arg)) for arg in self.args]
-        return float(eval(self.func+'('+','.join(argVals)+')'))
-
-    def __int__(self): #let eval figure out what the function means
-        argVals = [str(float(arg)) for arg in self.args]
-        return int(eval(self.func+'('+','.join(argVals)+')'))
-    
-    def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
-        onlyConstants = True
-        newArgs = [arg.evaluate(dic) for arg in self.args]
-        for arg in newArgs:
-            if type(arg)!=Constant:
-                onlyConstants = False
-                break
-        if onlyConstants:
-            argVals = [str(float(arg)) for arg in newArgs]
-            return Constant(eval(self.func+'('+','.join(argVals)+')')) #polygamma was behaving weird, so I decided to do it this way
-        return self.__class__(*newArgs)
-        
-class SinNode(FuncNode):
-    """Represents the sine function"""
-    funcList.append("SinNode")
-    name = 'sin'
-    func = 'math.sin'
-
-    def __init__(self, arg):
-        super(SinNode, self).__init__(arg)
-
-    hasDerivative = True
-    def derivative(self):
-        return CosNode(self.args[0])
-        
-class ArcSinNode(FuncNode):
-    """Represents the sine function"""
-    funcList.append("ArcSinNode")
-    name = 'arcsin'
-    func = 'math.asin'
-    def __init__(self, arg):
-        super(ArcSinNode, self).__init__(arg)
-
-    hasDerivative = True
-    def derivative(self):
-        return (Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
-       
-class CosNode(FuncNode):
-    """Represents the cosine function"""
-    funcList.append("CosNode")
-    name = 'cos'
-    func = 'math.cos'
-    def __init__(self, arg):
-        super(CosNode, self).__init__(arg)
-        
-    hasDerivative = True
-    def derivative(self):
-        return Constant(-1)*SinNode(self.args[0])
-        
-class ArcCosNode(FuncNode):
-    """Represents the arccosine function"""
-    funcList.append("ArcSinNode")
-    name ='arccos'
-    func = 'math.acos'
-    def __init__(self, arg):
-        super(ArcCosNode, self).__init__(arg)
-        
-    hasDerivative = True
-    def derivative(self):
-        return Constant(-1)*(Constant(1)-self.args[0]*self.args[0])**Constant(-0.5)
-
-class TanNode(FuncNode):
-    """Represents the tan function"""
-    funcList.append("TanNode")
-    name= 'tan'
-    func = 'math.tan'
-    def __init__(self, arg):
-        super(TanNode, self).__init__(arg)               
-            
-    hasDerivative = True
-    def derivative(self):
-        return CosNode(self.args[0])**Constant(-2) 
-        
-class LogNode(FuncNode):
-    """Represents the logarithm"""
-    funcList.append("LogNode")
-    name = 'log'
-    func = 'math.log'
-    numargs = 2
-    def __init__(self, arg1, arg2):
-        super(LogNode, self).__init__(arg1, arg2)
-    #need to define derivatives for two arguments first
-
-class LnNode(FuncNode):
-    """Represents the natural logarithm"""
-    funcList.append("LnNode")
-    name = 'ln'
-    func = 'math.log'
-    def __init__(self, arg):
-        super(LnNode, self).__init__(arg)
-            
-    hasDerivative = True
-    def derivative(self):
-        return self.args[0]**Constant(-1)
-        
-class ExpNode(FuncNode):
-    """Represents the exponent function"""
-    name = 'exp'
-    func = 'math.exp'
-    funcList.append("ExpNode")
-    def __init__(self, arg):
-        super(ExpNode, self).__init__(arg)
-            
-    hasDerivative = True
-    def derivative(self):
-        return self
-
-class GammaNode(FuncNode): #feature request from Aldo
-    """Represents the gamma function"""
-    name = 'gamma'
-    func = 'math.gamma'
-    funcList.append("GammaNode")
-    def __init__(self,arg):
-        super(GammaNode,self).__init__(arg)
-
-    hasDerivative = True
-    def derivative(self):
-        return GammaNode(self.args[0])*PolyGammaNode(Constant(0),self.args[0])
-
-class PolyGammaNode(FuncNode):
-    """Represents the polygamma function"""
-    name = 'polygamma'
-    func = 'special.polygamma'
-    numargs=2
-    funcList.append("PolyGammaNode")
-    
-    def __init__(self,nnn,arg):
-        super(PolyGammaNode,self).__init__(nnn, arg)
-
-    hasDerivative = True
-    derivativeException = True
-    def derivative(self,var,dic={}):
-        return PolyGammaNode(self.args[0]+Constant(1),self.args[1])*DNode(self.args[1],var).evaluate(dic)
-    
+#macro for Expression.fromString(string)
 def frost(string):
     return Expression.fromString(string)
+
     
 class Constant(Expression):
     """Represents a constant value"""
@@ -472,8 +239,7 @@ class BinaryNode(Expression):
     def __init__(self, lhs, rhs):
         self.lhs = lhs
         self.rhs = rhs
-    
-    # TODO: what other properties could you need? Precedence, associativity, identity, etc.
+
     # Done: precedence and associativity
             
     def __eq__(self, other):
@@ -583,3 +349,8 @@ class ModNode(BinaryNode):
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
+
+from differentiate import *
+from functions import *
+from simplifier import *
+from numintegrate import *
