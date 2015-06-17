@@ -54,6 +54,7 @@ class Expression():
      - __str__(): return a string representation of the Expression.
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
+     - deg(self, var): the degree of an expression (as a polynomial in var)
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
 
@@ -216,6 +217,15 @@ class Constant(Expression):
 
     def diff(self,var):
         return Constant(0)
+
+
+    def deg(self, var):
+        #the degree of the zero polynomial is -infinity
+        if self.value == 0:
+            return -float("inf")
+        #the degree of a constant non-zero polynomial is 0
+        else:
+            return 0
         
 class Variable(Expression):
     """Represents a variable"""
@@ -243,7 +253,14 @@ class Variable(Expression):
         if self == var:
             return Constant(1)
         else: return Constant(0)
-            
+
+    def deg(self, var):
+       #the degree of the polynomial x is 1 w.r.t. x
+       if self.symbol == var:
+           return 1
+       #the degree of the polynomial x is 0 w.r.t. y
+       else:
+           return 0
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
@@ -313,6 +330,9 @@ class AddNode(BinaryNode):
 
     def diff(self, var):
         return self.lhs.diff(var)+self.rhs.diff(var)
+
+    def deg(self, var):
+        return max(self.lhs.deg(var),self.rhs.deg(var))
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
@@ -327,6 +347,9 @@ class SubNode(BinaryNode):
 
     def diff(self, var):
         return self.lhs.diff(var) - self.rhs.diff(var)
+
+    def deg(self, var):
+        return max(self.lhs.deg(var),self.rhs.deg(var))
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -341,6 +364,9 @@ class MulNode(BinaryNode):
 
     def diff(self, var):
         return self.lhs.diff(var)*self.rhs + self.lhs*self.rhs.diff(var)
+
+    def deg(self, var):
+        return self.lhs.deg(var)+self.rhs.deg(var)
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
@@ -355,6 +381,9 @@ class DivNode(BinaryNode):
 
     def diff(self, var):
         return self.lhs.diff(var)/self.rhs - (self.lhs * self.rhs.diff(var))/(self.rhs*self.rhs)
+
+    def deg(self, var):
+        return self.lhs.deg(var)-self.rhs.deg(var)
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
@@ -369,6 +398,17 @@ class PowNode(BinaryNode):
 
     def diff(self, var):
         return self*(self.rhs*self.lhs.diff(var)/self.lhs+LnNode(self.lhs)*self.rhs.diff(var))
+
+    def deg(self, var):
+        #x^0 heeft graad 0
+        if self.rhs.deg(var)==-float('inf'):
+            return 0
+        #x^2 heeft graad 2
+        elif self.rhs.deg(var)==0:
+            return self.lhs.deg(var)*self.rhs.value
+        #x^x heeft graad oneindig
+        else:
+            return float('inf')
 
 class ModNode(BinaryNode):
     """Represents the modulo opertor"""

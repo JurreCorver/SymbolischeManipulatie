@@ -58,7 +58,13 @@ Simplifier.py dingen die niet goed worden versimpeld
 - 2/(2*x)
 -  -1 * sin(x) * cos(x) + -1 * sin(x) * cos(x)
 waarschijnlijk versimpeld hij x**-1 * y**-1 niet naar 1/(x*y) (nog niet getest)
+- simplify(frost('x**9*(x**2+1)')) werkt de haakjes niet uit #heeft J-W nodig voor deg
 
+--
+Differentiëren werkt niet meer:
+print(simplify(frost('d(sin(x)*ln(x),x)')).evaluate()) geeft als output 'd'.
+
+--
 
 #Fixed bugs:
 simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'
