@@ -348,3 +348,5 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
 #DONE: Add an expand method taking e.g. (x+2)*(x-3) to x**2-x-6
 #DONE: Support division
 #DONE: Support for 
+
+#TODO: support trigoniometric properties

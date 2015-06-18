@@ -1,5 +1,6 @@
 from expression_template import *
 from functions import *
+from eqSolver import *
 
 
 
@@ -13,7 +14,16 @@ d = a+b**c-x
 #print(d)
 #print(c)
 
-print(Expression.fromString('5+2*3' )   )
+#print(Expression.fromString('5+2*3' )   )
 
-print(LogNode(a).evaluate())
+#print(LogNode(a).evaluate())
 
+#(simplify(frost('b*x + a*x**2+ b*x**2')))
+
+#frost('a**x +b')
+
+#print(frost('x+y'))
+
+solvePolynomial("x+y")
+
+#get commlist
