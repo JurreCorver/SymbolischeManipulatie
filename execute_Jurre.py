@@ -24,6 +24,9 @@ d = a+b**c-x
 
 #print(frost('x+y'))
 
-solvePolynomial("x+y")
+#solvePolynomial("x+y = 0")
 
 #get commlist
+
+print(frost('x**2+2').deg())
+#print('test')

@@ -219,7 +219,7 @@ class Constant(Expression):
         return Constant(0)
 
 
-    def deg(self, var):
+    def deg(self, var = 'x'):
         #the degree of the zero polynomial is -infinity
         if self.value == 0:
             return -float("inf")
@@ -254,7 +254,7 @@ class Variable(Expression):
             return Constant(1)
         else: return Constant(0)
 
-    def deg(self, var):
+    def deg(self, var = 'x'):
        #the degree of the polynomial x is 1 w.r.t. x
        if self.symbol == var:
            return 1
@@ -331,7 +331,7 @@ class AddNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var)+self.rhs.diff(var)
 
-    def deg(self, var):
+    def deg(self, var= 'x'):
         return max(self.lhs.deg(var),self.rhs.deg(var))
        
 class SubNode(BinaryNode):
@@ -348,7 +348,7 @@ class SubNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var) - self.rhs.diff(var)
 
-    def deg(self, var):
+    def deg(self, var= 'x'):
         return max(self.lhs.deg(var),self.rhs.deg(var))
         
 class MulNode(BinaryNode):
@@ -365,7 +365,7 @@ class MulNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var)*self.rhs + self.lhs*self.rhs.diff(var)
 
-    def deg(self, var):
+    def deg(self, var= 'x'):
         return self.lhs.deg(var)+self.rhs.deg(var)
         
 class DivNode(BinaryNode):
@@ -382,7 +382,7 @@ class DivNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var)/self.rhs - (self.lhs * self.rhs.diff(var))/(self.rhs*self.rhs)
 
-    def deg(self, var):
+    def deg(self, var= 'x'):
         return self.lhs.deg(var)-self.rhs.deg(var)
         
 class PowNode(BinaryNode):
@@ -399,7 +399,7 @@ class PowNode(BinaryNode):
     def diff(self, var):
         return self*(self.rhs*self.lhs.diff(var)/self.lhs+LnNode(self.lhs)*self.rhs.diff(var))
 
-    def deg(self, var):
+    def deg(self, var = 'x'):
         #x^0 heeft graad 0
         if self.rhs.deg(var)==-float('inf'):
             return 0
