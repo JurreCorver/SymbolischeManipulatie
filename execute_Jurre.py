@@ -28,5 +28,8 @@ d = a+b**c-x
 
 #get commlist
 
-print(frost('x**2+2').deg())
+#print(frost('x**2+2').deg())
 #print('test')
+
+solvePolynomial('5*a +b = 2')
+print(frost('a*x +b = 3'))
