@@ -34,7 +34,7 @@ def texToImage(string):
 tex = r'\sum_{n=1}^\infty \frac1{n^2} = \frac{\pi^2}6'
 
 t1 = time.time()#time the function. It ran about 700-800ms on my desktop PC
-texToImage(tex*4)
+texToImage(tex*2)
 print(time.time()-t1,'s')
 
 

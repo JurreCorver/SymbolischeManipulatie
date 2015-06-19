@@ -421,6 +421,27 @@ class ModNode(BinaryNode):
     def __init__(self,lhs,rhs):
         super(ModNode, self).__init__(lhs,rhs)
 
+class EqNode(BinaryNode): #egg node
+    """Represents the equality operator"""
+    leftass=True
+    rightass=True
+    precedence=15
+    op_symbol = '='
+
+    binNodeList.append("EqNode")
+    def __init__(self,lhs,rhs):
+        super(EqNode,self).__init__(lhs,rhs)
+
+    def evaluate(self,dic={}):
+        return EqNode(self.lhs.evaluate(dic),self.rhs.evaluate(dic))
+
+    def __float__(self):
+        return float(self.lhs)-float(self.rhs)
+
+    def __int__(self):
+        return int(self.lhs)-int(self.rhs)
+    
+        
 from functions import *
 from simplifier import *
 from numintegrate import *
