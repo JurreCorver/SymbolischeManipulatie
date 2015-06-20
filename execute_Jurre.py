@@ -4,11 +4,14 @@ from eqSolver import *
 
 
 
+zero = Constant(0)
 a = Constant(2)
 b = Constant(3)
 c = Constant(4)
 x = Variable('x')
+y = Variable('y')
 d = a+b**c-x
+solution = frost('a / b +c * d')
 
 
 #print(d)
@@ -33,6 +36,8 @@ d = a+b**c-x
 
 
 
-print(solvePolynomial('x - 2'))
+print(solvePolynomial('3 + x-2', x))
+
+#print(simplify(zero - solution))
 
 #print(frost('2 == 2'))
