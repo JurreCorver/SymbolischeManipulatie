@@ -5,7 +5,7 @@ from scipy import special
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),%")
+    splitchars = list("+-*/(),%=")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -42,9 +42,11 @@ def isint(string):
         return True
     except ValueError:
         return False
+    
 #create empty lists of binary nodes and functions. They will be filled later
-binNodeList=[]
-funcList=[]
+binNodeList=[] #list of binary nodes
+funcList=[] #list of functions
+methodList =[] #list of methods
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -107,6 +109,10 @@ class Expression():
         #list of functions
         funcdic = {eval(func).name:eval(func) for func in funcList}
         funcnamelist = [eval(func).name for func in funcList]
+
+        #list of methods
+        metnamelist = [met[0] for met in methodList]
+        metdic = {met[0]:(met[1],met[2]) for met in methodList}
         
         for token in tokens:
             if isnumber(token):
@@ -116,7 +122,7 @@ class Expression():
                 else:
                     output.append(Constant(float(token)))
                 
-            elif token in funcnamelist:
+            elif token in funcnamelist+metnamelist:
                 stack.append(token)
 
             elif token == ',':
@@ -151,7 +157,7 @@ class Expression():
                     output.append(stack.pop())
                 # pop the left paranthesis from the stack (but not to the output)
                 stack.pop()
-                if len(stack)>0 and stack[-1] in funcnamelist:
+                if len(stack)>0 and stack[-1] in funcnamelist+metnamelist:
                     output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
             else:
@@ -164,6 +170,11 @@ class Expression():
         
         # convert RPN to an actual expression tree
         for t in output:
+            if t in metnamelist:
+                args = []
+                while len(args)<metdic[t][1]:
+                    args.append(stack.pop())
+                stack.append(metdic[t][0](*args[::-1]))
             if t in funcnamelist:
                 args = []
                 while len(args)<funcdic[t].numargs:
@@ -173,13 +184,23 @@ class Expression():
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
                 x = stack.pop()
-                stack.append(eval('x %s y' % t))
+                if t == '=': #exception for = since eval would interpret it wrong
+                    stack.append(EqNode(x,y))
+                else:
+                    stack.append(eval('x %s y' % t))
             else:
                 # a constant, push it to the stack
                 stack.append(t)
         # the resulting expression tree is what's left on the stack
         return stack[0]
 
+
+def diff(exp,var): #add diff to the list of understood methods by fromstring so that frost('d(x,y)') works
+    return exp.diff(var)
+methodList.append(['d',diff,2])
+
+methodList.append(['exit',exit,0])
+    
 #macro for Expression.fromString(string)
 def frost(string):
     return Expression.fromString(string)
@@ -429,14 +450,14 @@ class EqNode(BinaryNode): #egg node
     """Represents the equality operator"""
     leftass=True
     rightass=True
-    precedence=15
-    op_symbol = '=='
+    precedence=15#never add brackets
+    op_symbol = '='
 
     binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):
         super(EqNode,self).__init__(lhs,rhs)
 
-    def evaluate(self,dic={}):
+    def evaluate(self,dic={}): #while EqNode is a binary node, some of its methods are irregular
         return EqNode(self.lhs.evaluate(dic),self.rhs.evaluate(dic))
 
     def __float__(self):
@@ -444,7 +465,6 @@ class EqNode(BinaryNode): #egg node
 
     def __int__(self):
         return int(self.lhs)-int(self.rhs)
-    
         
 from functions import *
 from simplifier import *

@@ -3,13 +3,34 @@ import subprocess
 import os
 import time
 from PIL import Image
-
-#this should work, but it gives an error (if we place it in /GUI)
-#from .gui import * 
+from expression_template import *
 
 root = tk.Tk() #initialize the window
 root.wm_title("Project symbolische manipulatie")
-root.geometry('800x300')
+root.geometry('800x600')
+
+
+inpBox = tk.Text(root,height=1) #make a text box 1 line high at the bottom of the screen
+inpBox.pack(side=tk.BOTTOM, fill=tk.X)
+
+
+def sendCommand(self): #Command used to parse content of inpBox when Return is pressed
+    outBox.config(state=tk.NORMAL) #enable the output box so it can be edited
+    inpText = inpBox.get("1.0",'end') #get the text
+    inpText = inpText[0:-1] #remove the last character
+    if ord(inpText[0])==10: #remove first character of text if its a newline character (which has code 10)
+        inpText =inpText[1::]
+    if inpText: #Insert the text
+        outBox.insert(tk.END, '>>> '+inpText+'\n')
+    inpBox.delete("1.0",tk.END)
+    outBox.insert(tk.END, str(sfrost(inpText))+'\n')
+    outBox.config(state=tk.DISABLED) #disable the output box again
+    
+inpBox.bind("<Return>",sendCommand)
+
+
+outBox = tk.Text(root,height=10000,state=tk.DISABLED)
+outBox.pack(side=tk.TOP, fill=tk.BOTH)
 
 def texToImage(string):
     outputTex = open('equation.tex','w')
@@ -31,18 +52,19 @@ def texToImage(string):
     out.save('equation_conv.png') #save the converted equation
 
 
-tex = r'\sum_{n=1}^\infty \frac1{n^2} = \frac{\pi^2}6'
+# tex = r'\sum_{n=1}^\infty \frac1{n^2} = \frac{\pi^2}6'
 
-t1 = time.time()#time the function. It ran about 700-800ms on my desktop PC
-texToImage(tex*2)
-print(time.time()-t1,'s')
+# t1 = time.time()#time the function. It ran about 700-800ms on my desktop PC
+# texToImage(tex*2)
+# print(time.time()-t1,'s')
 
 
-teximage = tk.PhotoImage(file='equation_conv.png')
-canvas = tk.Canvas(root, width = 10000,height=500)
+# teximage = tk.PhotoImage(file='equation_conv.png')
+# canvas = tk.Canvas(pane, width = 10000,height=500)
+# pane.add(canvas)
     
-canvas.create_image(0,0,image=teximage, anchor=tk.NW)
-canvas.pack(anchor=tk.NW)
+#canvas.create_image(0,0,image=teximage, anchor=tk.NW)
+#canvas.pack(anchor=tk.NW)
 
 
 root.mainloop() #starts the event loop, any code after this will NOT be evaluated unless the window is closed
