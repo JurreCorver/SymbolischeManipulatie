@@ -90,10 +90,16 @@ def removeZero(node): #remove zero-like expressions
         return node.__class__(removeZero(node.lhs),removeZero(node.rhs)) #iterate over tree
     return node
 
-def simplifyPower(node): #turn (a**b)**c to a**(b*c)
+def simplifyPower(node):
     if type(node)==PowNode:
-        if type(node.lhs)==PowNode:
+        if type(node.lhs)==PowNode: #turn (a**b)**c to a**(b*c)
             return simplifyPower(node.lhs.lhs)**(simplifyPower(node.lhs.rhs)*simplifyPower(node.rhs)).evaluate()
+        if type(node.lhs)==MulNode: #turn (a*b)**c to a**c * b**c
+            terms = getCommList(node.lhs)
+            product = Constant(1)
+            for term in terms:
+                product = product* term**node.rhs
+            return removeUnits(product)
     elif issubclass(type(node),BinaryNode):
         return node.__class__(simplifyPower(node.lhs),simplifyPower(node.rhs))
     return node
@@ -119,6 +125,8 @@ def isMultiple(exp1,exp2): #check if two expressions are multiples of each other
     if x.rhs.evaluate() == y.rhs.evaluate():
         if type(x.lhs.evaluate())==Constant and type(y.lhs.evaluate())==Constant:
             return (True,((x.lhs+y.lhs).evaluate())*x.rhs) #return True and the sum of the two
+        else:
+            return (True, Constant(2)*x)
     return (False, None) #return False
 
 def isPower(exp1,exp2): #check if the two expression are the same up to exponent
@@ -240,8 +248,18 @@ def divtomul(exp): # convert a/b to a*b**-1 to be able to process the expression
 
 def multodiv(exp):
     if type(exp)==MulNode: #convert expressions like -5 * x**-1 to -5/x
-        if type(exp.rhs)==PowNode and type(exp.rhs.rhs)==Constant and float(exp.rhs.rhs)<0:
-            return exp.lhs/(multodiv(exp.rhs.lhs)**Constant(-num(exp.rhs.rhs)))
+        terms = getCommList(exp)
+        posProd = Constant(1)
+        negProd = Constant(1)
+        for term in terms:
+            if type(term)==PowNode and type(term.rhs)==Constant and float(term.rhs)<0:
+                negProd*=term.lhs**Constant(-num(term.rhs))
+            else:
+                posProd*=term
+        return removeUnits(posProd/negProd)
+                
+        # if type(exp.rhs)==PowNode and type(exp.rhs.rhs)==Constant and float(exp.rhs.rhs)<0:
+        #     return exp.lhs/(multodiv(exp.rhs.lhs)**Constant(-num(exp.rhs.rhs)))
         
     if type(exp)==PowNode: #convert x**-n to 1/x**n
         if type(exp.rhs)==Constant and float(exp.rhs)<0:
@@ -263,13 +281,17 @@ def simplifyStep(exp,expandEachStep=True):
     exp = removeUnits(exp) #remove unit operations
     exp = removeZero(exp) #remove zero elements
     exp = simplifyByComm(exp) #try to use commutativity to simplify
+    exp = removeUnits(exp) #remove unit operations
+    exp = removeZero(exp) #remove zero elements
     exp = factorTerms(exp) #factor terms in a sum, e.g. x+x to 2*x
-    if expandEachStep:
-        exp = expand(exp)
     exp = simplifyPower(exp) #(a**b)**c to a**(b*c)
     exp = simplifyByComm(exp) #try to use commutativity again
     exp = addtosub(exp) #first remove the intentionally added minusses
     exp = multodiv(exp) #turn expressions of form b**-1 back to 1/b
+    exp = removeZero(exp) #remove zeros added by the simplifier
+    exp = removeUnits(exp) #remove unit operators added by the simplifier
+    if expandEachStep:
+        exp = expand(exp)
     exp = removeZero(exp) #remove zeros added by the simplifier
     exp = removeUnits(exp) #remove unit operators added by the simplifier
     
@@ -298,7 +320,7 @@ def getCommList(exp): #return result of findSameChildren as a list
     findSameChildren(exp)
     return commList
 
-def simplify(exp,expandEachStep=True,n=100):#iterate simplifyStep until there is no change or maximum is exceeded
+def simplify(exp,expandEachStep=True,n=20):#iterate simplifyStep until there is no change or maximum is exceeded
     for i in range(n):
         newExp = simplifyStep(exp,expandEachStep)
         if exp == newExp:
@@ -308,7 +330,7 @@ def simplify(exp,expandEachStep=True,n=100):#iterate simplifyStep until there is
 
 def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
     if type(exp) == MulNode:
-        if type(exp.lhs) == AddNode and type(exp.rhs)!=AddNode: #(a+b)*c = ac+bc)
+        if type(exp.lhs) == AddNode and type(exp.rhs)!=AddNode: #(a+b)*c = ac+bc
             rhs = expand(exp.rhs)
             terms = getCommList(exp.lhs)
             newExp = Constant(0)
@@ -347,6 +369,6 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
 #DONE: factorize x**a * x**b into x**(a+b)
 #DONE: Add an expand method taking e.g. (x+2)*(x-3) to x**2-x-6
 #DONE: Support division
-#DONE: Support for 
 
 #TODO: support trigoniometric properties
+

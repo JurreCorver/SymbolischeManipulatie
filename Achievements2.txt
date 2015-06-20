@@ -17,16 +17,24 @@ variabelen aangeleverd met een dictionary.
  - exact integreren polynomen #J-W
 4. Grafieken genereren
 5. Grafische userinterface #Rik
+ - Basis ligt er
+Todo: 
+ - LaTeX support
+ - variabele declaratie (e.g. x:= 15)
+ - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
+ - scrollbars in output
+ - informatieve errors
 6. LaTeX  #Rik
+ - Kan strings naar latex converteren
+ - Todo: netjes expressies omzetten naar LaTeX code
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
 9. Polynoomdeling en modulo op polynomen #J-W
 10. pi, e, phi ondersteunen
 11. Vectoren en lineaire algebra
 12. Ondersteuning goniometrische identiteiten voor simplifier.py #Jurre
 13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme) #J-W
-14. Informatieve errors bij foute input van de gebruiker
-15. Complexe getallen
-16. Taylor
+14. Complexe getallen
+15. Taylor
 
 
 #DONE EXTRA
@@ -56,13 +64,21 @@ Expression.fromString('1+(0-1)*2') werkt wel.
 Haakjes weg werken gaat soms mis
 '1+(2-3)+4' en '1+(2+1*3)+4' worden niet verder versimpeld
 
+----
 Simplifier.py dingen die niet goed worden versimpeld
+- 
+----
+
+
+----------------------------------
+#Fixed bugs:
+----------------------------------
+
+simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'
+- simplify(frost('x**9*(x**2+1)')) werkt de haakjes niet uit #heeft J-W nodig voor deg  
 - 2/(2*x)
 -  -1 * sin(x) * cos(x) + -1 * sin(x) * cos(x)
 waarschijnlijk versimpeld hij x**-1 * y**-1 niet naar 1/(x*y) (nog niet getest)
-- simplify(frost('x**9*(x**2+1)')) werkt de haakjes niet uit #heeft J-W nodig voor deg  
-#opheldering gevraagd, wat wil je precies bereiken? dit is al goed versimpeld, kan enkel ge expand worden.
-
 
 --
 Differentiëren werkt niet meer:
@@ -70,5 +86,3 @@ print(simplify(frost('d(sin(x)*ln(x),x)')).evaluate()) geeft als output 'd'.
 
 --
 
-#Fixed bugs:
-simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'

@@ -5,4 +5,6 @@ from simplifier import *
 from numintegrate import *
 
 
-print(sfrost('x**3','x'))
+print(sfrost('d(x**2,x)'))
+
+exit()

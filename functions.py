@@ -154,3 +154,4 @@ class PolyGammaNode(FuncNode):
 
     def diff(self,var):
         return PolyGammaNode(self.args[0]+Constant(1),self.args[1])*self.args[1].diff(var)
+
