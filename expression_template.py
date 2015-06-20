@@ -81,6 +81,10 @@ class Expression():
 
     def __mod__(self, other):
         return ModNode(self, other)
+        
+    def __eq__(self, other):
+        return EqNode(self, other)
+    
 
     
     # basic Shunting-yard algorithm
@@ -426,7 +430,7 @@ class EqNode(BinaryNode): #egg node
     leftass=True
     rightass=True
     precedence=15
-    op_symbol = '='
+    op_symbol = '=='
 
     binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):

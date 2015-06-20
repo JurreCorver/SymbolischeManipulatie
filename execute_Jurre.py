@@ -31,5 +31,8 @@ d = a+b**c-x
 #print(frost('x**2+2').deg())
 #print('test')
 
-solvePolynomial('5*a +b = 2')
-print(frost('a*x +b = 3'))
+
+
+print(solvePolynomial('x - 2'))
+
+#print(frost('2 == 2'))
