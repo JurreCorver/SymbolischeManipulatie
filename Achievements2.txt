@@ -45,7 +45,9 @@ variabelen aangeleverd met een dictionary.
 
 #Bugs:
 
---
+---------------------------
+EqNode werkt niet goed. print(frost('a*x+b == 0')) werkt niet zoals het hoort en geeft alleen maar False of True nu
+---------------------------
 negatieve getallen in de fromString functie, e.g.
 Expression.fromString('1+(-1)*2') geeft een error,
 Expression.fromString('1+(0-1)*2') werkt wel.
