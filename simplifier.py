@@ -352,7 +352,7 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
             for term in terms:
                 newExp += term*lhs
             return newExp
-        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNOde: #(a+b)*(c+d) = ac+ad+bc+bd
+        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNode: #(a+b)*(c+d) = ac+ad+bc+bd
             lterms = getCommList(exp.lhs)
             rterms = getCommList(exp.rhs)
             newExp = Constant(0)

@@ -4,5 +4,5 @@ from functions import *
 from simplifier import *
 from numintegrate import *
 
-print(sfrost('y**(z-x)'))
+print(sfrost('d(sin(x**2),x)').tex())
 exit()

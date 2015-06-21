@@ -88,7 +88,8 @@ class Expression():
     def __eq__(self, other):
         return EqNode(self, other)
     
-
+    def tex(self): #standard conversion to TeX code is simply taking a string
+        return str(self)
     
     # basic Shunting-yard algorithm
     # Translates a string into an expression-tree
@@ -153,7 +154,7 @@ class Expression():
                         # push the new operator onto the stack
                     stack.append(token)
             elif token == '(':
-                if str(output[-1]) in funcnamelist+metnamelist: #check if last item on the output is a function/method, if it is pop it from the output to the stack
+                if len(output)>0 and str(output[-1]) in funcnamelist+metnamelist: #check if last item on the output is a function/method, if it is pop it from the output to the stack
                     stack.append(str(output.pop()))
                 # left parantheses go to the stack
                 stack.append(token)
@@ -319,6 +320,9 @@ class NegNode(Expression):
     def __str__(self):
         return '-%s' % str(self.arg)
 
+    def tex(self):
+        return '-%s' % self.arg.tex()
+
     def __float__(self):
         return -float(self.arg)
 
@@ -368,6 +372,27 @@ class BinaryNode(Expression):
             rstring = '(%s)' % rstring
             
         return "%s %s %s" % (lstring, self.op_symbol, rstring)
+
+    def tex(self):
+        lstring = self.lhs.tex()
+        if self.lhs.precedence<self.precedence: #add brackets if the lhs has higher precedence
+            lstring = r'\left('+lstring+r'\right)'
+        elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
+            lstring = r'\left('+lstring+r'\right)'
+            
+        rstring = self.rhs.tex()
+        if self.rhs.precedence<self.precedence: #add brackets if the rhs has higher precedence
+            rstring = r'\left('+rstring+r'\right)'
+        elif not self.rightass and self.rhs.precedence==self.precedence: #consider associativity
+            rstring = r'\left('+rstring+r'\right)'
+
+        lstring = '{%s}' % lstring
+        rstring = '{%s}' % rstring
+
+        if type(self)==MulNode and not type(self.lhs)==type(self.rhs)==Constant:
+            return lstring + r'\,'+ rstring
+        return "%s%s%s" % (lstring, self.tex_symbol, rstring)
+        
     
     #allow for evaluation
     def __float__(self): #let eval figure out what the op_symbol does on floats
@@ -395,6 +420,7 @@ class AddNode(BinaryNode):
     rightass = False
     precedence = 2
     op_symbol='+'
+    tex_symbol='+'
     
     binNodeList.append("AddNode")
     def __init__(self, lhs, rhs):
@@ -405,6 +431,8 @@ class AddNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return max(self.lhs.deg(var),self.rhs.deg(var))
+
+    
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
@@ -412,6 +440,7 @@ class SubNode(BinaryNode):
     rightass = False
     precedence = 2
     op_symbol='-'
+    tex_symbol='-'
 
     binNodeList.append("SubNode")
     def __init__(self, lhs, rhs):
@@ -429,6 +458,7 @@ class MulNode(BinaryNode):
     rightass = True
     precedence = 3
     op_symbol='*'
+    tex_symbol= r'\cdot'
 
     binNodeList.append("MulNode")
     def __init__(self, lhs, rhs):
@@ -456,6 +486,9 @@ class DivNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)-self.rhs.deg(var)
+
+    def tex(self):
+        return r'\frac{'+self.lhs.tex()+ r'}{'+self.rhs.tex()+r'}'
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
@@ -463,6 +496,7 @@ class PowNode(BinaryNode):
     rightass = True
     precedence = 3
     op_symbol='**'
+    tex_symbol = '^'
 
     binNodeList.append("PowNode")
     def __init__(self, lhs, rhs):
@@ -488,6 +522,7 @@ class ModNode(BinaryNode):
     rightass = False
     precedence = 3
     op_symbol='%'
+    tex_symbol = r'\,\mathrm{mod}\,'
 
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
@@ -499,6 +534,7 @@ class EqNode(BinaryNode): #egg node
     rightass=True
     precedence=15#never add brackets
     op_symbol = '='
+    tex_symbol = '='
 
     binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):

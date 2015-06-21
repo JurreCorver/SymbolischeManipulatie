@@ -17,16 +17,12 @@ variabelen aangeleverd met een dictionary.
  - exact integreren polynomen #J-W
 4. Grafieken genereren
 5. Grafische userinterface #Rik
- - Basis ligt er
 Todo: 
- - LaTeX support
- - variabele declaratie (e.g. x:= 15)
+ - variabele declaratie (e.g. x:= 15 dan moet daarna x-2 gewoon 13 als output geven)
+ - functie declaratie (e.g. f(x):=x**2 en dan moet f(2) gewoon 4 als output geven)
  - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
  - scrollbars in output
  - informatieve errors
-6. LaTeX  #Rik
- - Kan strings naar latex converteren
- - Todo: netjes expressies omzetten naar LaTeX code
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
 9. Polynoomdeling en modulo op polynomen #J-W
 10. pi, e, phi ondersteunen
@@ -45,6 +41,7 @@ Todo:
 - Done: functies met meerdere argumenten
 - Done: Joost style
 3. Numeriek integreren
+6. LaTeX  #Rik
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
 
@@ -63,6 +60,8 @@ Haakjes weg werken gaat soms mis
 ----
 Simplifier.py dingen die niet goed worden versimpeld
 - y**(-x+z) wordt niet y**(z-x)
+- (-x)**-y wordt naar -1**-y * x**-y versimpeld
+- y-1 wordt naar -1+y versimpeld
 ----
 
 
