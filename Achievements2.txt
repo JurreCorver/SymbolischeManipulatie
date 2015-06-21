@@ -52,13 +52,9 @@ Todo:
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 #Bugs:
-'d' als variabele gebruiken geeft errors want d is de differntiatie functie
 ---------------------------
 frost('a/b=c*e') geeft niet EqNode als bovenste node
 ---------------------------
-negatieve getallen in de fromString functie, e.g.
-Expression.fromString('1+(-1)*2') geeft een error,
-Expression.fromString('1+(0-1)*2') werkt wel.
 
 --
 Haakjes weg werken gaat soms mis
@@ -66,13 +62,19 @@ Haakjes weg werken gaat soms mis
 
 ----
 Simplifier.py dingen die niet goed worden versimpeld
-- 
+- y**(-x+z) wordt niet y**(z-x)
 ----
 
 
 ----------------------------------
 #Fixed bugs:
 ----------------------------------
+
+negatieve getallen in de fromString functie, e.g.
+Expression.fromString('1+(-1)*2') geeft een error,
+Expression.fromString('1+(0-1)*2') werkt wel.
+
+'d' als variabele gebruiken geeft errors want d is de differntiatie functie
 
 simplify versimpeld '(0-1)*1/x' niet naar '1/x' --> je bedoelt '-1/x'
 - simplify(frost('x**9*(x**2+1)')) werkt de haakjes niet uit #heeft J-W nodig voor deg  

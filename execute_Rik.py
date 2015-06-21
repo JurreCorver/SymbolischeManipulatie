@@ -4,7 +4,5 @@ from functions import *
 from simplifier import *
 from numintegrate import *
 
-
-print(sfrost('d(x**2,x)'))
-
+print(sfrost('y**(z-x)'))
 exit()

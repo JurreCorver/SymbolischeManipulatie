@@ -57,6 +57,7 @@ class Expression():
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
      - deg(self, var): the degree of an expression (as a polynomial in var)
+     - diff(self, var): the derivative of the expression
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
 
@@ -113,7 +114,8 @@ class Expression():
         #list of methods
         metnamelist = [met[0] for met in methodList]
         metdic = {met[0]:(met[1],met[2]) for met in methodList}
-        
+
+        index = 0
         for token in tokens:
             if isnumber(token):
                 # numbers go directly to the output
@@ -121,9 +123,6 @@ class Expression():
                     output.append(Constant(int(token)))
                 else:
                     output.append(Constant(float(token)))
-                
-            elif token in funcnamelist+metnamelist:
-                stack.append(token)
 
             elif token == ',':
                 while not stack[-1] == '(':
@@ -131,24 +130,31 @@ class Expression():
                     
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
-                while True:
-                    # DONE: when there are more operators, the rules are more complicated
-                    # DONE: look up the shunting yard-algorithm
-                    if len(stack) == 0 or stack[-1] not in oplist:
-                        break
-                    tokenindex=oplist.index(token)
-                    token2=stack[-1]
-                    tokenindex2=oplist.index(token2)
-                    if (
-                        (asslist[tokenindex] and preclist[tokenindex]<=preclist[tokenindex2]) or
-                        (not asslist[tokenindex] and preclist[tokenindex]< preclist[tokenindex2])
+                if token == '-' and (index==0 or tokens[index-1] in (['(']+oplist)):
+                    stack.append('neg')
+                else:
+                    while True:
+                        # DONE: when there are more operators, the rules are more complicated
+                        # DONE: look up the shunting yard-algorithm
+                        while len(stack)>0 and stack[-1]=='neg':
+                            output.append(stack.pop())
+                        if len(stack) == 0 or stack[-1] not in oplist:
+                            break
+                        tokenindex=oplist.index(token)
+                        token2=stack[-1]
+                        tokenindex2=oplist.index(token2)
+                        if (
+                                (asslist[tokenindex] and preclist[tokenindex]<=preclist[tokenindex2]) or
+                                (not asslist[tokenindex] and preclist[tokenindex]< preclist[tokenindex2])
                         ):
-                        output.append(stack.pop())
-                    else:
-                        break
-                # push the new operator onto the stack
-                stack.append(token)
+                            output.append(stack.pop())
+                        else:
+                            break
+                        # push the new operator onto the stack
+                    stack.append(token)
             elif token == '(':
+                if str(output[-1]) in funcnamelist+metnamelist: #check if last item on the output is a function/method, if it is pop it from the output to the stack
+                    stack.append(str(output.pop()))
                 # left parantheses go to the stack
                 stack.append(token)
             elif token == ')':
@@ -157,29 +163,40 @@ class Expression():
                     output.append(stack.pop())
                 # pop the left paranthesis from the stack (but not to the output)
                 stack.pop()
-                if len(stack)>0 and stack[-1] in funcnamelist+metnamelist:
+                if len(stack)>0 and stack[-1] in funcnamelist+metnamelist: #if after popping the top of the stack is a function/method add it to the output
                     output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
             else:
                 # unknown token
                 output.append(Variable(token))
-            
+            index+=1
         # pop any tokens still on the stack to the output
         while len(stack) > 0:
             output.append(stack.pop())
         
         # convert RPN to an actual expression tree
         for t in output:
-            if t in metnamelist:
+            if t in metnamelist+funcnamelist:
+                # print(stack)
                 args = []
-                while len(args)<metdic[t][1]:
+                if t in metnamelist:
+                    numargs = metdic[t][1]
+                else:
+                    numargs = funcdic[t].numargs
+                while len(args)<numargs:
                     args.append(stack.pop())
-                stack.append(metdic[t][0](*args[::-1]))
-            if t in funcnamelist:
-                args = []
-                while len(args)<funcdic[t].numargs:
-                    args.append(stack.pop())
-                stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
+                if t in metnamelist:
+                    stack.append(metdic[t][0](*args[::-1]))
+                else:
+                    stack.append(funcdic[t](*args[::-1]))
+
+            elif t == 'neg':
+                stack.append(NegNode(stack.pop()))
+            # if t in funcnamelist:
+            #     args = []
+            #     while len(args)<funcdic[t].numargs:
+            #         args.append(stack.pop())
+            #     stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
@@ -286,6 +303,36 @@ class Variable(Expression):
        #the degree of the polynomial x is 0 w.r.t. y
        else:
            return 0
+
+class NegNode(Expression):
+    """Represents the negation function"""
+    precedence = 3
+
+    def __init__(self,arg):
+       self.arg = arg
+
+    def __eq__(self, other):
+        if type(self)== type(other):
+            return self.arg == other.arg
+        return False
+
+    def __str__(self):
+        return '-%s' % str(self.arg)
+
+    def __float__(self):
+        return -float(self.arg)
+
+    def __int__(self):
+        return -int(self.arg)
+
+    def evaluate(self,dic={}):
+        return Constant(-1)*self.arg.evaluate(dic)
+
+    def deg(self, var = 'x'):
+        return self.arg.deg(var)
+
+    def diff(self,var):
+        return Constant(-1)*self.arg.diff(var)
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
