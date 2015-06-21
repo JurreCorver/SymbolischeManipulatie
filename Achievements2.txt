@@ -52,7 +52,9 @@ Todo:
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 #Bugs:
-
+BELANGRIJK: frost('a / b + c * d') levert nu een error op !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+--> d = a + b ** c - x
+--> solution = frost('a / b + c * d')
 ---------------------------
 EqNode werkt niet goed. print(frost('a*x+b == 0')) werkt niet zoals het hoort en geeft alleen maar False of True nu
 ---------------------------
