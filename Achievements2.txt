@@ -52,11 +52,9 @@ Todo:
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 #Bugs:
-BELANGRIJK: frost('a / b + c * d') levert nu een error op !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
---> d = a + b ** c - x
---> solution = frost('a / b + c * d')
+'d' als variabele gebruiken geeft errors want d is de differntiatie functie
 ---------------------------
-EqNode werkt niet goed. print(frost('a*x+b == 0')) werkt niet zoals het hoort en geeft alleen maar False of True nu
+frost('a/b=c*e') geeft niet EqNode als bovenste node
 ---------------------------
 negatieve getallen in de fromString functie, e.g.
 Expression.fromString('1+(-1)*2') geeft een error,
