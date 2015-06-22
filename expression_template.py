@@ -5,7 +5,7 @@ from scipy import special
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),%=")
+    splitchars = list("+-*/(),%")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -47,6 +47,7 @@ def isint(string):
 binNodeList=[] #list of binary nodes
 funcList=[] #list of functions
 methodList =[] #list of methods
+userVarDict = {} #dictionary for user defined variables
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -167,6 +168,8 @@ class Expression():
                 if len(stack)>0 and stack[-1] in funcnamelist+metnamelist: #if after popping the top of the stack is a function/method add it to the output
                     output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
+            elif token in userVarDict:
+                output.append(userVarDict[token])
             else:
                 # unknown token
                 output.append(Variable(token))
@@ -217,10 +220,20 @@ def diff(exp,var): #add diff to the list of understood methods by fromstring so 
     return exp.diff(var)
 methodList.append(['d',diff,2])
 
-methodList.append(['exit',exit,0])
-    
-#macro for Expression.fromString(string)
+methodList.append(['exit',exit,0])#make it possible for the user to exit
+
 def frost(string):
+    if '==' in string: #always put an EqNode at the trunk
+        stringSplit = string.split('==')
+        return EqNode(frost(stringSplit[0]),frost(stringSplit[1]))
+    
+    if ':=' in string: #handle user vars/functions differently
+        stringSplit = string.split(':=')
+        if '(' in stringSplit[0]:
+            addUserFunc(*stringSplit)
+        else:
+            userVarDict.update({stringSplit[0]:frost(stringSplit[1])})
+        return frost(stringSplit[1])
     return Expression.fromString(string)
 
 def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
@@ -237,7 +250,7 @@ class Constant(Expression):
     """Represents a constant value"""
     def __init__(self, value):
         self.value = value
-        self.precedence = 15 #never add brackets for constants
+        self.precedence = 8 #never add brackets for constants
         
     def __eq__(self, other):
         if isinstance(other, Constant):
@@ -532,11 +545,10 @@ class EqNode(BinaryNode): #egg node
     """Represents the equality operator"""
     leftass=True
     rightass=True
-    precedence=15#never add brackets
+    precedence=0
     op_symbol = '='
     tex_symbol = '='
 
-    binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):
         super(EqNode,self).__init__(lhs,rhs)
 
