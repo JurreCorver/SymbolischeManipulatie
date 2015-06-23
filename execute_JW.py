@@ -4,12 +4,17 @@ a = Constant(2)
 b = Constant(3)
 c = Constant(4)
 x = Variable('x')
-exp=frost('5*x**7-1-5*x**8')
-exp1=simplify(exp, False)
-exp2=frost('x**2')
+exp2=sfrost('(x+1)*(x-2)')
+exp1=sfrost('(x+1)*(x-3)')
+var='x'
 
-print(exp1)
-print(exp2)
-print(coefficient(exp2,1,'x'))
-print(polMod(exp1,exp2,'x'))
-print(polDiv(exp1,exp2,'x'))
+print(exp1,',', exp2)
+
+totquot = Constant(0)
+
+deg1 = exp1.deg(var)
+deg2 = exp2.deg(var)
+quot = coefficient(exp1,deg1, var)/coefficient(exp2,deg2,var) * Variable(var)**(Constant(exp1.deg(var) - exp2.deg(var)))
+exp1 = simplify(exp1 - quot * exp2)
+totquot = totquot + quot
+print(simplify(frost('-3 - 2 * x - (-2 - x + x ** 2) + x ** 2')))

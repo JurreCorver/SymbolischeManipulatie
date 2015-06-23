@@ -87,4 +87,5 @@ print(simplify(frost('d(sin(x)*ln(x),x)')).evaluate()) geeft als output 'd'.
 
 --
 
-getCommList(frost('3*x**7-1-5*x**8')) neemt + en - niet allebei
+print(expand(sfrost('2*x**2+x**4-x**2*(x**2+1)'))) expand niet
+print(simplify(frost('-3 - 2 * x - (-2 - x + x ** 2) + x ** 2'))) simplificeert niet

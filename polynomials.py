@@ -20,25 +20,33 @@ def coefficient(exp, deg, var='x'):
         else:
             return Constant(0)
 
-def polDivMod(exp1,exp2, var='x'):
+def polQuotRem(exp1,exp2, var='x'):
     #modulo 0 nothing happens
     if exp2 == Constant(0):
         return [Constant(0),exp1]
 
-    totdiv = Constant(0)
+    totquot = Constant(0)
     while exp1.deg(var)>= exp2.deg(var):
         deg1 = exp1.deg(var)
         deg2 = exp2.deg(var)
-        div = coefficient(exp1,deg1, var)/coefficient(exp2,deg2,var) * Variable(var)**(Constant(exp1.deg(var) - exp2.deg(var)))
-        exp1 = simplify(exp1 - div * exp2)
-        totdiv = totdiv + div
-    return [simplify(totdiv), exp1]
+        quot = coefficient(exp1,deg1, var)/coefficient(exp2,deg2,var) * Variable(var)**(Constant(exp1.deg(var) - exp2.deg(var)))
+        exp1 = simplify(exp1 - quot * exp2)
+        totquot = totquot + quot
+    return [simplify(totquot), exp1]
 
-def polDiv(exp1,exp2, var='x'):
-    return polDivMod(exp1, exp2, var)[0]
+def polQuot(exp1,exp2, var='x'):
+    return polQuotRem(exp1, exp2, var)[0]
 
-def polMod(exp1, exp2, var='x'):
-    return polDivMod(exp1, exp2, var)[1]
+def polRem(exp1, exp2, var='x'):
+    return polQuotRem(exp1, exp2, var)[1]
 
-methodList.append(['polDiv',polDiv,3])
-methodList.append(['polMod',polMod,3])
+methodList.append(['polQuot',polQuot,3])
+methodList.append(['polRem',polRem,3])
+
+def polGcd(exp1, exp2, var='x'):
+    while exp1 != Constant(0):
+        if exp1.deg(var)<exp2.deg(var):
+            (exp1,exp2)=(exp2,exp1)
+        (exp1, exp2) = (exp2, polRem(exp1, exp2, var))
+    return exp2
+

@@ -8,4 +8,4 @@ def numInt(expression, var, left, right, numsteps=10000):
     l=len(points)
     for point in points:
         ans+= float(expression.evaluate({var.symbol:Constant(point)}))/l
-    return ans
+    return Constant(ans)
