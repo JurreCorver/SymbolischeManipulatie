@@ -20,6 +20,9 @@ class FuncNode(Expression):
     def __str__(self):
         return '%s(%s)' % (self.name, ", ".join(map(str,self.args)))
 
+    def tex(self):
+        return r'\mathrm{'+self.name+r'}\!\left('+", ".join([arg.tex() for arg in self.args])+r'\right)'
+
     #allow for evaluation
     def __float__(self): #let eval figure out what the function means
         argVals = [str(float(arg)) for arg in self.args]

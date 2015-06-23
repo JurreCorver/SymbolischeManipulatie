@@ -126,7 +126,7 @@ def isMultiple(exp1,exp2): #check if two expressions are multiples of each other
         if type(x.lhs.evaluate())==Constant and type(y.lhs.evaluate())==Constant:
             return (True,((x.lhs+y.lhs).evaluate())*x.rhs) #return True and the sum of the two
         else:
-            return (True, Constant(2)*x)
+            return (True, (x.lhs+y.lhs)*x.rhs)
     return (False, None) #return False
 
 def isPower(exp1,exp2): #check if the two expression are the same up to exponent
@@ -269,13 +269,20 @@ def multodiv(exp):
         return exp.__class__(multodiv(exp.lhs),multodiv(exp.rhs))
     return exp
 
+def multoneg(exp): #replaces expressions such as -1*x with -x
+    if type(exp)==MulNode:
+        if exp.lhs==Constant(-1):
+            return NegNode(multoneg(exp.rhs))
+    if issubclass(type(exp), BinaryNode):
+        return exp.__class__(multoneg(exp.lhs),multoneg(exp.rhs))
+    return exp
+
 def simplifyStep(exp,expandEachStep=True):
     exp = exp.evaluate() #try to simplify using the evaluate method. If this returns a constant, stop
     if type(exp)==Constant:
         return exp
     if issubclass(type(exp),FuncNode): #if the node is a function, simplify its arguments
         return exp.__class__(*[simplifyStep(arg) for arg in exp.args])
-    oldExp = exp #store the expression to later check if it changed
     exp = subtoadd(exp) #turn a-b into a+(-1)*b to more easily use commutativity of addition operator
     exp = divtomul(exp) #turn a/b to a*b**-1
     exp = removeUnits(exp) #remove unit operations
@@ -294,6 +301,7 @@ def simplifyStep(exp,expandEachStep=True):
         exp = expand(exp)
     exp = removeZero(exp) #remove zeros added by the simplifier
     exp = removeUnits(exp) #remove unit operators added by the simplifier
+    exp = multoneg(exp)#replace -1*a with -a
     
     if issubclass(type(exp),BinaryNode): #try to simplify its children as well
         return exp.__class__(simplifyStep(exp.lhs,expandEachStep),simplifyStep(exp.rhs,expandEachStep))
@@ -344,7 +352,7 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
             for term in terms:
                 newExp += term*lhs
             return newExp
-        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNOde: #(a+b)*(c+d) = ac+ad+bc+bd
+        if type(exp.rhs) == AddNode and type(exp.lhs)==AddNode: #(a+b)*(c+d) = ac+ad+bc+bd
             lterms = getCommList(exp.lhs)
             rterms = getCommList(exp.rhs)
             newExp = Constant(0)

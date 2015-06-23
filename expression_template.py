@@ -5,7 +5,7 @@ from scipy import special
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),%=")
+    splitchars = list("+-*/(),%")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -47,6 +47,7 @@ def isint(string):
 binNodeList=[] #list of binary nodes
 funcList=[] #list of functions
 methodList =[] #list of methods
+userVarDict = {} #dictionary for user defined variables
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -56,7 +57,8 @@ class Expression():
      - __str__(): return a string representation of the Expression.
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
-     - deg(self, var): the degree of an expression (as a polynomial in var)
+     - deg(self, var='x'): the degree of an expression (as a polynomial in var)
+     - diff(self, var): the derivative of the expression
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
 
@@ -87,7 +89,8 @@ class Expression():
     def __eq__(self, other):
         return EqNode(self, other)
     
-
+    def tex(self): #standard conversion to TeX code is simply taking a string
+        return str(self)
     
     # basic Shunting-yard algorithm
     # Translates a string into an expression-tree
@@ -113,7 +116,8 @@ class Expression():
         #list of methods
         metnamelist = [met[0] for met in methodList]
         metdic = {met[0]:(met[1],met[2]) for met in methodList}
-        
+
+        index = 0
         for token in tokens:
             if isnumber(token):
                 # numbers go directly to the output
@@ -121,9 +125,6 @@ class Expression():
                     output.append(Constant(int(token)))
                 else:
                     output.append(Constant(float(token)))
-                
-            elif token in funcnamelist+metnamelist:
-                stack.append(token)
 
             elif token == ',':
                 while not stack[-1] == '(':
@@ -131,24 +132,31 @@ class Expression():
                     
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
-                while True:
-                    # DONE: when there are more operators, the rules are more complicated
-                    # DONE: look up the shunting yard-algorithm
-                    if len(stack) == 0 or stack[-1] not in oplist:
-                        break
-                    tokenindex=oplist.index(token)
-                    token2=stack[-1]
-                    tokenindex2=oplist.index(token2)
-                    if (
-                        (asslist[tokenindex] and preclist[tokenindex]<=preclist[tokenindex2]) or
-                        (not asslist[tokenindex] and preclist[tokenindex]< preclist[tokenindex2])
+                if token == '-' and (index==0 or tokens[index-1] in (['(']+oplist)):
+                    stack.append('neg')
+                else:
+                    while True:
+                        # DONE: when there are more operators, the rules are more complicated
+                        # DONE: look up the shunting yard-algorithm
+                        while len(stack)>0 and stack[-1]=='neg':
+                            output.append(stack.pop())
+                        if len(stack) == 0 or stack[-1] not in oplist:
+                            break
+                        tokenindex=oplist.index(token)
+                        token2=stack[-1]
+                        tokenindex2=oplist.index(token2)
+                        if (
+                                (asslist[tokenindex] and preclist[tokenindex]<=preclist[tokenindex2]) or
+                                (not asslist[tokenindex] and preclist[tokenindex]< preclist[tokenindex2])
                         ):
-                        output.append(stack.pop())
-                    else:
-                        break
-                # push the new operator onto the stack
-                stack.append(token)
+                            output.append(stack.pop())
+                        else:
+                            break
+                        # push the new operator onto the stack
+                    stack.append(token)
             elif token == '(':
+                if len(output)>0 and str(output[-1]) in funcnamelist+metnamelist: #check if last item on the output is a function/method, if it is pop it from the output to the stack
+                    stack.append(str(output.pop()))
                 # left parantheses go to the stack
                 stack.append(token)
             elif token == ')':
@@ -157,29 +165,42 @@ class Expression():
                     output.append(stack.pop())
                 # pop the left paranthesis from the stack (but not to the output)
                 stack.pop()
-                if len(stack)>0 and stack[-1] in funcnamelist+metnamelist:
+                if len(stack)>0 and stack[-1] in funcnamelist+metnamelist: #if after popping the top of the stack is a function/method add it to the output
                     output.append(stack.pop())
             # TODO: do we need more kinds of tokens?
+            elif token in userVarDict:
+                output.append(userVarDict[token])
             else:
                 # unknown token
                 output.append(Variable(token))
-            
+            index+=1
         # pop any tokens still on the stack to the output
         while len(stack) > 0:
             output.append(stack.pop())
         
         # convert RPN to an actual expression tree
         for t in output:
-            if t in metnamelist:
+            if t in metnamelist+funcnamelist:
+                # print(stack)
                 args = []
-                while len(args)<metdic[t][1]:
+                if t in metnamelist:
+                    numargs = metdic[t][1]
+                else:
+                    numargs = funcdic[t].numargs
+                while len(args)<numargs:
                     args.append(stack.pop())
-                stack.append(metdic[t][0](*args[::-1]))
-            if t in funcnamelist:
-                args = []
-                while len(args)<funcdic[t].numargs:
-                    args.append(stack.pop())
-                stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
+                if t in metnamelist:
+                    stack.append(metdic[t][0](*args[::-1]))
+                else:
+                    stack.append(funcdic[t](*args[::-1]))
+
+            elif t == 'neg':
+                stack.append(NegNode(stack.pop()))
+            # if t in funcnamelist:
+            #     args = []
+            #     while len(args)<funcdic[t].numargs:
+            #         args.append(stack.pop())
+            #     stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
@@ -199,10 +220,20 @@ def diff(exp,var): #add diff to the list of understood methods by fromstring so 
     return exp.diff(var)
 methodList.append(['d',diff,2])
 
-methodList.append(['exit',exit,0])
-    
-#macro for Expression.fromString(string)
+methodList.append(['exit',exit,0])#make it possible for the user to exit
+
 def frost(string):
+    if '==' in string: #always put an EqNode at the trunk
+        stringSplit = string.split('==')
+        return EqNode(frost(stringSplit[0]),frost(stringSplit[1]))
+    
+    if ':=' in string: #handle user vars/functions differently
+        stringSplit = string.split(':=')
+        if '(' in stringSplit[0]:
+            addUserFunc(*stringSplit)
+        else:
+            userVarDict.update({stringSplit[0]:frost(stringSplit[1])})
+        return frost(stringSplit[1])
     return Expression.fromString(string)
 
 def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
@@ -219,7 +250,7 @@ class Constant(Expression):
     """Represents a constant value"""
     def __init__(self, value):
         self.value = value
-        self.precedence = 15 #never add brackets for constants
+        self.precedence = 8 #never add brackets for constants
         
     def __eq__(self, other):
         if isinstance(other, Constant):
@@ -286,6 +317,39 @@ class Variable(Expression):
        #the degree of the polynomial x is 0 w.r.t. y
        else:
            return 0
+
+class NegNode(Expression):
+    """Represents the negation function"""
+    precedence = 3
+
+    def __init__(self,arg):
+       self.arg = arg
+
+    def __eq__(self, other):
+        if type(self)== type(other):
+            return self.arg == other.arg
+        return False
+
+    def __str__(self):
+        return '-%s' % str(self.arg)
+
+    def tex(self):
+        return '-%s' % self.arg.tex()
+
+    def __float__(self):
+        return -float(self.arg)
+
+    def __int__(self):
+        return -int(self.arg)
+
+    def evaluate(self,dic={}):
+        return Constant(-1)*self.arg.evaluate(dic)
+
+    def deg(self, var = 'x'):
+        return self.arg.deg(var)
+
+    def diff(self,var):
+        return Constant(-1)*self.arg.diff(var)
         
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
@@ -321,6 +385,27 @@ class BinaryNode(Expression):
             rstring = '(%s)' % rstring
             
         return "%s %s %s" % (lstring, self.op_symbol, rstring)
+
+    def tex(self):
+        lstring = self.lhs.tex()
+        if self.lhs.precedence<self.precedence: #add brackets if the lhs has higher precedence
+            lstring = r'\left('+lstring+r'\right)'
+        elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
+            lstring = r'\left('+lstring+r'\right)'
+            
+        rstring = self.rhs.tex()
+        if self.rhs.precedence<self.precedence: #add brackets if the rhs has higher precedence
+            rstring = r'\left('+rstring+r'\right)'
+        elif not self.rightass and self.rhs.precedence==self.precedence: #consider associativity
+            rstring = r'\left('+rstring+r'\right)'
+
+        lstring = '{%s}' % lstring
+        rstring = '{%s}' % rstring
+
+        if type(self)==MulNode and not type(self.lhs)==type(self.rhs)==Constant:
+            return lstring + r'\,'+ rstring
+        return "%s%s%s" % (lstring, self.tex_symbol, rstring)
+        
     
     #allow for evaluation
     def __float__(self): #let eval figure out what the op_symbol does on floats
@@ -348,16 +433,23 @@ class AddNode(BinaryNode):
     rightass = False
     precedence = 2
     op_symbol='+'
+    tex_symbol='+'
     
     binNodeList.append("AddNode")
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs)
 
-    def diff(self, var):
+    def diff(self, var='x'):
         return self.lhs.diff(var)+self.rhs.diff(var)
 
-    def deg(self, var= 'x'):
-        return max(self.lhs.deg(var),self.rhs.deg(var))
+    def deg(self, var='x'):
+        #x**2-x**2 has degree -infinity
+        if simplify(self.lhs+self.rhs)==Constant(0):
+            return -float('inf')
+        else:
+            return max(self.lhs.deg(var),self.rhs.deg(var))
+
+    
        
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
@@ -365,6 +457,7 @@ class SubNode(BinaryNode):
     rightass = False
     precedence = 2
     op_symbol='-'
+    tex_symbol='-'
 
     binNodeList.append("SubNode")
     def __init__(self, lhs, rhs):
@@ -373,8 +466,12 @@ class SubNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var) - self.rhs.diff(var)
 
-    def deg(self, var= 'x'):
-        return max(self.lhs.deg(var),self.rhs.deg(var))
+    def deg(self, var='x'):
+        #x**2-x**2 has degree -infinity
+        if simplify(self.lhs-self.rhs)==Constant(0):
+            return -float('inf')
+        else:
+            return max(self.lhs.deg(var),self.rhs.deg(var))
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -382,6 +479,7 @@ class MulNode(BinaryNode):
     rightass = True
     precedence = 3
     op_symbol='*'
+    tex_symbol= r'\cdot'
 
     binNodeList.append("MulNode")
     def __init__(self, lhs, rhs):
@@ -409,6 +507,9 @@ class DivNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)-self.rhs.deg(var)
+
+    def tex(self):
+        return r'\frac{'+self.lhs.tex()+ r'}{'+self.rhs.tex()+r'}'
         
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
@@ -416,6 +517,7 @@ class PowNode(BinaryNode):
     rightass = True
     precedence = 3
     op_symbol='**'
+    tex_symbol = '^'
 
     binNodeList.append("PowNode")
     def __init__(self, lhs, rhs):
@@ -441,6 +543,7 @@ class ModNode(BinaryNode):
     rightass = False
     precedence = 3
     op_symbol='%'
+    tex_symbol = r'\,\mathrm{mod}\,'
 
     binNodeList.append("ModNode")
     def __init__(self,lhs,rhs):
@@ -450,10 +553,10 @@ class EqNode(BinaryNode): #egg node
     """Represents the equality operator"""
     leftass=True
     rightass=True
-    precedence=15#never add brackets
+    precedence=0
     op_symbol = '='
+    tex_symbol = '='
 
-    binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):
         super(EqNode,self).__init__(lhs,rhs)
 
@@ -469,6 +572,9 @@ class EqNode(BinaryNode): #egg node
 from functions import *
 from simplifier import *
 from numintegrate import *
+from numtheory import *
+from polynomials import *
+from eqSolver import *
 
 
 
