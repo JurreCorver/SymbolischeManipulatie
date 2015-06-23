@@ -24,7 +24,6 @@ Todo:
  - scrollbars in output
  - informatieve errors
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
-9. Polynoomdeling en modulo op polynomen #J-W
 10. pi, e, phi ondersteunen
 11. Vectoren en lineaire algebra
 12. Ondersteuning goniometrische identiteiten voor simplifier.py #Jurre
@@ -44,6 +43,7 @@ Todo:
 6. LaTeX  #Rik
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
+9. Polynoomdeling en modulo op polynomen #J-W
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------

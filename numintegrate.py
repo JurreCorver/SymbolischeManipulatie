@@ -7,5 +7,5 @@ def numInt(expression, var, left, right, numsteps=10000):
     points = np.arange(left, right, stepsize)
     l=len(points)
     for point in points:
-        ans+= float(expression.evaluate({var.symbol:point}))/l
+        ans+= float(expression.evaluate({var.symbol:Constant(point)}))/l
     return ans
