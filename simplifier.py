@@ -126,7 +126,7 @@ def isMultiple(exp1,exp2): #check if two expressions are multiples of each other
         if type(x.lhs.evaluate())==Constant and type(y.lhs.evaluate())==Constant:
             return (True,((x.lhs+y.lhs).evaluate())*x.rhs) #return True and the sum of the two
         else:
-            return (True, Constant(2)*x)
+            return (True, (x.lhs+y.lhs)*x.rhs)
     return (False, None) #return False
 
 def isPower(exp1,exp2): #check if the two expression are the same up to exponent

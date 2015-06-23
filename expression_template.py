@@ -573,6 +573,8 @@ from functions import *
 from simplifier import *
 from numintegrate import *
 from numtheory import *
+from polynomials import *
+from eqSolver import *
 
 
 
