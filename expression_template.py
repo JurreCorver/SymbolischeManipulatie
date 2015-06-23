@@ -439,11 +439,15 @@ class AddNode(BinaryNode):
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs)
 
-    def diff(self, var):
+    def diff(self, var='x'):
         return self.lhs.diff(var)+self.rhs.diff(var)
 
-    def deg(self, var= 'x'):
-        return max(self.lhs.deg(var),self.rhs.deg(var))
+    def deg(self, var):
+        #x**2-x**2 has degree -infinity
+        if simplify(self.lhs+self.rhs)==Constant(0):
+            return -float('inf')
+        else:
+            return max(self.lhs.deg(var),self.rhs.deg(var))
 
     
        
@@ -462,8 +466,12 @@ class SubNode(BinaryNode):
     def diff(self, var):
         return self.lhs.diff(var) - self.rhs.diff(var)
 
-    def deg(self, var= 'x'):
-        return max(self.lhs.deg(var),self.rhs.deg(var))
+    def deg(self, var='x'):
+        #x**2-x**2 has degree -infinity
+        if simplify(self.lhs-self.rhs)==Constant(0):
+            return -float('inf')
+        else:
+            return max(self.lhs.deg(var),self.rhs.deg(var))
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
