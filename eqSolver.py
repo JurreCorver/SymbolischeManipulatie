@@ -76,7 +76,12 @@ def findcoefficient(exp, var, power):
             side = 'r'
             location = location.rhs
     
-    print(location)            
+    print(location)     
+    if type(location) == Constant:
+        return(location)
+        print('test')
+    
+    
     if side == 'm':
         
         return(Constant(1))
@@ -110,6 +115,18 @@ def findcoefficient(exp, var, power):
         else:
             return(Constant(100000000))         
             
+            
+'''def findConstant(exp, var):
+    var = str(var)
+    prevlocation = exp
+    location = exp
+    side = 'm'
+    
+    if type(exp) == Constant:
+        return(exp)
+    
+    elif (type(exp) == AddNode or type(exp) == SubNode) '''  
+    
 
 def solvePolynomial(eq, var):
     exp = simplify(frost(str(eq)))
@@ -128,8 +145,10 @@ def solvePolynomial(eq, var):
         print('found degree 2 polynomial')
         a = findcoefficient(exp, var, 2)
         b = findcoefficient(exp, var, 1)
-        #c = exp.lhs
-        c = Constant(0)
+        print('finding constant')
+        print(simplify(exp))
+        c = findcoefficient(exp, var, 0)
+        #c = Constant(0)
         print(c)
         sol1 = simplify(((b ** Constant(2) - Constant(4) * a * c) ** Constant(0.5) - b)/ (Constant(2) * a))
         sol2 = simplify((Constant(0) - (b ** Constant(2) - Constant(4) * a * c) ** Constant(0.5) - b)/ (Constant(2) * a))
