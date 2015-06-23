@@ -57,7 +57,7 @@ class Expression():
      - __str__(): return a string representation of the Expression.
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
-     - deg(self, var): the degree of an expression (as a polynomial in var)
+     - deg(self, var='x'): the degree of an expression (as a polynomial in var)
      - diff(self, var): the derivative of the expression
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
@@ -442,7 +442,7 @@ class AddNode(BinaryNode):
     def diff(self, var='x'):
         return self.lhs.diff(var)+self.rhs.diff(var)
 
-    def deg(self, var):
+    def deg(self, var='x'):
         #x**2-x**2 has degree -infinity
         if simplify(self.lhs+self.rhs)==Constant(0):
             return -float('inf')
@@ -572,6 +572,7 @@ class EqNode(BinaryNode): #egg node
 from functions import *
 from simplifier import *
 from numintegrate import *
+from numtheory import *
 
 
 
