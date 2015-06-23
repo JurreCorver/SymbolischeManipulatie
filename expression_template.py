@@ -301,7 +301,7 @@ class Variable(Expression):
 
     def evaluate(self,dic={}):
         if self.symbol in dic:
-            return Constant(dic[self.symbol])
+            return dic[self.symbol]
         else:
             return self
 
