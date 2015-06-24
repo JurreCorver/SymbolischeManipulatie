@@ -606,6 +606,11 @@ class EqNode(BinaryNode): #egg node
     def __int__(self):
         return int(self.lhs)-int(self.rhs)
         
+    def deg(self, var = 'x'):
+        return max(self.lhs.deg(var), self.rhs.deg(var))
+    def mindeg(self, var = 'x'):
+        return min(self.lhs.mindeg(var), self.rhs.mindeg(var))    
+        
 from functions import *
 from simplifier import *
 from numintegrate import *
