@@ -69,20 +69,14 @@ def texToImage(string):
     root.images.append(tk.PhotoImage(file='equation_conv.png'))
     outBox.image_create('end',image=root.images[-1])
 
-# tex = r'\sum_{n=1}^\infty \frac1{n^2} = \frac{\pi^2}6'
-
-# t1 = time.time()#time the function. It ran about 700-800ms on my desktop PC
-# texToImage(tex*2)
-# print(time.time()-t1,'s')
-
-
-# teximage = tk.PhotoImage(file='equation_conv.png')
-# canvas = tk.Canvas(pane, width = 10000,height=500)
-# pane.add(canvas)
-    
-#canvas.create_image(0,0,image=teximage, anchor=tk.NW)
-#canvas.pack(anchor=tk.NW)
-
+    #this process generates a lot of files, which we are going to remove now
+    os.remove('equation.aux')
+    os.remove('equation.dvi')
+    os.remove('equation.log')
+    os.remove('equation.png')
+    os.remove('equation.ps')
+    os.remove('equation.tex')
+    os.remove('equation_conv.png')
 
 root.mainloop() #starts the event loop, any code after this will NOT be evaluated unless the window is closed
 exit() #make sure the process ends after closing the window

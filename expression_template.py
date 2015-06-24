@@ -226,16 +226,16 @@ methodList.append(['exit',exit,0])#make it possible for the user to exit
 def frost(string):
     if '==' in string: #always put an EqNode at the trunk
         stringSplit = string.split('==')
-        return EqNode(frost(stringSplit[0]),frost(stringSplit[1]))
+        return EqNode(frost(stringSplit[0]),frost(stringSplit[1])) #parse left and right side seperately
     
     if ':=' in string: #handle user vars/functions differently
         stringSplit = string.split(':=')
-        if '(' in stringSplit[0]:
-            addUserFunc(*stringSplit)
+        if '(' in stringSplit[0]: #if the expression on the left of := contains a left bracket, it must be a function
+            userNodes.stringToNode(*stringSplit) #add a user defined FuncNode
         else:
-            userVarDict.update({stringSplit[0]:frost(stringSplit[1])})
-        return frost(stringSplit[1])
-    return Expression.fromString(string)
+            userVarDict.update({stringSplit[0]:frost(stringSplit[1])}) #it's not a function so add the variable to a global dictionary
+        return frost(stringSplit[1]) #return the string on the right hand side for display
+    return Expression.fromString(string) #if there was no '==' or ':=' just parse the string normally
 
 def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
     if d!='':
@@ -617,6 +617,7 @@ from numintegrate import *
 from numtheory import *
 from polynomials import *
 from polynomialSolver import *
+import userNodes #need to do a regular import to be able to refer to the global variables of userNodes.py
 
 
 
