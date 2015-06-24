@@ -282,6 +282,9 @@ class Constant(Expression):
         #the degree of a constant non-zero polynomial is 0
         else:
             return 0
+            
+    def mindeg(self, var = 'x'):
+        return 0
         
 class Variable(Expression):
     """Represents a variable"""
@@ -317,6 +320,14 @@ class Variable(Expression):
        #the degree of the polynomial x is 0 w.r.t. y
        else:
            return 0
+    def mindeg(self, var = 'x'):
+        #the degree of the polynomial x is 1 w.r.t. x
+        if self.symbol == var:
+            return 1
+        #the degree of the polynomial x is 0 w.r.t. y
+        else:
+            return 0
+           
 
 class NegNode(Expression):
     """Represents the negation function"""
@@ -347,6 +358,9 @@ class NegNode(Expression):
 
     def deg(self, var = 'x'):
         return self.arg.deg(var)
+    
+    def mindeg(self, var = 'x'):
+        return self.arg.mindeg(var)
 
     def diff(self,var):
         return Constant(-1)*self.arg.diff(var)
@@ -448,6 +462,9 @@ class AddNode(BinaryNode):
             return -float('inf')
         else:
             return max(self.lhs.deg(var),self.rhs.deg(var))
+    
+    def mindeg(self, var='x'):
+        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))        
 
     
        
@@ -472,6 +489,9 @@ class SubNode(BinaryNode):
             return -float('inf')
         else:
             return max(self.lhs.deg(var),self.rhs.deg(var))
+    
+    def mindeg(self, var='x'):
+        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))        
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -490,6 +510,9 @@ class MulNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)+self.rhs.deg(var)
+    
+    def mindeg(self, var= 'x'):
+        return self.lhs.mindeg(var)+self.rhs.mindeg(var)    
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
@@ -507,6 +530,9 @@ class DivNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)-self.rhs.deg(var)
+    
+    def mindeg(self, var = 'x'):
+        return self.lhs.mindeg(var)-self.rhs.mindeg(var)
 
     def tex(self):
         return r'\frac{'+self.lhs.tex()+ r'}{'+self.rhs.tex()+r'}'
@@ -533,6 +559,16 @@ class PowNode(BinaryNode):
         #x^2 heeft graad 2
         elif self.rhs.deg(var)==0:
             return self.lhs.deg(var)*self.rhs.value
+        #x^x heeft graad oneindig
+        else:
+            return float('inf')
+    
+    def mindeg(self, var = 'x'):
+        if self.rhs.mindeg(var)==-float('inf'):
+            return 0
+        #x^2 heeft graad 2
+        elif self.rhs.mindeg(var)==0:
+            return self.lhs.mindeg(var)*self.rhs.value
         #x^x heeft graad oneindig
         else:
             return float('inf')
