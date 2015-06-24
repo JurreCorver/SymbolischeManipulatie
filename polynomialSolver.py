@@ -6,15 +6,23 @@ def solvePolynomial(eq, var):
     #Check of input eq is really an equation. If it is move the right hand side to the left. If it is not try to interpret the result and give error.
     if type(eq) == EqNode:
         exp = simplify(eq.lhs - eq.rhs)
+
     else:
         print("Input is not an equation. Try something in the form of 'a == b'.")
         print("Interpreting input as " + str(eq) + " == " + str(0) + ".")
         exp = eq
     
-    #Define the variable, the degree of the equation and find the list of coefficients. 
-    #For a polynomial a x^3 + b x^2 + c, a = coef[3] 
+    #Define the variable and check the degree of the equation and find the list of coefficients.
+    #If the expression has negative powers of x, multiply to remove this negative factor
     var = str(var)
+    mindeg = exp.mindeg(var)
+    if mindeg <= -1:
+        exp = simplify(exp * frost(var) ** Constant(-mindeg))
+    
     deg = exp.deg(var)
+    
+    #Find the list of coefficients.
+    #For a polynomial a x^3 + b x^2 + c, a = coef[3]
     coef = [0 for i in range(0, deg+1)]
     for i in range(0, deg+1):
         coef[i] = coefficient(exp, i, var)
