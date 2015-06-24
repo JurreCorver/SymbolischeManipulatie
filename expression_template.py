@@ -58,6 +58,7 @@ class Expression():
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
      - deg(self, var='x'): the degree of an expression (as a polynomial in var)
+     - mindeg(self, var = 'x'): the lowest power of variable in self
      - diff(self, var): the derivative of the expression
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
