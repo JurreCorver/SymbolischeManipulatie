@@ -36,7 +36,7 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
         try:
             outExpr = sfrost(inpText)
         except Exception as err:
-            outBox.insert(tk.END,err.__class__.__name__+str(err)+'\n')
+            outBox.insert(tk.END,err.__class__.__name__+': '+str(err)+'\n')
         else:
             if useTex.get()==1:
                 texToImage(outExpr.tex())
