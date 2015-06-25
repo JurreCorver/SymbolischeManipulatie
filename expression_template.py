@@ -355,7 +355,10 @@ class NegNode(Expression):
         return -int(self.arg)
 
     def evaluate(self,dic={}):
-        return Constant(-1)*self.arg.evaluate(dic)
+        arg =self.arg.evaluate(dic)
+        if type(arg)==Constant:
+            return Constant(-num(arg))
+        return Constant(-1)*arg
 
     def deg(self, var = 'x'):
         return self.arg.deg(var)
@@ -434,7 +437,7 @@ class BinaryNode(Expression):
         r = self.rhs.evaluate(dic)
 
         if type(l)==Constant and type(r)==Constant:
-            val =  eval('%s %s %s' % (float(l),self.op_symbol,float(r)))
+            val =  eval('(%s) %s (%s)' % (float(l),self.op_symbol,float(r)))
             if float(int(val)) == val:
                 return Constant(int(val))
             else:
@@ -614,7 +617,6 @@ class EqNode(BinaryNode): #egg node
 from functions import *
 from simplifier import *
 from numintegrate import *
-from numtheory import *
 from polynomials import *
 from polynomialSolver import *
 import userNodes #need to do a regular import to be able to refer to the global variables of userNodes.py

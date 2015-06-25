@@ -3,10 +3,9 @@ from expression_template import *
     #find the coefficient of a polynomial before x**deg
 def coefficient(exp, deg, var='x'):
     #simplify exp to the form a_n x^n + \ldots + a_0
-    exp=subtoadd(simplify(exp))
     #gebruik subtoadd om aftrekken te veranderen in optellen (van een negatief getal) en trek coefficienten bij dezelfde macht samen
-    #e.g. 2 x**7 + a x**7 = (2+a) x**7
-    #exp=subtoadd(simplify(exp,False))
+    exp=subtoadd(simplify(exp))
+
     #split the expressions in its terms and search for the term with the degree of the expression
     if isinstance(exp,AddNode):
         terms=getCommList(exp)
@@ -15,6 +14,7 @@ def coefficient(exp, deg, var='x'):
             if term.deg(var)==deg:
                 ans += term/(Variable(var)**Constant(deg))
         return simplify(ans)
+    #if there is only one term
     else:
         if exp.deg(var)==deg:
             return simplify(exp/(Variable(var)**Constant(deg)))
