@@ -57,6 +57,13 @@ binNodeList=[] #list of binary nodes
 funcList=[] #list of functions
 methodList =[] #list of methods
 userVarDict = {} #dictionary for user defined variables
+
+class InputError(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return self.message
+    
     
 class Expression():
     """A mathematical expression, represented as an expression tree"""
@@ -177,7 +184,6 @@ class Expression():
                 stack.pop()
                 if len(stack)>0 and stack[-1] in funcnamelist+metnamelist: #if after popping the top of the stack is a function/method add it to the output
                     output.append(stack.pop())
-            # TODO: do we need more kinds of tokens?
             elif token in userVarDict:
                 output.append(userVarDict[token])
             else:
@@ -198,6 +204,8 @@ class Expression():
                 else:
                     numargs = funcdic[t].numargs
                 while len(args)<numargs:
+                    if len(stack)==0:
+                        raise InputError('%s arguments excpected of function %s' % (numargs, t))
                     args.append(stack.pop())
                 if t in metnamelist:
                     stack.append(metdic[t][0](*args[::-1]))
@@ -270,11 +278,13 @@ class Constant(Expression):
         
     def __str__(self):
         val = num(self.value)
-        if complex(val).real == complex(val):
+        if complex(val).imag == 0:
             return str(val)
         else:
-            return str(val.real)+str(val.imag)+'i'
-        return str(self.value)
+            if complex(val).real!=0:
+                return str(num(val.real))+' + '+str(num(val.imag))+'i'
+            else:
+                return str(num(val.imag))+'i'
         
     # allow conversion to numerical values
     def __int__(self):

@@ -33,11 +33,16 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
     if len(inpText)>0: #Insert the text
         outBox.insert(tk.END, '>>> '+inpText+'\n')
         inpBox.delete("1.0",tk.END)
-        if useTex.get()==1:
-            texToImage(sfrost(inpText).tex())
-            outBox.insert(tk.END,'\n')
+        try:
+            outExpr = sfrost(inpText)
+        except Exception as err:
+            outBox.insert(tk.END,err.__class__.__name__+str(err)+'\n')
         else:
-            outBox.insert(tk.END, str(sfrost(inpText))+'\n')
+            if useTex.get()==1:
+                texToImage(outExpr.tex())
+                outBox.insert(tk.END,'\n')
+            else:
+                outBox.insert(tk.END, str(outExpr)+'\n')
     outBox.config(state=tk.DISABLED) #disable the output box again
     
 inpBox.bind("<Return>",sendCommand)

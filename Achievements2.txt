@@ -13,22 +13,28 @@ variabelen aangeleverd met een dictionary.
 #TODO Mandatory (DONE)
 ---------------------------------------------------------------------------------------------------------------------------------------
 #TODO EXTRA
-3. - Eerst doen: expressies in variabelen ombouwen tot functies
- - exact integreren polynomen #J-W
-4. Grafieken genereren
+
+Algemeen:
+ - expression_template.py verder opsplitsen
+ - informatieve errors (!)
+
 5. Grafische userinterface #Rik
-Todo:
  - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
  - scrollbars in output
- - informatieve errors (!)
+ - optie om niet altijd te simplify'en
+ - LaTeX output muten en errors detecteren
+ - pressing up arrow cycles through previous input
+ - force single line input
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
-10. pi, e, phi ondersteunen
-11. Vectoren en lineaire algebra
-12. Ondersteuning goniometrische identiteiten voor simplifier.py #Jurre
 13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi) #J-W
-14. Complexe getallen
-15. Taylor
 
+
+#MAYBE EXTRA
+3. exact integreren polynomen
+4. Grafieken genereren
+11. Vectoren en lineaire algebra
+12. Ondersteuning goniometrische identiteiten voor simplifier.py
+15. Taylor
 
 
 #DONE EXTRA
@@ -46,7 +52,9 @@ Todo:
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
 9. Polynoomdeling en modulo op polynomen #J-W
+10. pi, e, phi ondersteunen
 13. GGD met Euclidisch algoritme
+14. Complexe getallen
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
