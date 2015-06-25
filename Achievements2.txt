@@ -22,7 +22,7 @@ Todo:
  - functie declaratie (e.g. f(x):=x**2 en dan moet f(2) gewoon 4 als output geven)
  - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
  - scrollbars in output
- - informatieve errors
+ - informatieve errors (!)
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
 10. pi, e, phi ondersteunen
 11. Vectoren en lineaire algebra
@@ -30,6 +30,7 @@ Todo:
 13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme) #J-W
 14. Complexe getallen
 15. Taylor
+
 
 
 #DONE EXTRA
@@ -51,7 +52,6 @@ Todo:
 #Bugs:
 
 --
-In 'x + 7 -2 +5 +R' wordt R niet als coefficient gevonden door coefficient()
 --
 --
 Haakjes weg werken gaat soms mis
@@ -93,3 +93,5 @@ print(expand(sfrost('2*x**2+x**4-x**2*(x**2+1)'))) expand niet
 print(simplify(frost('-3 - 2 * x - (-2 - x + x ** 2) + x ** 2'))) simplificeert niet
 ----------------------------
 - y**(-x+z) wordt niet y**(z-x)
+-------------------------
+In 'x + 7 -2 +5 +R' wordt R niet als coefficient gevonden door coefficient()

@@ -134,6 +134,15 @@ class ExpNode(FuncNode):
     def diff(self, var):
         return self*self.args[0].diff(var)
 
+class FloorNode(FuncNode):
+    """Represents the floor function"""
+    funcList.append("FloorNode")
+    name = 'floor'
+    func = 'math.floor'
+
+    def __init__(self, arg):
+        super(FloorNode, self).__init__(arg)
+
 class GammaNode(FuncNode): #feature request from Aldo
     """Represents the gamma function"""
     name = 'gamma'

@@ -294,6 +294,8 @@ def simplifyStep(exp,expandEachStep=True):
     exp = simplifyPower(exp) #(a**b)**c to a**(b*c)
     exp = simplifyByComm(exp) #try to use commutativity again
     if expandEachStep:
+        exp = removeZero(exp) #remove zeros added by the simplifier
+        exp = removeUnits(exp) #remove unit operators added by the simplifier
         exp = expand(exp)
         exp = removeZero(exp) #remove zeros added by the simplifier
         exp = removeUnits(exp) #remove unit operators added by the simplifier
@@ -350,7 +352,7 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
             terms = getCommList(exp.rhs)
             newExp = Constant(0)
             for term in terms:
-                newExp += term*lhs
+                newExp += lhs*term
             return newExp
         if type(exp.rhs) == AddNode and type(exp.lhs)==AddNode: #(a+b)*(c+d) = ac+ad+bc+bd
             lterms = getCommList(exp.lhs)
