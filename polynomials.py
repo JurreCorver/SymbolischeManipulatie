@@ -22,6 +22,8 @@ def coefficient(exp, deg, var='x'):
             return Constant(0)
 
 def polQuotRem(exp1,exp2, var='x'):
+    '''calculate the remainder and the quotient of exp1/exp2 over the reals'''
+
     #modulo 0 nothing happens
     if exp2 == Constant(0):
         return [Constant(0),exp1]
@@ -36,6 +38,7 @@ def polQuotRem(exp1,exp2, var='x'):
     return [simplify(totquot), exp1]
 
 def polQuotRemInt(exp1, exp2, var='x'):
+    '''calculate the remainder and the quotient of exp1/exp2 over the integers'''
     #modulo 0 nothing happens
     if exp2 == Constant(0):
         return [Constant(0),exp1]
@@ -66,11 +69,25 @@ methodList.append(['polRem',polRem,3])
 methodList.append(['polQuotInt',polQuot,3])
 methodList.append(['polRemInt',polRem,3])
 
+def gcd(exp1, exp2):
+    '''calculate the gcd of two integers'''
+    if int(exp1)<0:
+        exp1=NegNode(exp1)
+    if int(exp2)<0:
+        exp2=NegNode(exp2)
+    while exp1 !=0:
+        if int(exp1)<int(exp2):
+            (exp1,exp2) = (exp2, exp1)
+        (exp1, exp2) = (exp2, polRemInt(exp2, exp1))
+    return exp2
+
 def polGcd(exp1, exp2, var='x'):
+    '''calculate the gcd of two possibly constant polynomials'''
     while exp1 != Constant(0):
         if exp1.deg(var)<exp2.deg(var):
             (exp1,exp2)=(exp2,exp1)
-        (exp1, exp2) = (exp2, polRemInt(exp1, exp2, var))
+        (exp1, exp2) = (exp2, polRem(exp1, exp2, var))
+
     #the leading coefficient of the polGcd should be positive
     leadingcoef2=coefficient(exp2, exp2.deg(var),var)
     if isinstance(leadingcoef2,Constant):
