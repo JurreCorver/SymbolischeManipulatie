@@ -17,10 +17,9 @@ def solvePolynomial(eq, var):
     var = str(var)
     mindeg = exp.mindeg(var)
     if mindeg <= -1:
-        exp = simplify(exp * frost(var) ** Constant(-mindeg))
+        exp = simplify(exp * frost(var) ** Constant(-mindeg) )
     
     deg = exp.deg(var)
-    
     #Find the list of coefficients.
     #For a polynomial a x^3 + b x^2 + c, a = coef[3]
     coef = [0 for i in range(0, deg+1)]
@@ -44,8 +43,8 @@ def solvePolynomial(eq, var):
         sol = [0 for i in range(0, deg)]
         answer = [0 for i in range(0, deg)]
         #solutions using the quadratic formula
-        sol[0] = (Constant(0) - coef[1] + (coef[1] ** Constant(2) - Constant(4) * coef[2] * coef[0] ) ** Constant(0.5) ) / ( Constant(2) * coef[2] )
-        sol[1] = (Constant(0) - coef[1] - (coef[1] ** Constant(2) - Constant(4) * coef[2] * coef[0] ) ** Constant(0.5) ) / ( Constant(2) * coef[2] )
+        sol[0] = (Constant(0) - coef[1] + ((coef[1]) ** Constant(2) - Constant(4) * coef[2] * coef[0] ) ** Constant(0.5) ) / ( Constant(2) * coef[2] )
+        sol[1] = (Constant(0) - coef[1] - ((coef[1]) ** Constant(2) - Constant(4) * coef[2] * coef[0] ) ** Constant(0.5) ) / ( Constant(2) * coef[2] )
         
         for i in range(0, deg):
             sol[i] = simplify(sol[i])
