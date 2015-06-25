@@ -17,9 +17,7 @@ variabelen aangeleverd met een dictionary.
  - exact integreren polynomen #J-W
 4. Grafieken genereren
 5. Grafische userinterface #Rik
-Todo: 
- - variabele declaratie (e.g. x:= 15 dan moet daarna x-2 gewoon 13 als output geven)
- - functie declaratie (e.g. f(x):=x**2 en dan moet f(2) gewoon 4 als output geven)
+Todo:
  - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
  - scrollbars in output
  - informatieve errors (!)
@@ -27,7 +25,7 @@ Todo:
 10. pi, e, phi ondersteunen
 11. Vectoren en lineaire algebra
 12. Ondersteuning goniometrische identiteiten voor simplifier.py #Jurre
-13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi, GGD met Euclidisch algoritme) #J-W
+13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi) #J-W
 14. Complexe getallen
 15. Taylor
 
@@ -41,11 +39,14 @@ Todo:
 - Done: functies met meerdere argumenten
 - Done: Joost style
 3. Numeriek integreren
+5.
+ - variabele declaratie (e.g. x:= 15 dan moet daarna x-2 gewoon 13 als output geven)
+ - functie declaratie (e.g. f(x):=x**2 en dan moet f(2) gewoon 4 als output geven)
 6. LaTeX  #Rik
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
 9. Polynoomdeling en modulo op polynomen #J-W
-
+13. GGD met Euclidisch algoritme
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 

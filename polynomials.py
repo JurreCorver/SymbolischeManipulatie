@@ -72,6 +72,9 @@ def polGcd(exp1, exp2, var='x'):
             (exp1,exp2)=(exp2,exp1)
         (exp1, exp2) = (exp2, polRemInt(exp1, exp2, var))
     #the leading coefficient of the polGcd should be positive
-#    if coefficient(exp2, exp2.deg(var),var)
+    leadingcoef2=coefficient(exp2, exp2.deg(var),var)
+    if isinstance(leadingcoef2,Constant):
+        if float(leadingcoef2) < 0:
+            return simplify(Constant(-1)*exp2)
     return exp2
 
