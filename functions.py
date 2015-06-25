@@ -40,7 +40,7 @@ class FuncNode(Expression):
                 onlyConstants = False
                 break
         if onlyConstants:
-            argVals = [str(float(arg)) for arg in newArgs]
+            argVals = [str(num(arg)) for arg in newArgs]
             return Constant(eval(self.func+'('+','.join(argVals)+')')) #polygamma was behaving weird, so I decided to do it this way
         return self.__class__(*newArgs)
 
@@ -48,7 +48,7 @@ class SinNode(FuncNode):
     """Represents the sine function"""
     funcList.append("SinNode")
     name = 'sin'
-    func = 'math.sin'
+    func = 'cmath.sin'
 
     def __init__(self, arg):
         super(SinNode, self).__init__(arg)
@@ -60,7 +60,7 @@ class ArcSinNode(FuncNode):
     """Represents the sine function"""
     funcList.append("ArcSinNode")
     name = 'arcsin'
-    func = 'math.asin'
+    func = 'cmath.asin'
     def __init__(self, arg):
         super(ArcSinNode, self).__init__(arg)
 
@@ -71,7 +71,7 @@ class CosNode(FuncNode):
     """Represents the cosine function"""
     funcList.append("CosNode")
     name = 'cos'
-    func = 'math.cos'
+    func = 'cmath.cos'
     def __init__(self, arg):
         super(CosNode, self).__init__(arg)
 
@@ -82,7 +82,7 @@ class ArcCosNode(FuncNode):
     """Represents the arccosine function"""
     funcList.append("ArcSinNode")
     name ='arccos'
-    func = 'math.acos'
+    func = 'cmath.acos'
     def __init__(self, arg):
         super(ArcCosNode, self).__init__(arg)
 
@@ -93,7 +93,7 @@ class TanNode(FuncNode):
     """Represents the tan function"""
     funcList.append("TanNode")
     name= 'tan'
-    func = 'math.tan'
+    func = 'cmath.tan'
     def __init__(self, arg):
         super(TanNode, self).__init__(arg)
 
@@ -104,7 +104,7 @@ class LogNode(FuncNode):
     """Represents the logarithm"""
     funcList.append("LogNode")
     name = 'log'
-    func = 'math.log'
+    func = 'cmath.log'
     numargs = 2
     def __init__(self, arg1, arg2):
         super(LogNode, self).__init__(arg1, arg2)
@@ -116,7 +116,7 @@ class LnNode(FuncNode):
     """Represents the natural logarithm"""
     funcList.append("LnNode")
     name = 'ln'
-    func = 'math.log'
+    func = 'cmath.log'
     def __init__(self, arg):
         super(LnNode, self).__init__(arg)
 
@@ -126,7 +126,7 @@ class LnNode(FuncNode):
 class ExpNode(FuncNode):
     """Represents the exponent function"""
     name = 'exp'
-    func = 'math.exp'
+    func = 'cmath.exp'
     funcList.append("ExpNode")
     def __init__(self, arg):
         super(ExpNode, self).__init__(arg)

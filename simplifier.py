@@ -28,11 +28,6 @@ DivNode.unit = Constant(1)
 DivNode.hasRUnit = True
 DivNode.hasLUnit = False
 
-def num(x): #short command to make numbers looks nicer than just float()
-    if float(int(x))==float(x):
-        return int(x)
-    else: return float(x)
-
 def subtoadd(node): #convert a-b to a+(-b) to process it as if it were addition
     if not type(node)==SubNode: #Check if the supplied node really is a SubNode
         if issubclass(type(node),BinaryNode):
@@ -50,16 +45,16 @@ def addtosub(node): #replace a+(-b)*c with a-b*c
         if type(node.rhs)==MulNode:
             rhs = node.rhs.rhs.evaluate()
             lhs = node.rhs.lhs.evaluate()
-            if type(rhs)==Constant and float(rhs) < 0:
+            if type(rhs)==Constant and complex(rhs).real < 0:
                 return SubNode(addtosub(node.lhs),Constant(-num(rhs))*addtosub(node.rhs.lhs))
-            if type(lhs)==Constant and float(lhs)<0:
+            if type(lhs)==Constant and complex(lhs).real <0:
                 return SubNode(addtosub(node.lhs),Constant(-num(lhs))*addtosub(node.rhs.rhs))
         elif type(node.lhs)==MulNode:
             rhs = node.lhs.rhs.evaluate()
             lhs = node.lhs.lhs.evaluate()
-            if type(rhs)==Constant and float(rhs) < 0:
+            if type(rhs)==Constant and complex(rhs).real < 0:
                 return SubNode(addtosub(node.rhs),Constant(-num(rhs))*addtosub(node.lhs.lhs))
-            elif type(lhs)==Constant and float(lhs) < 0:
+            elif type(lhs)==Constant and complex(lhs).real < 0:
                 return SubNode(addtosub(node.rhs),Constant(-num(lhs))*addtosub(node.lhs.rhs))
         return AddNode(addtosub(node.lhs),addtosub(node.rhs))
 
@@ -234,7 +229,7 @@ def variableKey(exp): #sort key used to sort varibales and powers of variables
         return exp.symbol
     if type(exp)==PowNode:
         if type(exp.lhs)==Variable:
-            if type(exp.rhs)==Constant and float(exp.rhs)<0: #sort negative powers to the right of positive ones
+            if type(exp.rhs)==Constant and complex(exp.rhs).real <0: #sort negative powers to the right of positive ones
                 return "~" + exp.lhs.symbol # '~' is the last normal character in the ASCII table
             return exp.lhs.symbol
     return "" #return empty string to sort compound expressions to the right
@@ -252,7 +247,7 @@ def multodiv(exp):
         posProd = Constant(1)
         negProd = Constant(1)
         for term in terms:
-            if type(term)==PowNode and type(term.rhs)==Constant and float(term.rhs)<0:
+            if type(term)==PowNode and type(term.rhs)==Constant and complex(term.rhs).real<0:
                 negProd*=term.lhs**Constant(-num(term.rhs))
             else:
                 posProd*=term
@@ -262,7 +257,7 @@ def multodiv(exp):
         #     return exp.lhs/(multodiv(exp.rhs.lhs)**Constant(-num(exp.rhs.rhs)))
         
     if type(exp)==PowNode: #convert x**-n to 1/x**n
-        if type(exp.rhs)==Constant and float(exp.rhs)<0:
+        if type(exp.rhs)==Constant and complex(exp.rhs).real <0:
             return Constant(1)/(multodiv(exp.lhs)**Constant(-num(exp.rhs)))
         
     if issubclass(type(exp),BinaryNode):#iterate over tree

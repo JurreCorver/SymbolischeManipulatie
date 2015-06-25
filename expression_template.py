@@ -1,4 +1,5 @@
 import math
+import cmath
 from scipy import special
 
 # split a string into mathematical tokens
@@ -42,6 +43,14 @@ def isint(string):
         return True
     except ValueError:
         return False
+
+def num(x): #short command to make numbers looks nicer than just float()
+    if type(x)==complex and complex(x.imag)!=0:
+        return x
+    x = float(complex(x).real)
+    if float(int(x))==float(x):
+        return int(x)
+    else: return float(x)
     
 #create empty lists of binary nodes and functions. They will be filled later
 binNodeList=[] #list of binary nodes
@@ -260,6 +269,11 @@ class Constant(Expression):
             return False
         
     def __str__(self):
+        val = num(self.value)
+        if complex(val).real == complex(val):
+            return str(val)
+        else:
+            return str(val.real)+str(val.imag)+'i'
         return str(self.value)
         
     # allow conversion to numerical values
@@ -268,6 +282,9 @@ class Constant(Expression):
         
     def __float__(self):
         return float(self.value)
+
+    def __complex__(self):
+        return complex(self.value)
 
     def evaluate(self,dic={}):
         return self
@@ -286,6 +303,12 @@ class Constant(Expression):
             
     def mindeg(self, var = 'x'):
         return 0
+
+#make it easy to type in common mathematical constants
+userVarDict.update({'i':Constant(1j)}) 
+userVarDict.update({'pi':Constant(math.pi)})
+userVarDict.update({'e':Constant(math.e)})
+userVarDict.update({'phi':Constant(0.5*(1+5**0.5))})
         
 class Variable(Expression):
     """Represents a variable"""
@@ -353,6 +376,9 @@ class NegNode(Expression):
 
     def __int__(self):
         return -int(self.arg)
+
+    def __complex__(self):
+        return -complex(self.arg)
 
     def evaluate(self,dic={}):
         arg =self.arg.evaluate(dic)
@@ -431,17 +457,17 @@ class BinaryNode(Expression):
 
     def __int__(self): #let eval figure out what the op_symbol does on ints
         return eval('int(self.lhs) %s int(self.rhs)' % self.op_symbol)
+
+    def __complex__(self): #let eval figure out what the op_symbol does on complex numbers
+        return eval('complex(self.lhs) %s complex(self.rhs)' % self.op_symbol)
     
     def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
         l = self.lhs.evaluate(dic)
         r = self.rhs.evaluate(dic)
 
         if type(l)==Constant and type(r)==Constant:
-            val =  eval('(%s) %s (%s)' % (float(l),self.op_symbol,float(r)))
-            if float(int(val)) == val:
-                return Constant(int(val))
-            else:
-                return Constant(val)
+            val =  eval('(%s) %s (%s)' % (complex(l),self.op_symbol,complex(r)))
+            return(Constant(num(val)))
         else:
             return self.__class__(l,r)
         
@@ -608,6 +634,9 @@ class EqNode(BinaryNode): #egg node
 
     def __int__(self):
         return int(self.lhs)-int(self.rhs)
+
+    def __complex__(self):
+        return complex(self.lhs)-complex(self.rhs)
         
     def deg(self, var = 'x'):
         return max(self.lhs.deg(var), self.rhs.deg(var))

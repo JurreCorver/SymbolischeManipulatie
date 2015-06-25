@@ -1,2 +1,5 @@
 __pycache__
 execute_*
+*.py~
+*.py#
+.#*
