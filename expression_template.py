@@ -58,6 +58,7 @@ class Expression():
      - __eq__(other): tree-equality, check if other represents the same expression tree.
      - evaluate(dict={}): evaluate expression with a dictionary
      - deg(self, var='x'): the degree of an expression (as a polynomial in var)
+     - mindeg(self, var = 'x'): the lowest power of variable in self
      - diff(self, var): the derivative of the expression
     """
     # TODO: when adding new methods that should be supported by all subclasses, add them to this list
@@ -225,16 +226,16 @@ methodList.append(['exit',exit,0])#make it possible for the user to exit
 def frost(string):
     if '==' in string: #always put an EqNode at the trunk
         stringSplit = string.split('==')
-        return EqNode(frost(stringSplit[0]),frost(stringSplit[1]))
+        return EqNode(frost(stringSplit[0]),frost(stringSplit[1])) #parse left and right side seperately
     
     if ':=' in string: #handle user vars/functions differently
         stringSplit = string.split(':=')
-        if '(' in stringSplit[0]:
-            addUserFunc(*stringSplit)
+        if '(' in stringSplit[0]: #if the expression on the left of := contains a left bracket, it must be a function
+            userNodes.stringToNode(*stringSplit) #add a user defined FuncNode
         else:
-            userVarDict.update({stringSplit[0]:frost(stringSplit[1])})
-        return frost(stringSplit[1])
-    return Expression.fromString(string)
+            userVarDict.update({stringSplit[0]:frost(stringSplit[1])}) #it's not a function so add the variable to a global dictionary
+        return frost(stringSplit[1]) #return the string on the right hand side for display
+    return Expression.fromString(string) #if there was no '==' or ':=' just parse the string normally
 
 def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
     if d!='':
@@ -282,6 +283,9 @@ class Constant(Expression):
         #the degree of a constant non-zero polynomial is 0
         else:
             return 0
+            
+    def mindeg(self, var = 'x'):
+        return 0
         
 class Variable(Expression):
     """Represents a variable"""
@@ -317,6 +321,14 @@ class Variable(Expression):
        #the degree of the polynomial x is 0 w.r.t. y
        else:
            return 0
+    def mindeg(self, var = 'x'):
+        #the degree of the polynomial x is 1 w.r.t. x
+        if self.symbol == var:
+            return 1
+        #the degree of the polynomial x is 0 w.r.t. y
+        else:
+            return 0
+           
 
 class NegNode(Expression):
     """Represents the negation function"""
@@ -347,6 +359,9 @@ class NegNode(Expression):
 
     def deg(self, var = 'x'):
         return self.arg.deg(var)
+    
+    def mindeg(self, var = 'x'):
+        return self.arg.mindeg(var)
 
     def diff(self,var):
         return Constant(-1)*self.arg.diff(var)
@@ -448,6 +463,9 @@ class AddNode(BinaryNode):
             return -float('inf')
         else:
             return max(self.lhs.deg(var),self.rhs.deg(var))
+    
+    def mindeg(self, var='x'):
+        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))        
 
     
        
@@ -472,6 +490,9 @@ class SubNode(BinaryNode):
             return -float('inf')
         else:
             return max(self.lhs.deg(var),self.rhs.deg(var))
+    
+    def mindeg(self, var='x'):
+        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))        
         
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
@@ -490,6 +511,9 @@ class MulNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)+self.rhs.deg(var)
+    
+    def mindeg(self, var= 'x'):
+        return self.lhs.mindeg(var)+self.rhs.mindeg(var)    
         
 class DivNode(BinaryNode):
     """Represents the division operator"""
@@ -507,6 +531,9 @@ class DivNode(BinaryNode):
 
     def deg(self, var= 'x'):
         return self.lhs.deg(var)-self.rhs.deg(var)
+    
+    def mindeg(self, var = 'x'):
+        return self.lhs.mindeg(var)-self.rhs.mindeg(var)
 
     def tex(self):
         return r'\frac{'+self.lhs.tex()+ r'}{'+self.rhs.tex()+r'}'
@@ -533,6 +560,16 @@ class PowNode(BinaryNode):
         #x^2 heeft graad 2
         elif self.rhs.deg(var)==0:
             return self.lhs.deg(var)*self.rhs.value
+        #x^x heeft graad oneindig
+        else:
+            return float('inf')
+    
+    def mindeg(self, var = 'x'):
+        if self.rhs.mindeg(var)==-float('inf'):
+            return 0
+        #x^2 heeft graad 2
+        elif self.rhs.mindeg(var)==0:
+            return self.lhs.mindeg(var)*self.rhs.value
         #x^x heeft graad oneindig
         else:
             return float('inf')
@@ -569,12 +606,18 @@ class EqNode(BinaryNode): #egg node
     def __int__(self):
         return int(self.lhs)-int(self.rhs)
         
+    def deg(self, var = 'x'):
+        return max(self.lhs.deg(var), self.rhs.deg(var))
+    def mindeg(self, var = 'x'):
+        return min(self.lhs.mindeg(var), self.rhs.mindeg(var))    
+        
 from functions import *
 from simplifier import *
 from numintegrate import *
 from numtheory import *
 from polynomials import *
-from eqSolver import *
+from polynomialSolver import *
+import userNodes #need to do a regular import to be able to refer to the global variables of userNodes.py
 
 
 
