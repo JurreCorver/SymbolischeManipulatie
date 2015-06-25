@@ -63,7 +63,7 @@ Simplifier.py dingen die niet goed worden versimpeld #niet erg belangrijk
 - (-x)**-y wordt naar -1**-y * x**-y versimpeld
 - y-1 wordt naar -1+y versimpeld
 ----
-
+Simplifier werkt niet op ListNode
 
 ----------------------------------
 #Fixed bugs:
