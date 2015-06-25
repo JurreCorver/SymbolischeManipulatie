@@ -293,12 +293,12 @@ def simplifyStep(exp,expandEachStep=True):
     exp = factorTerms(exp) #factor terms in a sum, e.g. x+x to 2*x
     exp = simplifyPower(exp) #(a**b)**c to a**(b*c)
     exp = simplifyByComm(exp) #try to use commutativity again
-    exp = addtosub(exp) #first remove the intentionally added minusses
-    exp = multodiv(exp) #turn expressions of form b**-1 back to 1/b
-    exp = removeZero(exp) #remove zeros added by the simplifier
-    exp = removeUnits(exp) #remove unit operators added by the simplifier
     if expandEachStep:
         exp = expand(exp)
+        exp = removeZero(exp) #remove zeros added by the simplifier
+        exp = removeUnits(exp) #remove unit operators added by the simplifier
+    exp = addtosub(exp) #first remove the intentionally added minusses
+    exp = multodiv(exp) #turn expressions of form b**-1 back to 1/b
     exp = removeZero(exp) #remove zeros added by the simplifier
     exp = removeUnits(exp) #remove unit operators added by the simplifier
     exp = multoneg(exp)#replace -1*a with -a
@@ -379,4 +379,3 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
 #DONE: Support division
 
 #TODO: support trigoniometric properties
-

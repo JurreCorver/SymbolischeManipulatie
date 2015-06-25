@@ -58,8 +58,7 @@ Haakjes weg werken gaat soms mis
 '1+(2-3)+4' en '1+(2+1*3)+4' worden niet verder versimpeld
 
 ----
-Simplifier.py dingen die niet goed worden versimpeld
-- y**(-x+z) wordt niet y**(z-x)
+Simplifier.py dingen die niet goed worden versimpeld #niet erg belangrijk
 - (-x)**-y wordt naar -1**-y * x**-y versimpeld
 - y-1 wordt naar -1+y versimpeld
 ----
@@ -92,3 +91,5 @@ frost('a/b=c*e') geeft niet EqNode als bovenste node
 ---------------------------
 print(expand(sfrost('2*x**2+x**4-x**2*(x**2+1)'))) expand niet
 print(simplify(frost('-3 - 2 * x - (-2 - x + x ** 2) + x ** 2'))) simplificeert niet
+----------------------------
+- y**(-x+z) wordt niet y**(z-x)
