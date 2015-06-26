@@ -70,28 +70,52 @@ methodList.append(['polQuotInt',polQuot,3])
 methodList.append(['polRemInt',polRem,3])
 
 def gcd(exp1, exp2):
-    '''calculate the gcd of two integers'''
+    '''calculate the gcd of at least two integers'''
+
+    #we can assume both integers are positive
     if int(exp1)<0:
-        exp1=NegNode(exp1)
+        exp1=NegNode(exp1).evaluate()
     if int(exp2)<0:
-        exp2=NegNode(exp2)
-    while exp1 !=0:
-        if int(exp1)<int(exp2):
-            (exp1,exp2) = (exp2, exp1)
-        (exp1, exp2) = (exp2, polRemInt(exp2, exp1))
-    return exp2
+        exp2=NegNode(exp2).evaluate()
+
+    #during our calculations we always want exp1 > exp2
+    if int(exp1)<int(exp2):
+        (exp1,exp2) = (exp2, exp1)
+
+    #subtract exp2 as much as possible from exp1
+    #then it follows that the new value of exp1 is smaller than exp2, hence interchange them
+    #by continuing until exp2 = 0 we find the gcd
+    while int(exp2) !=0:
+        newexp1 = (exp1-FloorNode(exp1/exp2)*exp2).evaluate()
+        (exp1, exp2) = (exp2, newexp1)
+    return exp1
+
+def polContent(exp1,var):
+    '''makes a polynomial primitive'''
+    exp1=simplify(exp1)
+    content = Constant(0)
+    for i in range(0,exp1.deg(var)+1):
+        coef=coefficient(exp1,i,var)
+        content = gcd(content, coef)
+    return content
 
 def polGcd(exp1, exp2, var='x'):
     '''calculate the gcd of two possibly constant polynomials'''
+
+    #first calculate the gcd of the contents of the polynomials
+    gcdcontents=gcd(polContent(exp1, var),polContent(exp2, var))
+
+    #calcultate the gcd of the polynomials self (over the reals)
     while exp1 != Constant(0):
         if exp1.deg(var)<exp2.deg(var):
             (exp1,exp2)=(exp2,exp1)
         (exp1, exp2) = (exp2, polRem(exp1, exp2, var))
+    exp2 = exp2 / polContent(exp2, var)
 
     #the leading coefficient of the polGcd should be positive
     leadingcoef2=coefficient(exp2, exp2.deg(var),var)
     if isinstance(leadingcoef2,Constant):
         if float(leadingcoef2) < 0:
             return simplify(Constant(-1)*exp2)
-    return exp2
+    return simplify(exp2 / polContent(exp2, var))
 
