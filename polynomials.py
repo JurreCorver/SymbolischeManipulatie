@@ -72,6 +72,12 @@ methodList.append(['polRemInt',polRem,3])
 def gcd(exp1, exp2):
     '''calculate the gcd of at least two integers'''
 
+    #check whether both exp1 and exp2 are integers
+    if int(exp1) != float(exp1):
+        raise ValueError('%s is not an integer' % str(exp1))
+    if int(exp2) != float(exp2):
+        raise ValueError('%s is not an integer' % str(exp2))
+
     #we can assume both integers are positive
     if int(exp1)<0:
         exp1=NegNode(exp1).evaluate()
@@ -92,7 +98,13 @@ def gcd(exp1, exp2):
 
 def polContent(exp1,var):
     '''makes a polynomial primitive'''
+
     exp1=simplify(exp1)
+    #content of the zero polynomial is 0
+    if exp1==Constant(0):
+        return Constant(0)
+
+    #calculate the gcd of all the terms
     content = Constant(0)
     for i in range(0,exp1.deg(var)+1):
         coef=coefficient(exp1,i,var)
@@ -105,17 +117,15 @@ def polGcd(exp1, exp2, var='x'):
     #first calculate the gcd of the contents of the polynomials
     gcdcontents=gcd(polContent(exp1, var),polContent(exp2, var))
 
+    if exp1.deg(var)<exp2.deg(var):
+        (exp1,exp2)=(exp2,exp1)
+
     #calcultate the gcd of the polynomials self (over the reals)
     while exp1 != Constant(0):
-        if exp1.deg(var)<exp2.deg(var):
-            (exp1,exp2)=(exp2,exp1)
         (exp1, exp2) = (exp2, polRem(exp1, exp2, var))
-    exp2 = exp2 / polContent(exp2, var)
 
-    #the leading coefficient of the polGcd should be positive
+    #the leading coefficient of the polGcd should be 1
     leadingcoef2=coefficient(exp2, exp2.deg(var),var)
-    if isinstance(leadingcoef2,Constant):
-        if float(leadingcoef2) < 0:
-            return simplify(Constant(-1)*exp2)
-    return simplify(exp2 / polContent(exp2, var))
+    exp2=exp2/leadingcoef2
+    return simplify(exp2 * gcdcontents)
 
