@@ -1,5 +1,10 @@
 __pycache__
 execute_*
+.aux
+.log
+.out
+.main.synctex.gz
+.tex.bak
 *.py~
 *.py#
 .#*
