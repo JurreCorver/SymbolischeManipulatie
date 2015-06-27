@@ -1,7 +1,7 @@
 from expression_template import *
 
     #find the coefficient of a polynomial before x**deg
-def coefficient(exp, deg, var=Variable(x)):
+def coefficient(exp, deg, var):
     #simplify exp to the form a_n x^n + \ldots + a_0
     #gebruik subtoadd om aftrekken te veranderen in optellen (van een negatief getal) en trek coefficienten bij dezelfde macht samen
     exp=subtoadd(simplify(exp))
@@ -21,7 +21,7 @@ def coefficient(exp, deg, var=Variable(x)):
         else:
             return Constant(0)
 
-def polQuotRem(exp1,exp2, var=Variable(x)):
+def polQuotRem(exp1,exp2, var):
     '''calculate the remainder and the quotient of exp1/exp2 over the reals'''
 
     #modulo 0 nothing happens
@@ -37,7 +37,7 @@ def polQuotRem(exp1,exp2, var=Variable(x)):
         totquot = totquot + quot
     return [simplify(totquot), exp1]
 
-def polQuotRemInt(exp1, exp2, var=Variable(x)):
+def polQuotRemInt(exp1, exp2, var):
     '''calculate the remainder and the quotient of exp1/exp2 over the integers'''
     #modulo 0 nothing happens
     if exp2 == Constant(0):
@@ -52,16 +52,16 @@ def polQuotRemInt(exp1, exp2, var=Variable(x)):
         totquot = totquot + quot
     return [simplify(totquot), exp1]
 
-def polQuot(exp1,exp2, var=Variable(x)):
+def polQuot(exp1,exp2, var):
     return polQuotRem(exp1, exp2, var)[0]
 
-def polRem(exp1, exp2, var=Variable(x)):
+def polRem(exp1, exp2, var):
     return polQuotRem(exp1, exp2, var)[1]
 
-def polQuotInt(exp1,exp2, var=Variable(x)):
+def polQuotInt(exp1,exp2, var):
     return polQuotRemInt(exp1, exp2, var)[0]
 
-def polRemInt(exp1, exp2, var=Variable(x)):
+def polRemInt(exp1, exp2, var):
     return polQuotRemInt(exp1, exp2, var)[1]
 
 methodList.append(['polQuot',polQuot,3])
@@ -111,7 +111,7 @@ def polContent(exp1,var):
         content = gcd(content, coef)
     return content
 
-def polGcd(exp1, exp2, var=Variable(x)):
+def polGcd(exp1, exp2, var):
     '''calculate the gcd of two possibly constant polynomials'''
 
     #first calculate the gcd of the contents of the polynomials
