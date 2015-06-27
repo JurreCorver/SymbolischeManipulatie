@@ -129,3 +129,6 @@ def polGcd(exp1, exp2, var):
     exp2=exp2/leadingcoef2
     return simplify(exp2 * gcdcontents)
 
+methodList.append(['gcd',gcd,2])
+methodList.append(['polContent',polContent,2])
+methodList.append(['polGcd',gcd,2])

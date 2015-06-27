@@ -65,6 +65,11 @@ simplify werkt niet meer op:
 print(frost('5%3').evaluate())
 TypeError: can't mod complex numbers
 --
+exp1=frost('(x-3)*5**2')
+exp2=frost('(x-3)*(x-7)')
+print(polRem(exp2,exp1,var))
+geeft -8.881784197001252e-16 i.p.v. 0 als output (afrondfout)
+----
 Simplifier.py dingen die niet goed worden versimpeld #niet erg belangrijk
 - (-x)**-y wordt naar -1**-y * x**-y versimpeld
 - y-1 wordt naar -1+y versimpeld
