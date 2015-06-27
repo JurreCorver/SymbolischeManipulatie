@@ -20,11 +20,6 @@ Algemeen:
 
 5. Grafische userinterface #Rik
  - meer methoden (e.g. exit, evaluate, simplify, expand, integrate)
- - scrollbars in output
- - optie om niet altijd te simplify'en
- - LaTeX output muten en errors detecteren
- - pressing up arrow cycles through previous input
- - force single line input
 8. equation solver(polynomen graad 4 + numeriek implementeer rootfinder inleveropgave) #Jurre
 13. Getaltheoretische dingetjes (priemgetallen, priemfactorizatie, euler-phi) #J-W
 
@@ -48,6 +43,10 @@ Algemeen:
 5.
  - variabele declaratie (e.g. x:= 15 dan moet daarna x-2 gewoon 13 als output geven)
  - functie declaratie (e.g. f(x):=x**2 en dan moet f(2) gewoon 4 als output geven)
+ - scrollbars in output
+ - pressing up arrow cycles through previous input
+ - optie om niet altijd te simplify'en
+ - LaTeX output muten en errors detecteren
 6. LaTeX  #Rik
 (7.)  evaluate als x niet gegeven
 7.  versimpeling symbolische uitdrukkingen
