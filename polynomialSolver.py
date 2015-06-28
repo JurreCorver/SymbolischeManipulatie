@@ -12,7 +12,7 @@ def eqtoexp(eq):
         exp = eq
         return exp
 
-
+#needs a variable and solution, the returns a list of expressions in the form xi = answer
 def prepareSolutions(var, solutions):
     answers = []
     for i in range(0, len(solutions)):
@@ -34,12 +34,13 @@ def solveQuadratic(var, coef):
     #solutions using the quadratic formula
     Dscr =  (coef[1]) ** Constant(2) - Constant(4) * coef[2] * coef[0]
     
-    if int(Dscr.evaluate()) < 0:
-        return []
-    else:     
-        sol[0] = simplify((Constant(0) - coef[1] + (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
-        sol[1] = simplify((Constant(0) - coef[1] - (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
-        return(sol)
+    #if int(Dscr.evaluate()) < 0:
+    #    return []
+    #else:     
+    sol[0] = simplify((Constant(0) - coef[1] + (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
+    sol[1] = simplify((Constant(0) - coef[1] - (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
+    return(sol)
+    
 #Add extra functionality for special cases -> https://en.wikipedia.org/wiki/Cubic_function
 def solveCubic(var, coef):
     deg = 3
@@ -57,8 +58,6 @@ def solveCubic(var, coef):
         sol[i] = simplify(D * (coef[2] + u[i] * C + delta0 / ( u[i] * C)))
     
     return sol    
-    
-    
 
 #Solves Polynomials of degree 1 and 2
 def solvePolynomial(eq, var):
@@ -75,6 +74,8 @@ def solvePolynomial(eq, var):
     elif mindeg >= 1 and exp.deg(var) >= 4:
         exp = simplify(exp * frost(var) ** Constant(-mindeg) )
         solutions.append(Constant(0))
+        
+        
     
     deg = exp.deg(var)
     #Find the list of coefficients.
@@ -82,6 +83,14 @@ def solvePolynomial(eq, var):
     coef = [0 for i in range(0, deg+1)]
     for i in range(0, deg+1):
         coef[i] = coefficient(exp, i, var)
+    
+    #checks if the expression is of the simple form x^k = constant, then solves it if this is true.
+    checkstr = [int(str(coef[i])) for i in range(1, deg) ]
+    if checkstr == [0 for i in range(1, deg) ]:
+        ans = simplify(((Constant(0) - coef[0] ) / coef[-1] ) ** (Constant(1) / Constant(deg) ))
+        solutions.append(ans)
+        return prepareSolutions(var, solutions)
+
         
         
     #Return error when the degree is 0
@@ -101,10 +110,10 @@ def solvePolynomial(eq, var):
     elif deg == 3:
         solutions += solveCubic(var, coef)
         return prepareSolutions(var, solutions)
+    
         
     #Return error message for polynomials of degree greater than 2.
     else:
         print("Polynomial is of degree " + str(deg) + "." )
         print("This software doesn't solve polynomials of this degree.")
         return []
-        
