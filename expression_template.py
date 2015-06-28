@@ -63,8 +63,8 @@ class InputError(Exception): #define the InputError exception to be raised in th
         self.message = message
     def __str__(self):
         return self.message
-    
-    
+
+
 class Expression():
     """A mathematical expression, represented as an expression tree"""
     
@@ -348,7 +348,6 @@ class Variable(Expression):
         else:
             return 0
            
-
 class NegNode(Expression):
     """Represents the negation function"""
     precedence = 3
@@ -384,13 +383,13 @@ class NegNode(Expression):
 
     def deg(self, var):
         return self.arg.deg(var)
-    
+
     def mindeg(self, var):
         return self.arg.mindeg(var)
 
     def diff(self,var):
         return Constant(-1)*self.arg.diff(var)
-        
+
 class BinaryNode(Expression):
     """A node in the expression tree representing a binary operator."""
 
@@ -398,32 +397,32 @@ class BinaryNode(Expression):
     leftass = False
     rightass = False
     precedence = 0 #always add brackets
-    
+
     def __init__(self, lhs, rhs):
         self.lhs = lhs
         self.rhs = rhs
 
     # Done: precedence and associativity
-            
+
     def __eq__(self, other):
         if type(self) == type(other):
             return self.lhs == other.lhs and self.rhs == other.rhs
         else:
             return False
-            
+
     def __str__(self):
         lstring = str(self.lhs)
         if self.lhs.precedence<self.precedence: #add brackets if the lhs has higher precedence
             lstring = '(%s)' % lstring
         elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
             lstring = '(%s)' % lstring
-            
+
         rstring = str(self.rhs)
         if self.rhs.precedence<self.precedence: #add brackets if the rhs has higher precedence
             rstring = '(%s)' % rstring
         elif not self.rightass and self.rhs.precedence==self.precedence: #consider associativity
             rstring = '(%s)' % rstring
-            
+
         return "%s %s %s" % (lstring, self.op_symbol, rstring)
 
     def tex(self):
@@ -432,7 +431,7 @@ class BinaryNode(Expression):
             lstring = r'\left('+lstring+r'\right)'
         elif not self.leftass and self.lhs.precedence==self.precedence: #consider associativity
             lstring = r'\left('+lstring+r'\right)'
-            
+
         rstring = self.rhs.tex()
         if self.rhs.precedence<self.precedence: #add brackets if the rhs has higher precedence
             rstring = r'\left('+rstring+r'\right)'
@@ -445,8 +444,8 @@ class BinaryNode(Expression):
         if type(self)==MulNode and not type(self.lhs)==type(self.rhs)==Constant:
             return lstring + r'\,'+ rstring
         return "%s%s%s" % (lstring, self.tex_symbol, rstring)
-        
-    
+
+
     #allow for evaluation
     def __float__(self): #let eval figure out what the op_symbol does on floats
         return eval('float(self.lhs) %s float(self.rhs)' % self.op_symbol)
@@ -456,7 +455,7 @@ class BinaryNode(Expression):
 
     def __complex__(self): #let eval figure out what the op_symbol does on complex numbers
         return eval('complex(self.lhs) %s complex(self.rhs)' % self.op_symbol)
-    
+
     def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
         l = self.lhs.evaluate(dic)
         r = self.rhs.evaluate(dic)
@@ -466,7 +465,7 @@ class BinaryNode(Expression):
             return(Constant(num(val)))
         else:
             return self.__class__(l,r)
-        
+
 class AddNode(BinaryNode):
     """Represents the addition operator"""
     leftass = True
@@ -474,7 +473,7 @@ class AddNode(BinaryNode):
     precedence = 2
     op_symbol='+'
     tex_symbol='+'
-    
+
     binNodeList.append("AddNode")
     def __init__(self, lhs, rhs):
         super(AddNode, self).__init__(lhs, rhs)
@@ -487,14 +486,14 @@ class AddNode(BinaryNode):
         if simplify(self.lhs+self.rhs)==Constant(0):
             return -float('inf')
         return max(self.lhs.deg(var),self.rhs.deg(var))
-    
+
     def mindeg(self, var):
         if simplify(self.lhs+self.rhs)==Constant(0):
             return 0
         return min(self.lhs.mindeg(var),self.rhs.mindeg(var))
 
-    
-       
+
+
 class SubNode(BinaryNode):
     """Represents the substraction operator"""
     leftass = True
@@ -515,12 +514,12 @@ class SubNode(BinaryNode):
         if simplify(self.lhs-self.rhs)==Constant(0):
             return -float('inf')
         return max(self.lhs.deg(var),self.rhs.deg(var))
-    
+
     def mindeg(self, var):
         if simplify(self.lhs-self.rhs)==Constant(0):
             return 0
-        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))        
-        
+        return min(self.lhs.mindeg(var),self.rhs.mindeg(var))
+
 class MulNode(BinaryNode):
     """Represents the multiplication operator"""
     leftass = True
@@ -538,10 +537,10 @@ class MulNode(BinaryNode):
 
     def deg(self, var):
         return self.lhs.deg(var)+self.rhs.deg(var)
-    
+
     def mindeg(self, var):
-        return self.lhs.mindeg(var)+self.rhs.mindeg(var)    
-        
+        return self.lhs.mindeg(var)+self.rhs.mindeg(var)
+
 class DivNode(BinaryNode):
     """Represents the division operator"""
     leftass = True
@@ -558,13 +557,13 @@ class DivNode(BinaryNode):
 
     def deg(self, var):
         return self.lhs.deg(var)-self.rhs.deg(var)
-    
+
     def mindeg(self, var):
         return self.lhs.mindeg(var)-self.rhs.mindeg(var)
 
     def tex(self):
         return r'\frac{'+self.lhs.tex()+ r'}{'+self.rhs.tex()+r'}'
-        
+
 class PowNode(BinaryNode):
     """Represents the exponentiation (power) operator"""
     leftass = False
@@ -590,7 +589,7 @@ class PowNode(BinaryNode):
         #x^x heeft geen gedefinieerde graad
         else:
             raise TypeError('%s is not a polynomial' % (self.lhs**self.rhs))
-    
+
     def mindeg(self, var):
         #x^n heeft graad n als n een constant is
         if self.rhs.mindeg(var)==0:
@@ -633,7 +632,6 @@ class EqNode(BinaryNode): #egg node
 
     def __complex__(self):
         return complex(self.lhs)-complex(self.rhs)
-
 
 from functions import *
 from simplifier import *

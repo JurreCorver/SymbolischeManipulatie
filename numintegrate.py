@@ -9,3 +9,5 @@ def numInt(expression, var, left, right, numsteps=10000):
     for point in points:
         ans+= float(expression.evaluate({var.symbol:Constant(point)}))/l
     return Constant(ans)
+
+methodList.append(['numIntegrate',numInt,5])

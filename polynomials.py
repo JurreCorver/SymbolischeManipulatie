@@ -64,13 +64,13 @@ def polQuotInt(exp1,exp2, var):
 def polRemInt(exp1, exp2, var):
     return polQuotRemInt(exp1, exp2, var)[1]
 
-methodList.append(['polQuot',polQuot,3])
-methodList.append(['polRem',polRem,3])
-methodList.append(['polQuotInt',polQuot,3])
-methodList.append(['polRemInt',polRem,3])
+methodList.append(['polQuotient',polQuot,3])
+methodList.append(['polRemainder',polRem,3])
+methodList.append(['polIntQuotient',polQuotInt,3])
+methodList.append(['polIntRem',polRemInt,3])
 
 def gcd(exp1, exp2):
-    '''calculate the gcd of at least two integers'''
+    '''calculate the gcd of two integers'''
 
     #check whether both exp1 and exp2 are integers
     if int(exp1) != float(exp1):
