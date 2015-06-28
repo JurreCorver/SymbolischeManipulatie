@@ -57,7 +57,7 @@ class SinNode(FuncNode):
         return CosNode(self.args[0])*self.args[0].diff(var)
 
 class ArcSinNode(FuncNode):
-    """Represents the sine function"""
+    """Represents the arcsine function"""
     funcList.append("ArcSinNode")
     name = 'arcsin'
     func = 'cmath.asin'
@@ -80,7 +80,7 @@ class CosNode(FuncNode):
 
 class ArcCosNode(FuncNode):
     """Represents the arccosine function"""
-    funcList.append("ArcSinNode")
+    funcList.append("ArcCosNode")
     name ='arccos'
     func = 'cmath.acos'
     def __init__(self, arg):
@@ -99,6 +99,17 @@ class TanNode(FuncNode):
 
     def diff(self,var):
         return CosNode(self.args[0])**Constant(-2)*self.args[0].diff(var)
+
+class ArcTanNode(FuncNode):
+    """Represents the arctan function"""
+    funcList.append("ArcTanNode")
+    name ='arctan'
+    func = 'cmath.atan'
+    def __init__(self, arg):
+        super(ArcTanNode, self).__init__(arg)
+
+    def diff(self,var):
+        return self.args[0].diff(var)/(self.args[0]**2+1)
 
 class LogNode(FuncNode):
     """Represents the logarithm"""

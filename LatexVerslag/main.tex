@@ -9,6 +9,7 @@
 \linespread{1.4}
 
 \newcommand{\rcom}[1]{\textbf{\textcolor{red}{#1}}}
+\newcommand{\com}[2]{\texttt{#1}\mbox{}\vspace{-2ex}\begin{adjustwidth}{0.8cm}{} #2 \end{adjustwidth}}
 
 \pagestyle{fancy}
 
@@ -62,7 +63,7 @@ De grafische omgeving kan gebruikt worden door \texttt{tkmain.pyw} uit te voeren
 \subsection{Syntax}
 De invoer ondersteund standaard operaties op getallen die met symbolen \texttt{*, +, -, **, /, \%} kunnen worden ingevoerd. Verder kunnen ronde haaken \texttt{( )} worden gebruikt. Enkele voorbeelden:
 \begin{adjustwidth}{1.5cm}{}
-\setstretch{1}
+\setstretch{0.9}
 \texttt{>>> 2+2-1}\\
 $1$\\
 \texttt{>>> (2**3)/2}\\
@@ -70,14 +71,63 @@ $4$\\
 \texttt{>>> 7 \% 3}\\
 $1$
 \end{adjustwidth}
-Ook zijn de standaardfuncties \texttt{sin, cos, tan, arcsin, arccos, ln, exp, floor, gamma, polygamma} ge\"implementeerd. \rcom{iets meer over schrijven, voorbeeld toevoegen, log toevoegen met twee argumenten}
+Ook zijn standaard numerieke functies \texttt{sin, cos, tan, arcsin, arccos, ln, exp, floor, gamma, polygamma} ge\"implementeerd. De specifieke details over deze functies zijn te vinden in de volgende sectie. Er is verder ook ondersteuning voor complexe getallen. De imaginaire constante wordt aangeduid met \texttt{i}. Andere standaard constanten zijn \texttt{pi, e, phi}. Voorbeeld:
+\begin{adjustwidth}{1.5cm}{}
+\setstretch{0.9}
+\texttt{>>> i**2}\\
+$-1$\\
+\texttt{>>> exp(i*pi)-1}\\
+$0$\\
+\end{adjustwidth}
+Naast standaard operaties is het ook mogelijk om zelf functies en constanten toe te voegen. Hiervoor kan \texttt{:=} gebruikt worden. Als links van de \texttt{:=} alleen een symbool staat, dan wordt wat rechts van de \texttt{:=} staat opgeslagen onder naam van het symbool aan de linkerkant. We kunnen bijvoorbeeld het volgende doen:
+\begin{adjustwidth}{1.5cm}{}
+\setstretch{0.9}
+\texttt{>>> x:=5}\\
+$5$\\
+\texttt{>>> x**2}\\
+$25$
+\end{adjustwidth}
+Functies kunnen op een vergelijkbare manier worden toegevoegd. Neem als voorbeeld:
+\begin{adjustwidth}{1.5cm}{}
+\setstretch{1}
+\texttt{>>> f(x,y):=sin(x)*cos(y)}\\
+$\mathrm{sin}(x)\,\mathrm{cos}(y)$\\
+\texttt{>>> f(pi/2,pi)}\\
+$-1$
+\end{adjustwidth}
+Als laatste is er ondersteuning voor een gelijkheids operator met \texttt{==} als symbool. Deze kan bijvoorbeeld worden gebruikt bij invoeren van vergelijkingen.
 
-\rcom{dingen over == en := toevoegen, complexe getallen}
 
 \subsection{Lijst van commando's}
-\rcom{Rik: exit(), pi, e, phi, d}
+\rcom{na afloop op alfabetische volgorde zetten\\}
+\com{exit()}{Sluit het programma af.}
+\com{d(f(x),x)}{Berekent de afgeleide van \texttt{f(x)} naar de variabele \texttt{x}. Indien de afgeleide van de functie niet bekend is wordt een foutmelding gegeven. Voorbeeld:\vspace{-0.5ex}}
+\begin{adjustwidth}{1.5cm}{}
+\setstretch{1}
+\texttt{>>> d(sin(x)+2,x)}\\
+$\cos(x)$
+\end{adjustwidth}
 
-\textbf{solvePolynomial(eq, var)}
+\com{sin(x)}{Geeft de sinus van \texttt{x}.}
+\com{arcsin(X)}{Geeft de arcsinus van \texttt{x}.}
+\com{cos(x)}{Geeft de cosinus van \texttt{x}.}
+\com{arccos(x)}{Geeft de arccosinus van \texttt{x}.}
+\com{tan(x)}{Geeft de tangus van \texttt{x}.}
+\com{arctan(x)}{Geeft de arctangus van \texttt{x}.}
+\com{log(x,y)}{Geeft het logaritme van \texttt{x} in basis \texttt{y}. Equivalent aan \texttt{ln(x)/ln(y)}.}
+\com{ln(x)}{Geeft het natuurlijk logaritme van \texttt{x}.}
+\com{exp(x)}{Geeft het exponent van \texttt{x}.}
+\com{floor(x)}{Neemt de floor van \texttt{x}.}
+\com{gamma(x)}{Geeft de gamma functie van \texttt{x}.}
+\com{polygamma(x,y)}{Geeft de \texttt{y}'de orde polygamma functie van \texttt{x}.}
+
+\rcom{misschien ook nog even round en ceil toevoegen voor compleetheid?}
+
+\rcom{nog toevoegen:\\}
+\com{solvePolynomial(eq, var)}{}
+\com{numintegrate}{}
+\com{gcd enzo}{}
+
 
 
 
