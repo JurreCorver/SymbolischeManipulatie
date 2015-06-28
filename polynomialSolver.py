@@ -77,12 +77,12 @@ def solvePolynomial(eq, var):
         
         
     
-    deg = exp.deg(var)
+    deg = exp.deg(Variable(var))
     #Find the list of coefficients.
     #For a polynomial a x^3 + b x^2 + c, a = coef[3]
     coef = [0 for i in range(0, deg+1)]
     for i in range(0, deg+1):
-        coef[i] = coefficient(exp, i, var)
+        coef[i] = coefficient(exp, i, Variable(var))
     
     #checks if the expression is of the simple form x^k = constant, then solves it if this is true.
     checkstr = [int(str(coef[i])) for i in range(1, deg) ]
