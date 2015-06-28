@@ -44,7 +44,7 @@ def isint(string):
     except ValueError:
         return False
 
-def num(x): #short command to make numbers looks nicer than just float()
+def num(x): #short command to make numbers looks nicer than just float() or complex()
     if type(x)==complex and complex(x.imag)!=0:
         return x
     x = float(complex(x).real)
@@ -58,7 +58,7 @@ funcList=[] #list of functions
 methodList =[] #list of methods
 userVarDict = {} #dictionary for user defined variables
 
-class InputError(Exception):
+class InputError(Exception): #define the InputError exception to be raised in the fromString method
     def __init__(self, message):
         self.message = message
     def __str__(self):
@@ -77,7 +77,6 @@ class Expression():
      - mindeg(self, var = 'x'): the lowest power of variable in self
      - diff(self, var): the derivative of the expression
     """
-    # TODO: when adding new methods that should be supported by all subclasses, add them to this list
 
     precedence = 0 #by default always add brackets
 
@@ -85,14 +84,13 @@ class Expression():
     # this allows us to perform 'arithmetic' with expressions, and obtain another expression
     def __add__(self, other):
         return AddNode(self, other)
-        
-    # DONE: other overloads, such as __sub__, __mul__, etc.
 
     def __sub__(self, other):
         return SubNode(self, other)
         
     def __mul__(self, other):
         return MulNode(self, other)
+    
     #truediv implemented instead of div. Unsure why this works
     def __truediv__(self, other):
         return DivNode(self, other)        
@@ -149,16 +147,18 @@ class Expression():
                     
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
+
+                #add neg to the stack when encountering a -, later we will check if it was subtraction or negation
                 if token == '-' and (index==0 or tokens[index-1] in (['(']+oplist)):
                     stack.append('neg')
                 else:
                     while True:
-                        # DONE: when there are more operators, the rules are more complicated
-                        # DONE: look up the shunting yard-algorithm
-                        while len(stack)>0 and stack[-1]=='neg':
+                        while len(stack)>0 and stack[-1]=='neg': #the previous token was a negation so add it to the output
                             output.append(stack.pop())
                         if len(stack) == 0 or stack[-1] not in oplist:
                             break
+
+                        #use associativity and precedence to get correct order of operations
                         tokenindex=oplist.index(token)
                         token2=stack[-1]
                         tokenindex2=oplist.index(token2)
@@ -184,7 +184,7 @@ class Expression():
                 stack.pop()
                 if len(stack)>0 and stack[-1] in funcnamelist+metnamelist: #if after popping the top of the stack is a function/method add it to the output
                     output.append(stack.pop())
-            elif token in userVarDict:
+            elif token in userVarDict: #add the value of user defined variables to the output
                 output.append(userVarDict[token])
             else:
                 # unknown token
@@ -196,10 +196,9 @@ class Expression():
         
         # convert RPN to an actual expression tree
         for t in output:
-            if t in metnamelist+funcnamelist:
-                # print(stack)
+            if t in metnamelist+funcnamelist: #check whether the token is a method/function and pop the right amount of arguments from the stack
                 args = []
-                if t in metnamelist:
+                if t in metnamelist: 
                     numargs = metdic[t][1]
                 else:
                     numargs = funcdic[t].numargs
@@ -214,19 +213,12 @@ class Expression():
 
             elif t == 'neg':
                 stack.append(NegNode(stack.pop()))
-            # if t in funcnamelist:
-            #     args = []
-            #     while len(args)<funcdic[t].numargs:
-            #         args.append(stack.pop())
-            #     stack.append(funcdic[t](*args[::-1])) #args seems to be in reverse order, so we have to reverse the list
+
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
                 x = stack.pop()
-                if t == '=': #exception for = since eval would interpret it wrong
-                    stack.append(EqNode(x,y))
-                else:
-                    stack.append(eval('x %s y' % t))
+                stack.append(eval('x %s y' % t))
             else:
                 # a constant, push it to the stack
                 stack.append(t)
@@ -254,14 +246,8 @@ def frost(string):
         return frost(stringSplit[1]) #return the string on the right hand side for display
     return Expression.fromString(string) #if there was no '==' or ':=' just parse the string normally
 
-def sfrost(exp,d='',n=1): #macro for simplifying and optionally differtiating frost(string)
-    if d!='':
-        expr = frost(exp)
-        for i in range(n):
-            expr=simplify(expr.diff(Variable(d)))
-        return expr
-    else:
-        return simplify(frost(exp))
+def sfrost(exp): #macro for simplifying and optionally differtiating frost(string)
+    return simplify(frost(exp))
 
     
 class Constant(Expression):
