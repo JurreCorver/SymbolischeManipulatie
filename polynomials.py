@@ -124,10 +124,14 @@ def polGcd(exp1, exp2, var):
     while exp1 != Constant(0):
         (exp1, exp2) = (exp2, polRem(exp1, exp2, var))
 
-    #the leading coefficient of the polGcd should be 1
-    leadingcoef2=coefficient(exp2, exp2.deg(var),var)
-    exp2=exp2/leadingcoef2
-    return simplify(exp2 * gcdcontents)
+    #the content of the polGcd should be the gcd of the contents of the two initial polynomials
+    content2=polContent(exp2,var)
+    exp2=simplify(exp2/content2*gcdcontents)
+
+    #the leading coefficient should be positive
+    if int(coefficient(exp2, exp2.deg(var),var))<0:
+        exp2=simplify(NegNode(exp2))
+    return exp2
 
 methodList.append(['gcd',gcd,2])
 methodList.append(['polContent',polContent,2])
