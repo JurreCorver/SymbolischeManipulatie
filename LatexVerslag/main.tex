@@ -25,18 +25,20 @@ Begeleider: Joost Houben}
 %Your abstract.
 %\end{abstract}
 
+\rcom{Gisteren met Joost gesproken over het verslag. Hij zei dat alle standaardfuncties best op een regel in de documentatie mogen. Bovendien vond hij het niet erg als het verslag iets langer dan 5 pagina's is (zolang er maar nuttige dingen in staan). }
+
 \section{Introductie}
 In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om symbolisch te kunnen rekenen zoals dat bijvoorbeeld in Mathematica gebeurt. Wiskundige formules worden hiervoor opgeslagen in een zogenaamde expressie-boom. Behalve dat deze representatie kan worden gebruikt om berekeningen te doen, is deze geschikt voor symbolische manipulaties, zoals optellen, vermenigvuldigen, maar ook differenti\"eren en oplossen van sommige polynoom~vergelijkingen. De code behordende bij dit project kan gevonden worden op \url{https://github.com/JurreCorver/SymbolischeManipulatie}.
 
 
 \section{Theorie}
 %Beschrijving van de theorie
-Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurige aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een interne knopen (en de wortel) is een operator of een functie, een blad is een constante of een variabele. Een voorbeeld zie je in \rcom{figuur 1}
+Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in \rcom{Ik weet niet hoe je handig plaatjes kan maken, maar ik stel voor om de expressie $-2+\sin(1.2*3)$ o.i.d. in een expressieboom te zetten (in ieder geval minstens \'e\'en functie,  \'e\'en negNode en  \'e\'en binaire knoop}. 
 
 
 \section{Algoritmen}
 %Beschrijving van de gebruikte algoritmen, denk hierbij ook aan bijvoorbeeld de complexiteit en de gebruikte datastructuren
-
+\subsection{Shunting-Yard}
 
 
 \section{Documentatie}
@@ -73,7 +75,8 @@ $4$\\
 \texttt{>>> 7 \% 3}\\
 $1$
 \end{adjustwidth}
-Ook zijn standaard numerieke functies \texttt{sin, cos, tan, arcsin, arccos, ln, exp, floor, gamma, polygamma} ge\"implementeerd. De specifieke details over deze functies zijn te vinden in de volgende sectie. Er is verder ook ondersteuning voor complexe getallen. De imaginaire constante wordt aangeduid met \texttt{i}. Andere standaard constanten zijn \texttt{pi, e, phi}. Voorbeeld:
+Ook zijn standaard functies als \texttt{sin, ln, gamma, gcd} ge\"implementeerd. %De specifieke details over deze functies zijn te vinden in de volgende sectie. 
+De lijst met alle ge\"implementeerde functies is te vinden in de volgende sectie. Er is verder ook ondersteuning voor complexe getallen. De imaginaire constante wordt aangeduid met \texttt{i}. Andere standaard constanten zijn \texttt{pi, e, phi}. Voorbeeld:
 \begin{adjustwidth}{1.5cm}{}
 \setstretch{0.9}
 \texttt{>>> i**2}\\
@@ -110,32 +113,34 @@ Als laatste is er ondersteuning voor een gelijkheids operator met \texttt{==} al
 $\cos(x)$
 \end{adjustwidth}
 
-\com{sin(x)}{Geeft de sinus van \texttt{x}.}
-\com{arcsin(x)}{Geeft de arcsinus van \texttt{x}.}
-\com{cos(x)}{Geeft de cosinus van \texttt{x}.}
-\com{arccos(x)}{Geeft de arccosinus van \texttt{x}.}
-\com{tan(x)}{Geeft de tangus van \texttt{x}.}
-\com{arctan(x)}{Geeft de arctangus van \texttt{x}.}
+\com{sin(x), arcsin(x), cos(x), arccos(x), tan(x), arctan(x), ln(x), exp(x), floor(x), gamma(x)}{Geeft de bijbehorende standaardfunctie als functie van \texttt{x}.}
+%\com{sin(x)}{Geeft de sinus van \texttt{x}.}
+%\com{arcsin(x)}{Geeft de arcsinus van \texttt{x}.}
+%\com{cos(x)}{Geeft de cosinus van \texttt{x}.}
+%\com{arccos(x)}{Geeft de arccosinus van \texttt{x}.}
+%\com{tan(x)}{Geeft de tangus van \texttt{x}.}
+%\com{arctan(x)}{Geeft de arctangus van \texttt{x}.}
+%\com{log(x,y)}{Geeft het logaritme van \texttt{x} in basis \texttt{y}. Equivalent aan \texttt{ln(x)/ln(y)}.}
+%\com{ln(x)}{Geeft het natuurlijk logaritme van \texttt{x}.}
+%\com{exp(x)}{Geeft het exponent van \texttt{x}.}
+%\com{floor(x)}{Neemt de floor van \texttt{x}.}
+%\com{gamma(x)}{Geeft de gamma functie van \texttt{x}.}
 \com{log(x,y)}{Geeft het logaritme van \texttt{x} in basis \texttt{y}. Equivalent aan \texttt{ln(x)/ln(y)}.}
-\com{ln(x)}{Geeft het natuurlijk logaritme van \texttt{x}.}
-\com{exp(x)}{Geeft het exponent van \texttt{x}.}
-\com{floor(x)}{Neemt de floor van \texttt{x}.}
-\com{gamma(x)}{Geeft de gamma functie van \texttt{x}.}
 \com{polygamma(x,y)}{Geeft de \texttt{y}'de orde polygamma functie van \texttt{x}.}
 
 \rcom{misschien ook nog even round en ceil toevoegen voor compleetheid?}
 
 \rcom{nog toevoegen:\\}
 \com{solvePolynomial(eq, var)}{}
-\com{numIntegrate(expressie, x, l, r, numsteps)}{Numeriek bepalen van $\int_{\texttt{l}}^\texttt{r} \texttt{expressie} \; \mathrm{d}\texttt{x}$ door middel van een Riemann benadering van \texttt{numsteps} stappen.}
+\com{numIntegrate(expressie, x, l, r, numsteps)}{Numeriek bepalen van $\int_{\texttt{l}}^\texttt{r} \texttt{expressie} \; \mathrm{d}\texttt{x}$ door middel van een Riemann benadering in \texttt{numsteps} stappen.}
 \com{gcd(n,m)}{Geeft de grootste gemene deler van twee gehele getallen \texttt{n} en \texttt{m}.}
 \com{polQuotient(pol1, pol2, x)}{Geeft het quotient van de deling van \texttt{pol1} door \texttt{pol2} met rest, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2}, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polIntQuotient(pol1, pol2, x)}{Geeft het quotient van de deling van het polynoom \texttt{pol1} door het polynoom \texttt{pol2} met rest over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen met gehele co\"effici\"enten in \texttt{x} zijn.}
 \com{polIntRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2} over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
-\com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}}
-\com{deg(pol,x)}{Geeft de graad van \texttt{pol} als polynoom in \texttt{x}}
+\com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
+\com{deg(pol,x)}{Geeft de graad van \texttt{pol} als polynoom in \texttt{x}.}
 
 \section{Resultaten}
 %Eventuele resultate die behaald zijn met de code
