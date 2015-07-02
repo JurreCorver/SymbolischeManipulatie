@@ -33,9 +33,6 @@ noneButton.grid(column=5,row=0)
 
 inpFrame.pack(side=tk.TOP, fill=tk.X)
 
-
-
-
 def sendCommand(self): #Command used to parse content of inpBox when Return is pressed
     outBox.config(state=tk.NORMAL) #enable the output box so it can be edited
     inpText = inpBox.get("1.0",'end') #get the text
@@ -52,23 +49,44 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
         inpBox.delete("1.0",tk.END)
         try: #process input based on settings and catch+print any errors
             outSet = outputSetting.get()
-            if outSet == 'simplify':
-                outExpr = sfrost(inpText)
-            elif outSet == 'evaluate':
-                outExpr = frost(inpText).evaluate()
-            elif outSet == 'none':
-                outExpr = frost(inpText)
+            outExpr = frost(inpText)
+            if type(outExpr)!=list:
+                if outSet == 'simplify':
+                    outExpr = sfrost(inpText)
+                elif outSet == 'evaluate':
+                    outExpr = frost(inpText).evaluate()
+                elif outSet == 'none':
+                    outExpr = frost(inpText)
         except Exception as err:
             outBox.insert(tk.END,err.__class__.__name__+': '+str(err)+'\n')
         else: #if there were no errors convert the output to tex if the option is enabled
             if useTex.get()==1:
                 try: #catch errors that converting to LaTeX may produce
-                    texToImage(outExpr.tex())
+                    if type(outExpr)==list:
+                        if len(outExpr)==1:
+                            texToImage(outExpr[0].tex())
+                        else:
+                            texList = [e.tex() for e in outExpr]
+                            outTex=''
+                            for i in range(len(texList)):
+                                if i==0:
+                                    outTex+="["+texList[i]+", "
+                                elif i!=len(texList)-1:
+                                    outTex+=texList[i]+", "
+                                else:
+                                    outTex+=texList[i]+"]"
+                            texToImage(outTex)
+                    else:
+                        texToImage(outExpr.tex())
                 except Exception as err:
                     outBox.insert(tk.END,'Error evaluating LaTeX: '+str(err))
                 outBox.insert(tk.END,'\n')
             else:
-                outBox.insert(tk.END, str(outExpr)+'\n')
+                if type(outExpr)==list:
+                    for exp in outExpr:
+                        outBox.insert(tk.END, str(exp)+'\n')
+                else:
+                    outBox.insert(tk.END, str(outExpr)+'\n')
     outBox.config(state=tk.DISABLED) #disable the output box
 
 #bind sending the input to the enter key    
