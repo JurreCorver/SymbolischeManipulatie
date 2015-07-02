@@ -271,10 +271,10 @@ class Constant(Expression):
         
     # allow conversion to numerical values
     def __int__(self):
-        return int(self.value)
+        return int(num(self.value))
         
     def __float__(self):
-        return float(self.value)
+        return float(num(self.value))
 
     def __complex__(self):
         return complex(self.value)
