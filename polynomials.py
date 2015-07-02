@@ -136,4 +136,4 @@ def polGcd(exp1, exp2, var):
 
 methodList.append(['gcd',gcd,2])
 methodList.append(['polContent',polContent,2])
-methodList.append(['polGcd',gcd,3])
+methodList.append(['polGcd',polGcd,3])
