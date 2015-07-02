@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     10030,        261]
-NotebookOptionsPosition[      9675,        244]
-NotebookOutlinePosition[     10018,        259]
-CellTagsIndexPosition[      9975,        256]
+NotebookDataLength[      8321,        210]
+NotebookOptionsPosition[      7925,        192]
+NotebookOutlinePosition[      8269,        207]
+CellTagsIndexPosition[      8226,        204]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -33,7 +33,7 @@ Cell[BoxData[{
     RowBox[{"{", 
      RowBox[{"\"\<2\>\"", ",", "\"\<2\>\""}], "}"}], ",", 
     RowBox[{"{", 
-     RowBox[{"\"\<*\>\"", ",", "\"\<\[Times]\>\""}], "}"}], ",", 
+     RowBox[{"\"\<*\>\"", ",", "\"\<*\>\""}], "}"}], ",", 
     RowBox[{"{", 
      RowBox[{"\"\<pi\>\"", ",", "\"\<\[Pi]\>\""}], "}"}], ",", 
     RowBox[{"{", 
@@ -74,7 +74,8 @@ Cell[BoxData[{
   3.644824234785234*^9}, {3.6448243982886868`*^9, 3.6448244181558847`*^9}, {
   3.644824466436448*^9, 3.6448244960591364`*^9}, {3.6448245284416604`*^9, 
   3.64482454982487*^9}, {3.64482490795378*^9, 3.6448250804103975`*^9}, {
-  3.6448252631638613`*^9, 3.64482526649207*^9}}],
+  3.6448252631638613`*^9, 3.64482526649207*^9}, {3.644858228307974*^9, 
+  3.6448582287159977`*^9}}],
 
 Cell[BoxData[
  RowBox[{"{", 
@@ -88,13 +89,13 @@ Cell[BoxData[
    RowBox[{"{", 
     RowBox[{"\<\"2\"\>", ",", "\<\"2\"\>"}], "}"}], ",", 
    RowBox[{"{", 
-    RowBox[{"\<\"*\"\>", ",", "\<\"\[Times]\"\>"}], "}"}], ",", 
+    RowBox[{"\<\"*\"\>", ",", "\<\"*\"\>"}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{"\<\"pi\"\>", ",", "\<\"\[Pi]\"\>"}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{"\<\"3\"\>", ",", "\<\"3\"\>"}], "}"}]}], "}"}]], "Output",
  CellChangeTimes->{{3.6448250573340626`*^9, 3.6448250815031233`*^9}, {
-  3.6448252674637175`*^9, 3.6448252754800434`*^9}}],
+   3.6448252674637175`*^9, 3.6448252754800434`*^9}, 3.64485823443632*^9}],
 
 Cell[BoxData[
  GraphicsBox[
@@ -104,147 +105,94 @@ Cell[BoxData[
       "+", "neg", "sin", "2", "*", "3", "pi"}, {{{1, 2}, {1, 3}, {2, 4}, {3, 
        5}, {5, 6}, {5, 7}}, Null}, {
       VertexLabels -> {
-        "neg" -> Placed["neg", Center], "+" -> Placed["+", Center], "3" -> 
-         Placed["3", Center], "2" -> Placed["2", Center], "pi" -> 
-         Placed["\[Pi]", Center], "sin" -> Placed["sin", Center], "*" -> 
-         Placed["\[Times]", Center]}, VertexLabelStyle -> {
-         Directive[20, FontFamily -> "Courier"]}, VertexSize -> {Large}}]], 
-    Typeset`boxes, Typeset`boxes$s2d = GraphicsGroupBox[{{
-       Arrowheads[0.02986820540892973], 
-       Directive[
-        Opacity[0.7], 
-        Hue[0.6, 0.7, 0.5]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$1", Automatic, Center], 
-          DynamicLocation["VertexID$2", Automatic, Center]}]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$1", Automatic, Center], 
-          DynamicLocation["VertexID$3", Automatic, Center]}]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$2", Automatic, Center], 
-          DynamicLocation["VertexID$4", Automatic, Center]}]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$3", Automatic, Center], 
-          DynamicLocation["VertexID$5", Automatic, Center]}]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$5", Automatic, Center], 
-          DynamicLocation["VertexID$6", Automatic, Center]}]], 
-       ArrowBox[
-        LineBox[{
-          DynamicLocation["VertexID$5", Automatic, Center], 
-          DynamicLocation["VertexID$7", Automatic, Center]}]]}, {
-       Directive[
-        Hue[0.6, 0.2, 0.8], 
-        EdgeForm[
-         Directive[
-          GrayLevel[0], 
-          Opacity[0.7]]]], 
-       TagBox[{
-         TagBox[
-          
-          DiskBox[{0.4629100498862757, 2.7774602993176543`}, 
-           0.1851640199545103], "DynamicName", BoxID -> "VertexID$1"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"+\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$1", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$1"], 
-       TagBox[{
-         TagBox[
-          DiskBox[{0., 1.8516401995451028`}, 0.1851640199545103], 
-          "DynamicName", BoxID -> "VertexID$2"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"neg\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$2", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$2"], 
-       TagBox[{
-         TagBox[
-          
-          DiskBox[{0.9258200997725514, 1.8516401995451028`}, 
-           0.1851640199545103], "DynamicName", BoxID -> "VertexID$3"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"sin\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$3", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$3"], 
-       TagBox[{
-         TagBox[
-          DiskBox[{0., 0.9258200997725514}, 0.1851640199545103], 
-          "DynamicName", BoxID -> "VertexID$4"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"2\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$4", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$4"], 
-       TagBox[{
-         TagBox[
-          
-          DiskBox[{0.9258200997725514, 0.9258200997725514}, 
-           0.1851640199545103], "DynamicName", BoxID -> "VertexID$5"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"\[Times]\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$5", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$5"], 
-       TagBox[{
-         TagBox[
-          DiskBox[{0.4629100498862757, 0.}, 0.1851640199545103], 
-          "DynamicName", BoxID -> "VertexID$6"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"3\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$6", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> "VertexLabelID$6"], 
-       TagBox[{
-         TagBox[
-          DiskBox[{1.3887301496588271`, 0.}, 0.1851640199545103], 
-          "DynamicName", BoxID -> "VertexID$7"], 
-         InsetBox[
-          FormBox[
-           StyleBox["\"\[Pi]\"", 
-            Directive[20, FontFamily -> "Courier"], StripOnInput -> False], 
-           TraditionalForm], 
-          DynamicLocation["VertexID$7", None, Center], BaseStyle -> 
-          "Graphics"]}, "DynamicName", BoxID -> 
-        "VertexLabelID$7"]}}], $CellContext`flag}, 
-    TagBox[
-     DynamicBox[GraphComputation`NetworkGraphicsBox[
-      3, Typeset`graph, Typeset`boxes, $CellContext`flag], {
-      CachedValue :> Typeset`boxes, SingleEvaluation -> True, 
-       SynchronousUpdating -> False, TrackedSymbols :> {$CellContext`flag}},
-      ImageSizeCache->{{3.9080600306866096`, 
-       241.49494150364401`}, {-214.2882623705409, 209.28826237054085`}}],
+        "2" -> Placed["2", Center], "neg" -> Placed["neg", Center], "3" -> 
+         Placed["3", Center], "+" -> Placed["+", Center], "*" -> 
+         Placed["*", Center], "sin" -> Placed["sin", Center], "pi" -> 
+         Placed["\[Pi]", Center]}, VertexLabelStyle -> {
+         Directive[20, FontFamily -> "Courier"]}, VertexSize -> {Large}}]]}, 
+    TagBox[GraphicsGroupBox[{
+       {Hue[0.6, 0.7, 0.5], Opacity[0.7], Arrowheads[0.02986820540892973], 
+        ArrowBox[{{{0.4629100498862757, 2.7774602993176543`}, {0., 
+         1.8516401995451028`}}, {{0.4629100498862757, 2.7774602993176543`}, {
+         0.9258200997725514, 1.8516401995451028`}}, {{0., 
+         1.8516401995451028`}, {0., 0.9258200997725514}}, {{
+         0.9258200997725514, 1.8516401995451028`}, {0.9258200997725514, 
+         0.9258200997725514}}, {{0.9258200997725514, 0.9258200997725514}, {
+         0.4629100498862757, 0.}}, {{0.9258200997725514, 
+         0.9258200997725514}, {1.3887301496588271`, 0.}}}, 
+         0.028622071383001782`]}, 
+       {Hue[0.6, 0.2, 0.8], EdgeForm[{GrayLevel[0], Opacity[
+        0.7]}], {
+         DiskBox[{0.4629100498862757, 2.7774602993176543`}, 
+          0.1851640199545103], InsetBox[
+          StyleBox["\<\"+\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0.4629100498862757, 2.7774602993176543`},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{0., 1.8516401995451028`}, 0.1851640199545103], InsetBox[
+          StyleBox["\<\"neg\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0., 1.8516401995451028`},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{0.9258200997725514, 1.8516401995451028`}, 
+          0.1851640199545103], InsetBox[
+          StyleBox["\<\"sin\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0.9258200997725514, 1.8516401995451028`},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{0., 0.9258200997725514}, 0.1851640199545103], InsetBox[
+          StyleBox["\<\"2\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0., 0.9258200997725514},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{0.9258200997725514, 0.9258200997725514}, 
+          0.1851640199545103], InsetBox[
+          StyleBox["\<\"*\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0.9258200997725514, 0.9258200997725514},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{0.4629100498862757, 0.}, 0.1851640199545103], InsetBox[
+          StyleBox["\<\"3\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {0.4629100498862757, 0.},
+          BaseStyle->"Graphics"]}, {
+         DiskBox[{1.3887301496588271`, 0.}, 0.1851640199545103], InsetBox[
+          StyleBox["\<\"\[Pi]\"\>",
+           StripOnInput->False,
+           FontFamily->"Courier",
+           FontSize->20], {1.3887301496588271`, 0.},
+          BaseStyle->"Graphics"]}}}],
      MouseAppearanceTag["NetworkGraphics"]],
-    AllowKernelInitialization->False,
-    UnsavedVariables:>{$CellContext`flag}]],
+    AllowKernelInitialization->False]],
   DefaultBaseStyle->{
    "NetworkGraphics", FrontEnd`GraphicsHighlightColor -> Hue[0.8, 1., 0.6]},
-  FrameTicks->None]], "Output",
+  FrameTicks->None,
+  ImagePadding->15]], "Output",
  CellChangeTimes->{{3.6448250573340626`*^9, 3.6448250815031233`*^9}, {
-  3.6448252674637175`*^9, 3.644825275497058*^9}}]
+   3.6448252674637175`*^9, 3.6448252754800434`*^9}, 3.6448582344993286`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Set", "::", "write"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Tag \[NoBreak]\\!\\(Inherited\\)\[NoBreak] in \
+\[NoBreak]\\!\\(Inherited[\\\"State\\\"]\\)\[NoBreak] is Protected. \
+\\!\\(\\*ButtonBox[\\\"\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", \
+ButtonFrame->None, ButtonData:>\\\"paclet:ref/message/General/write\\\", \
+ButtonNote -> \\\"Set::write\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.644858249414178*^9}]
 }, Open  ]]
 },
 WindowSize->{1350, 641},
 WindowMargins->{{0, Automatic}, {Automatic, 0}},
-FrontEndVersion->"9.0 for Microsoft Windows (64-bit) (January 25, 2013)",
+FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (December 4, 2014)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -259,9 +207,10 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[579, 22, 2329, 54, 72, "Input"],
-Cell[2911, 78, 721, 18, 87, "Output"],
-Cell[3635, 98, 6024, 143, 447, "Output"]
+Cell[579, 22, 2373, 55, 72, "Input"],
+Cell[2955, 79, 736, 18, 31, "Output"],
+Cell[3694, 99, 3722, 78, 480, "Output"],
+Cell[7419, 179, 490, 10, 21, "Message"]
 }, Open  ]]
 }
 ]
