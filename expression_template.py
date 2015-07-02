@@ -343,7 +343,7 @@ class Variable(Expression):
            return 0
     def mindeg(self, var):
         #the degree of the polynomial x is 1 w.r.t. x
-        if self == var:
+        if self.symbol == var.symbol:
             return 1
         #the degree of the polynomial x is 0 w.r.t. y
         else:
