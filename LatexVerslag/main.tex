@@ -47,17 +47,29 @@ Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op 
 \section{Algoritmen}
 %Beschrijving van de gebruikte algoritmen, denk hierbij ook aan bijvoorbeeld de complexiteit en de gebruikte datastructuren
 \subsection{Shunting-yardalgoritme}
-Een gebruiker vindt infix notatie het makkelijkst te gebruiken, en zal graag zijn invoer dus ook in infix notatie aan een programma willen doorvoeren. De meest nuttige manier om een expressie op te slaan en te bewerken blijkt echter in de vorm van een expressieboom te zijn. Het Shunting-yardalgoritme maakt de vertaalslag van de infix notatie van de gebruiker naar postfix notatie, en de vertaling van postfix notatie naar een expressieboom is vrij gemakkelijk. Het algortime is gepubliceerd door Dijkstra in 1961. 
+Een gebruiker vindt infix notatie het makkelijkst te gebruiken, en zal graag zijn invoer dus ook in infix notatie aan een programma willen doorvoeren. De meest nuttige manier om een expressie op te slaan en te bewerken blijkt echter in de vorm van een expressieboom te zijn. Het Shunting-yardalgoritme maakt de vertaalslag van de infix notatie van de gebruiker naar postfix notatie, en de vertaling van postfix notatie naar een expressieboom is vrij gemakkelijk. Het algoritme is gepubliceerd door Dijkstra in 1961. 
 
-We gaan niet het algoritme in volledig detail beschrijven, we behandelen het slechts in groffe lijnen aan de hand van voorbeelden. We beginnen met een string met een expressie in infix notatie, bijvoorbeeld \texttt{`2-3*3'}. Dit splitsen we dan op in kleine stukken genaamd `tokens'. In dit geval: \texttt{`2',`-',`3',`*'}. 
+We gaan niet het algoritme in volledig detail beschrijven, we behandelen het slechts in grove lijnen aan de hand van voorbeelden. We beginnen met een string met een expressie in infix notatie, bijvoorbeeld \texttt{`2-3*3'}. Dit splitsen we dan op in kleine stukken genaamd `tokens'. In dit geval: \texttt{`2',`-',`3',`*'}. 
 
 Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tokens heen en volgen de volgende procedure uit:
 \begin{enumerate}
 \item Indien de token een getal is, stop hem in de \ttt{output}.
 \item Als de token een comma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
-\item Als de token een binaire operator (\ttt{-,+,*,/,\%}) is,  
+\item Als de token een binaire operator (\ttt{-,+,*,/,\%,**}) is,  blijf dan aan de hand van de precedentie operatoren van de \ttt{stack} naar de \ttt{output} verplaatsen totdat het laatste element van de \ttt{stack} geen operator meer is. De \ttt- token wordt dan op een speciale manier behandeld, omdat het zowel negatie als aftrekken kan betekenen.
+\item Als de token \ttt{`('} is, kijk dan of het laatste element op de \ttt{output} een functie is. Zo ja, verplaats dan de functie naar de \ttt{stack}. Stop het haakje op de \ttt{output}.
+\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{'('} wordt tegengekomen. Verwijder dan de \ttt{'('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
+\item Als de token een bekende variabele (e.g. \ttt{`pi'}) is, voeg zijn waarden dan toe aan de \ttt{output}.
+\item Als de token in geen van de bovenstaande gevallen zit, voeg hem dan als onbekende variabele toe aan de \ttt{output}.
+\item Als we door de lijst van tokens heen zijn, voeg dan alle elementen van de \ttt{stack} toe aan de \ttt{output}.
 \end{enumerate}
 
+Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende alrogritme word dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
+\begin{enumerate}
+\item Als de token een functie is, haal dan $n$ elementen van de \ttt{stack} af, waar $n$ de hoeveelheid argumenten is die de functie aanneemt. Voeg vervolgens de functie als knoop toe de \ttt{stack} met als kinderen de $n$ argumenten. 
+\item Als de token een binaire operator is, voeg de operator als knoop toe aan de \ttt{stack} met als kinderen de twee operanden.
+\item Als de token geen functie of operator is, voeg hem dan aan de \ttt{stack} toe.
+\end{enumerate}
+Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tokens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tokens).
 
 \section{Documentatie}
 %Documentatie over het gebruik van de code
