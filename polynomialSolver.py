@@ -1,14 +1,22 @@
 from polynomials import *
 
 
+class solveError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
 #Check of input eq is really an equation. If it is move the right hand side to the left. If it is not try to interpret the result and give error.    
 def eqtoexp(eq):    
     if type(eq) == EqNode:
         exp = simplify(eq.lhs - eq.rhs)
         return exp
     else:
-        print("Input is not an equation. Try something in the form of 'a == b'.")
-        print("Interpreting input as " + str(eq) + " == " + str(0) + ".")
+        #print("Input is not an equation. Try something in the form of 'a == b'.")
+        #print("Interpreting input as " + str(eq) + " == " + str(0) + ".")
         exp = eq
         return exp
 
@@ -114,8 +122,7 @@ def solvePolynomial(eq, var):
         
     #Return error message for polynomials of degree greater than 2.
     else:
-        print("Polynomial is of degree " + str(deg) + "." )
-        print("This software doesn't solve polynomials of this degree.")
+        raise solveError("This software doesn't solve polynomials of this degree.")
         return []
         
         
