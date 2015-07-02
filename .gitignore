@@ -9,3 +9,7 @@ main.synctex.gz
 *.py#
 *.synctex
 .#*
+execute_Rik.py
+execute_JW.py
+execute_Jurre.py
+.idea
