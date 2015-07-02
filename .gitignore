@@ -7,4 +7,5 @@ main.synctex.gz
 *.tex.bak
 *.py~
 *.py#
+*.synctex
 .#*
