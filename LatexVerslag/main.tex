@@ -26,8 +26,6 @@ Begeleider: Joost Houben}
 %Your abstract.
 %\end{abstract}
 
-\rcom{Gisteren met Joost gesproken over het verslag. Hij zei dat alle standaardfuncties best op een regel in de documentatie mogen. Bovendien vond hij het niet erg als het verslag iets langer dan 5 pagina's is (zolang er maar nuttige dingen in staan). }
-
 \section{Introductie}
 In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om symbolisch te kunnen rekenen zoals dat bijvoorbeeld in Mathematica gebeurt. Wiskundige formules worden hiervoor opgeslagen in een zogenaamde expressie-boom. Behalve dat deze representatie kan worden gebruikt om berekeningen te doen, is deze geschikt voor symbolische manipulaties, zoals optellen, vermenigvuldigen, maar ook differenti\"eren en oplossen van sommige polynoom~vergelijkingen. De code behordende bij dit project kan gevonden worden op \url{https://github.com/JurreCorver/SymbolischeManipulatie}.
 
@@ -70,6 +68,13 @@ Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volge
 \item Als de token geen functie of operator is, voeg hem dan aan de \ttt{stack} toe.
 \end{enumerate}
 Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tokens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tokens).
+
+\subsection{Simplify algoritme}
+Voor vele andere functies in het programma is het erg nuttig om symbolische vergelijkingen te kunnen versimpelen. Denk hier bijvoorbeeld aan expressies als \ttt{x-x} naar \ttt{0} te versimpelen. Daarom is de functie \ttt{simplify(expression)} ge\"implementeerd die de expressie \ttt{expression} zoveel mogelijk probeert te versimpelen. We zullen hier een summiere omschrijving geven over de werking van deze functie. De \ttt{simplify} functie roept de \ttt{simplifyStep} functie net zo vaak, met een maximum van 20 keer, aan tot dat de uitdrukking niet meer veranderd na verdere toepassing van \ttt{simplifyStep}. De \ttt{simplifyStep} functie gebruikt standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. Bij functies versimpeld de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
+
+\subsection{Grafische omgeving}
+De grafische omgeving maakt gebruik van  \ttt{tk} voor de weergave. Deze interpreteert dan de invoer van de gebruiker en voert deze uit door \ttt{expression\_template.py} in te laden. De gebruiker heeft dan de optie om de uitvoer weer te geven met \LaTeX. Dit werkt door de expressie om te vormen tot \LaTeX code. Deze \LaTeX code wordt vervolgens naar een \ttt{.tex} bestand geschreven en uitgevoerd door \ttt{latex} aan te roepen, wat dan weer een \ttt{.dvi} bestand als uitvoer geeft. Dit \ttt{.dvi} bestand wordt dan met behulp van \textit{GhostScript} omgevormd naar een \ttt{.png} bestand die wordt weergegeven door \ttt{tk}.
+
 
 \subsection{solvePolynomial algoritme}
 Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen.
