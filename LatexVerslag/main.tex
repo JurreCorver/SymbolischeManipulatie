@@ -40,7 +40,15 @@ Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op 
 	\caption{Voorbeeld van een expressieboom. In infix notatie  kan de expressie weergegeven in deze boom gegeven worden door $-2+\sin(3\times \pi)$. In postfix notatie is het $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.}\label{fig:boom}
 \end{figure}
 
-\rcom{Iets over infix (normale wiskunde) versus postfix (RPN) notatie. Shunting-yard doet infix->postfix->boom.}
+\subsection{Postfix notatie}
+De wiskundige notatie waaraan wij gewend zijn, waarbij operatoren tussen operanden worden geplaatst, noemen we ook wel de infix notatie. Een simpel voorbeeld hiervan is $1 + 2$  waarbij $1$ en $2$ de operanden zijn en $+$ de operator. Het nadeel van deze notatie is dat de volgorde van de toepassing niet altijd direct duidelijk is, waardoor er haakjes gezet moeten worden. Een voorbeeld hiervan is 3+3 / 3 . Als delen eerst wordt uitgevoerd, is de uitkomst van deze expressie gelijk aan $3$. Als optellen eerst wordt uitgevoerd, dan is de uitkomst gelijk aan $2$. 
+
+Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $123f$. Een bijkomend nadeel hiervan is wel dat het aantal argumenten van de functie van tevoren wel aan duidelijk moet zijn.
+
+Gebruikers zullen hun invoer over het algemeen liever in de infix notatie doen. Daarom is er een algoritme nodig om de infix notatie om te schrijven naar postfix notatie en deze daarna in een expressieboom om te zetten. Hiervoor is het shunting-yard algortime ge\"implementeerd.
+
+
+\rcom{Iets over infix (normale wiskunde) versus postfix (RPN) notatie DONE. Shunting-yard doet infix->postfix->boom.}
 
 \section{Algoritmen}
 %Beschrijving van de gebruikte algoritmen, denk hierbij ook aan bijvoorbeeld de complexiteit en de gebruikte datastructuren
@@ -185,15 +193,23 @@ $\cos(x)$
 \com{polIntRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2} over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
 \com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
-\com{deg(pol,x)}{Geeft de graad van \texttt{pol} als polynoom in \texttt{x}.}
+
 
 \section{Taakverdeling}
 In het verslag is de volgende taakverdeling gehanteerd:
 
-\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd, theorie over postfix notatie, schrijven stukje over taakverdeling}
-\com{Rik} {Stukje theorie over Shunting-yard}
+\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
 
+\com{Rik} {Stukje theorie over Shunting-yard, grootste deel van de documentatie, stukje over user interface}
+\com{Jan-Willem} {Introductie geschreven}
 
+De volgende taakverdeling was van toepassing bij het schrijven van de software:
+
+\com{Jurre} {solvePolynomial geschreven, aantal simpele nodes toegevoegd vergelijkbaar met MulNode,Simpele functies toegevoegd. Mindeg functie toegevoegd, Shunting-yard ietwat aangepast}
+
+\com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, Shunting yard uitgebreid, differentieren ingevoerd, user variables en functions toegevoegd.}
+
+\com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd}
 
 
 \begin{thebibliography}{99}
