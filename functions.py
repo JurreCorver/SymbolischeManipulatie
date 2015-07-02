@@ -109,7 +109,7 @@ class ArcTanNode(FuncNode):
         super(ArcTanNode, self).__init__(arg)
 
     def diff(self,var):
-        return self.args[0].diff(var)/(self.args[0]**2+1)
+        return self.args[0].diff(var)/(self.args[0]**Constant(2)+Constant(1))
 
 class LogNode(FuncNode):
     """Represents the logarithm"""
@@ -121,7 +121,7 @@ class LogNode(FuncNode):
         super(LogNode, self).__init__(arg1, arg2)
 
     def diff(self,var):
-        return (LnNode(args[0])/LnNode(args[1])).diff(var)
+        return (LnNode(self.args[0])/LnNode(self.args[1])).diff(var)
 
 class LnNode(FuncNode):
     """Represents the natural logarithm"""
