@@ -10,6 +10,7 @@
 
 \newcommand{\rcom}[1]{\textbf{\textcolor{red}{#1}}}
 \newcommand{\com}[2]{\texttt{#1}\mbox{}\vspace{-2ex}\begin{adjustwidth}{0.8cm}{} #2 \end{adjustwidth}}
+\newcommand{\ttt}[1]{\texttt{#1}}
 
 \pagestyle{fancy}
 
@@ -33,12 +34,29 @@ In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om 
 
 \section{Theorie}
 %Beschrijving van de theorie
-Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in \rcom{Ik weet niet hoe je handig plaatjes kan maken, maar ik stel voor om de expressie $-2+\sin(1.2*3)$ o.i.d. in een expressieboom te zetten (in ieder geval minstens \'e\'en functie,  \'e\'en negNode en  \'e\'en binaire knoop}. 
+Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in \ref{fig:boom}.
 
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.25\textwidth]{expressionTree}
+	\caption{Voorbeeld van een expressieboom. In infix notatie  kan de expressie weergegeven in deze boom gegeven worden door $-2+\sin(3\times \pi)$. In postfix notatie is het $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.}\label{fig:boom}
+\end{figure}
+
+\rcom{Iets over infix (normale wiskunde) versus postfix (RPN) notatie. Shunting-yard doet infix->postfix->boom.}
 
 \section{Algoritmen}
 %Beschrijving van de gebruikte algoritmen, denk hierbij ook aan bijvoorbeeld de complexiteit en de gebruikte datastructuren
-\subsection{Shunting-Yard}
+\subsection{Shunting-yardalgoritme}
+Een gebruiker vindt infix notatie het makkelijkst te gebruiken, en zal graag zijn invoer dus ook in infix notatie aan een programma willen doorvoeren. De meest nuttige manier om een expressie op te slaan en te bewerken blijkt echter in de vorm van een expressieboom te zijn. Het Shunting-yardalgoritme maakt de vertaalslag van de infix notatie van de gebruiker naar postfix notatie, en de vertaling van postfix notatie naar een expressieboom is vrij gemakkelijk. Het algortime is gepubliceerd door Dijkstra in 1961. 
+
+We gaan niet het algoritme in volledig detail beschrijven, we behandelen het slechts in groffe lijnen aan de hand van voorbeelden. We beginnen met een string met een expressie in infix notatie, bijvoorbeeld \texttt{`2-3*3'}. Dit splitsen we dan op in kleine stukken genaamd `tokens'. In dit geval: \texttt{`2',`-',`3',`*'}. 
+
+Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tokens heen en volgen de volgende procedure uit:
+\begin{enumerate}
+\item Indien de token een getal is, stop hem in de \ttt{output}.
+\item Als de token een comma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
+\item Als de token een binaire operator (\ttt{-,+,*,/,\%}) is,  
+\end{enumerate}
 
 
 \section{Documentatie}
@@ -82,7 +100,7 @@ De lijst met alle ge\"implementeerde functies is te vinden in de volgende sectie
 \texttt{>>> i**2}\\
 $-1$\\
 \texttt{>>> exp(i*pi)-1}\\
-$0$\\
+$0$
 \end{adjustwidth}
 Naast standaard operaties is het ook mogelijk om zelf functies en constanten toe te voegen. Hiervoor kan \texttt{:=} gebruikt worden. Als links van de \texttt{:=} alleen een symbool staat, dan wordt wat rechts van de \texttt{:=} staat opgeslagen onder naam van het symbool aan de linkerkant. We kunnen bijvoorbeeld het volgende doen:
 \begin{adjustwidth}{1.5cm}{}
