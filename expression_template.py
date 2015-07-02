@@ -139,10 +139,7 @@ class Expression():
         for token in tokens:
             if isnumber(token):
                 # numbers go directly to the output
-                if isint(token):
-                    output.append(Constant(int(token)))
-                else:
-                    output.append(Constant(float(token)))
+                output.append(Constant(num(token)))
 
             elif token == ',':
                 while not stack[-1] == '(':
@@ -467,7 +464,7 @@ class BinaryNode(Expression):
         r = self.rhs.evaluate(dic)
 
         if type(l)==Constant and type(r)==Constant:
-            val =  eval('(%s) %s (%s)' % (complex(l),self.op_symbol,complex(r)))
+            val =  eval('(%s) %s (%s)' % (num(l),self.op_symbol,num(r)))
             return(Constant(num(val)))
         else:
             return self.__class__(l,r)
