@@ -44,7 +44,8 @@ def isint(string):
     except ValueError:
         return False
 
-def num(x): #short command to make numbers looks nicer than just float() or complex()
+def num(y): #short command to make numbers looks nicer than just float() or complex()
+    x=complex(y)
     if type(x)==complex and complex(x.imag)!=0:
         return x
     x = float(complex(x).real)
