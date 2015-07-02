@@ -6,7 +6,7 @@ from scipy import special
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),%")
+    splitchars = list("+-*/(),%=")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -19,10 +19,12 @@ def tokenize(string):
     #split on spaces - this gives us our tokens
     tokens = tokenstring.split()
     
-    #special casing for **:
+    #special casing for ** and ==:
     ans = []
     for t in tokens:
-        if len(ans) > 0 and t == ans[-1] == '*':
+        if len(ans) > 0 and t == ans[-1] == '=':
+            ans[-1] = '=='
+        elif len(ans) > 0 and t == ans[-1] == '*':
             ans[-1] = '**'
         else:
             ans.append(t)
@@ -194,7 +196,7 @@ class Expression():
         # pop any tokens still on the stack to the output
         while len(stack) > 0:
             output.append(stack.pop())
-        
+
         # convert RPN to an actual expression tree
         for t in output:
             if t in metnamelist+funcnamelist: #check whether the token is a method/function and pop the right amount of arguments from the stack
@@ -214,7 +216,10 @@ class Expression():
 
             elif t == 'neg':
                 stack.append(NegNode(stack.pop()))
-
+            elif t == '==':
+                y = stack.pop()
+                x = stack.pop()
+                stack.append(EqNode(x,y))
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
@@ -234,9 +239,9 @@ methodList.append(['d',diff,2])
 methodList.append(['exit',exit,0])#make it possible for the user to exit
 
 def frost(string):
-    if '==' in string: #always put an EqNode at the trunk
-        stringSplit = string.split('==')
-        return EqNode(frost(stringSplit[0]),frost(stringSplit[1])) #parse left and right side seperately
+    # if '==' in string: #always put an EqNode at the trunk
+    #     stringSplit = string.split('==')
+    #     return EqNode(frost(stringSplit[0]),frost(stringSplit[1])) #parse left and right side seperately
     
     if ':=' in string: #handle user vars/functions differently
         stringSplit = string.split(':=')
@@ -615,10 +620,11 @@ class EqNode(BinaryNode): #egg node
     """Represents the equality operator"""
     leftass=True
     rightass=True
-    precedence=0
-    op_symbol = '='
+    precedence=-1
+    op_symbol = '=='
     tex_symbol = '='
 
+    binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):
         super(EqNode,self).__init__(lhs,rhs)
 

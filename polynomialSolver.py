@@ -82,8 +82,6 @@ def solvePolynomial(eq, var):
         exp = simplify(exp * frost(var) ** Constant(-mindeg) )
         solutions.append(Constant(0))
         
-        
-    print(exp)
     deg = exp.deg(var)
     #Find the list of coefficients.
     #For a polynomial a x^3 + b x^2 + c, a = coef[3]
