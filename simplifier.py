@@ -152,17 +152,6 @@ def simplifyByComm(exp): #try to use commutativity to simplify the expression
                     consts.append(node.evaluate())
                 else:
                     compounds.append(node)
-                    
-            #deprecated by code that comes after this
-            # if type(exp)==MulNode: #turn expressions like x*x*x into x**3
-            #     for node in variables:
-            #         i = variables.index(node)
-            #         j = 1
-            #         while i+1<len(variables) and variables[i]==variables[i+1]:
-            #             j+=1
-            #             del variables[i+1]
-            #         if j!=1:
-            #             variables[i]=node**Constant(j)
 
             if type(exp)==MulNode:
                 for node in compounds:
@@ -252,9 +241,6 @@ def multodiv(exp):
             else:
                 posProd*=term
         return removeUnits(posProd/negProd)
-                
-        # if type(exp.rhs)==PowNode and type(exp.rhs.rhs)==Constant and float(exp.rhs.rhs)<0:
-        #     return exp.lhs/(multodiv(exp.rhs.lhs)**Constant(-num(exp.rhs.rhs)))
         
     if type(exp)==PowNode: #convert x**-n to 1/x**n
         if type(exp.rhs)==Constant and complex(exp.rhs).real <0:
@@ -360,19 +346,3 @@ def expand(exp): #expand expressions of form (sum a_i)*(sum b_j)
     if issubclass(type(exp),BinaryNode):
         return exp.__class__(expand(exp.lhs),expand(exp.rhs)) #iterate over tree
     return exp
-            
-            
-            
-         
-#DONE: use commutative properties, e.g. 2+x+4+2+y to 8+x+y
-#DONE: support subtraction, e.g. 2+x-2+4 = 4+x
-#DONE: remove units, e.g. 2+0 = 2, 2*1 = 1, 3**1 = 3
-#DONE: add zeros, e.g. 2*0 = 0 and 3**0 = 1
-#DONE: turn expressions like x+x into 2*x and 2+x-x into 2
-#DONE: sort variables into alphabetic order
-#DONE: Turn multiplications of variables into powers, e.g. x*x to x**2
-#DONE: factorize x**a * x**b into x**(a+b)
-#DONE: Add an expand method taking e.g. (x+2)*(x-3) to x**2-x-6
-#DONE: Support division
-
-#TODO: support trigoniometric properties

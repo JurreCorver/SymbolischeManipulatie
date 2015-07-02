@@ -13,11 +13,13 @@ inpFrame = tk.Frame(root)
 inpBox = tk.Text(root,height=1) #make a text box 1 line high at the bottom of the screen
 inpBox.pack(side=tk.BOTTOM, fill=tk.X)
 
-useTex = tk.IntVar()
+#make a checkbutton for LaTeX function toggling
+useTex = tk.IntVar() 
 useTex.set(1)
 texBox = tk.Checkbutton(inpFrame,text='Use LaTeX',variable=useTex)
 texBox.grid(column=1,row=0)
 
+#make three radiobuttons for the user to specify what kind of output processing is done
 outSettingLabel = tk.Label(inpFrame,text='\tOutput processing: ')
 outSettingLabel.grid(column=2,row=0)
 outputSetting=tk.StringVar()
@@ -31,16 +33,13 @@ noneButton.grid(column=5,row=0)
 
 inpFrame.pack(side=tk.TOP, fill=tk.X)
 
-
-
-
 def sendCommand(self): #Command used to parse content of inpBox when Return is pressed
     outBox.config(state=tk.NORMAL) #enable the output box so it can be edited
     inpText = inpBox.get("1.0",'end') #get the text
     inpText = inpText.replace('\n','') #remove newline characters from input
     inpText = inpText.replace(' ','') #remove spaces
 
-    global inpRingIndex
+    global inpRingIndex #add the input to the history and set the index to the end of the list
     inpRing.append(inpText)
     inpRingIndex = len(inpRing)
     if len(inpText)==0: #stop if the user pressed enter on an empty line
@@ -48,28 +47,52 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
     if len(inpText)>0: #Insert the text
         outBox.insert(tk.END, '>>> '+inpText+'\n')
         inpBox.delete("1.0",tk.END)
-        try:
+        try: #process input based on settings and catch+print any errors
             outSet = outputSetting.get()
-            if outSet == 'simplify':
-                outExpr = sfrost(inpText)
-            elif outSet == 'evaluate':
-                outExpr = frost(inpText).evaluate()
-            elif outSet == 'none':
-                outExpr = frost(inpText)
+            outExpr = frost(inpText)
+            if type(outExpr)!=list:
+                if outSet == 'simplify':
+                    outExpr = sfrost(inpText)
+                elif outSet == 'evaluate':
+                    outExpr = frost(inpText).evaluate()
+                elif outSet == 'none':
+                    outExpr = frost(inpText)
         except Exception as err:
             outBox.insert(tk.END,err.__class__.__name__+': '+str(err)+'\n')
-        else:
+        else: #if there were no errors convert the output to tex if the option is enabled
             if useTex.get()==1:
                 try: #catch errors that converting to LaTeX may produce
-                    texToImage(outExpr.tex())
+                    if type(outExpr)==list:
+                        if len(outExpr)==1:
+                            texToImage(outExpr[0].tex())
+                        else:
+                            texList = [e.tex() for e in outExpr]
+                            outTex=''
+                            for i in range(len(texList)):
+                                if i==0:
+                                    outTex+="["+texList[i]+", "
+                                elif i!=len(texList)-1:
+                                    outTex+=texList[i]+", "
+                                else:
+                                    outTex+=texList[i]+"]"
+                            texToImage(outTex)
+                    else:
+                        texToImage(outExpr.tex())
                 except Exception as err:
                     outBox.insert(tk.END,'Error evaluating LaTeX: '+str(err))
                 outBox.insert(tk.END,'\n')
             else:
-                outBox.insert(tk.END, str(outExpr)+'\n')
-    outBox.config(state=tk.DISABLED) #disable the output box again
-    
+                if type(outExpr)==list:
+                    for exp in outExpr:
+                        outBox.insert(tk.END, str(exp)+'\n')
+                else:
+                    outBox.insert(tk.END, str(outExpr)+'\n')
+    outBox.config(state=tk.DISABLED) #disable the output box
+
+#bind sending the input to the enter key    
 inpBox.bind("<Return>",sendCommand)
+
+#allow for the user to cycle through input history via the up/down arrow keys
 inpRing = []
 inpRingIndex=0
 def cycleRing(direction):
@@ -92,15 +115,19 @@ inpBox.bind("<Up>",cycleRingUp)
 inpBox.bind("<Down>",cycleRingDown)
 inpFrame = tk.Frame(root)
 
+#add a a scrollbar
 scrollbar = tk.Scrollbar(root)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+#create the box where the output goes
 outBox = tk.Text(root,height=10000,state=tk.DISABLED,yscrollcommand=scrollbar.set)
 scrollbar.config(command=outBox.yview)
 outBox.pack(side=tk.TOP, fill=tk.BOTH)
 
+#create a list of images to be displayed later
 root.images=[]
 
-class latexError(Exception):
+class latexError(Exception): #create an exception class for LaTeX errors 
     def __init__(self,message):
         self.message = message
 
@@ -111,7 +138,7 @@ def texToImage(string):
     outputTex = open('equation.tex','w')
     outputTex.write('\\documentclass[border=1pt,convert={density=600}]{standalone}\n')#changing density will change the DPI of the image, creating a linearly larger image
     outputTex.write('\\begin{document}\n')
-    outputTex.write('\\batchmode') #make LaTeX go on even when encountering erros
+    outputTex.write('\\batchmode\n') #make LaTeX go on even when encountering erros
     outputTex.write('$\\displaystyle\n')
     outputTex.write(string) #this is where the actual math expression goes.
     outputTex.write('\n$\n')
@@ -121,10 +148,11 @@ def texToImage(string):
     #use LaTeX to conver the tex file into a DVI file. The convert option of standalone then works its magic and outputs a png file with the name equation.png
     subprocess.call(['latex','-shell-escape', 'equation.tex'],stdout=open(os.devnull,'w')) #then call LaTeX
 
+    #open the log and check for errors
     texLog = open('equation.log','r')
     texErrors=''
     for line in texLog:
-        if line[0]=='!':
+        if line[0]=='!': #the line containing  errors in the log always start with an exclamation mark
             texErrors+=line[1:-1]
     if texErrors!='':
         raise latexError(texErrors)
@@ -132,7 +160,7 @@ def texToImage(string):
 
     im = Image.open('equation.png') #open the image for processing
     out=im.resize((int(im.size[0]/5),int(im.size[1]/5)),Image.LANCZOS) #scale down the image. Lanczos is a nice looking (but slow) algorithm to do so
-    out.save('equation_conv.png')#save the converted equation
+    out.save('equation_conv.png')#save the converted equation and display it to the output
     root.images.append(tk.PhotoImage(file='equation_conv.png'))
     outBox.image_create('end',image=root.images[-1])
 
@@ -144,8 +172,6 @@ def texToImage(string):
     os.remove('equation.ps')
     os.remove('equation.tex')
     os.remove('equation_conv.png')
-
-#texToImage(r'{a \ffsd')
 
 root.mainloop() #starts the event loop, any code after this will NOT be evaluated unless the window is closed
 exit() #make sure the process ends after closing the window
