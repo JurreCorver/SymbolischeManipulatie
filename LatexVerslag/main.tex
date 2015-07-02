@@ -1,9 +1,10 @@
 \documentclass[a4paper]{article}
-\usepackage[dutch]{babel}
+%\usepackage[dutch]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath,graphicx,hyperref,parskip,setspace,fancyhdr,changepage}
 \usepackage[margin=1in]{geometry}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{cleveref}
 
 \setlength{\parindent}{0mm}
 \linespread{1.4}
@@ -14,36 +15,42 @@
 
 \pagestyle{fancy}
 
+
 \title{Symbolische manipulatie}
 \author{Rik~Voorhaar~(3888169) - Jan-Willem~van~Ittersum~(3992942) - Jurre~Corver~(3905985)\\
 Begeleider: Joost Houben}
+\date{3 juli 2015}
 
 \begin{document}
 \maketitle
+\thispagestyle{empty}
 \clearpage
 
 %\begin{abstract}
 %Your abstract.
 %\end{abstract}
 
+\setcounter{page}{1}
 \section{Introductie}
 In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om symbolisch te kunnen rekenen zoals dat bijvoorbeeld in Mathematica gebeurt. Wiskundige formules worden hiervoor opgeslagen in een zogenaamde expressie-boom. Behalve dat deze representatie kan worden gebruikt om berekeningen te doen, is deze geschikt voor symbolische manipulaties, zoals optellen, vermenigvuldigen, maar ook differenti\"eren en oplossen van sommige polynoom~vergelijkingen. De code behordende bij dit project kan gevonden worden op \url{https://github.com/JurreCorver/SymbolischeManipulatie}.
 
 
 \section{Theorie}
 %Beschrijving van de theorie
-Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in figuur \ref{fig:boom}.
+Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. De knopen waarop de uitgaande zijden van een interne knoop uitmonden, heten \textit{de kinderen} van die interne knoop.
+
+In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in figuur \ref{fig:boom}. \rcom{JW: Ik zou het mooier vinden als de `x' in de expressieboom een `*' is, zoals in ons programma.}
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.25\textwidth]{expressionTree}
-	\caption{Voorbeeld van een expressieboom. In infix notatie  kan de expressie weergegeven in deze boom gegeven worden door $-2+\sin(3\times \pi)$. In postfix notatie is het $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.}\label{fig:boom}
+	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3\times \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in \cref{sec:postfix}, wordt deze expressie weergegeven als $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.} \label{fig:boom}
 \end{figure}
 
-\subsection{Postfix notatie}
-De wiskundige notatie waaraan wij gewend zijn, waarbij operatoren tussen operanden worden geplaatst, noemen we ook wel de infix notatie. Een simpel voorbeeld hiervan is $1 + 2$  waarbij $1$ en $2$ de operanden zijn en $+$ de operator. Het nadeel van deze notatie is dat de volgorde van de toepassing niet altijd direct duidelijk is, waardoor er haakjes gezet moeten worden. Een voorbeeld hiervan is 3+3 / 3 . Als delen eerst wordt uitgevoerd, is de uitkomst van deze expressie gelijk aan $3$. Als optellen eerst wordt uitgevoerd, dan is de uitkomst gelijk aan $2$. 
+\subsection{Infix en postfix notatie}\label{sec:postfix}
+De wiskundige notatie waaraan wij gewend zijn, waarbij operatoren tussen operanden worden geplaatst, noemen we ook wel de infix notatie. Een simpel voorbeeld hiervan is $1 + 2$  waarbij $1$ en $2$ de operanden zijn en $+$ de operator. Het nadeel van deze notatie is dat de volgorde waarin de operatoren moeten worden toegepast niet altijd direct duidelijk is, waardoor er haakjes gezet moeten worden. Een voorbeeld hiervan is $3+3 / 3$ . Als delen eerst wordt uitgevoerd, is de uitkomst van deze expressie gelijk aan $3$. Als optellen eerst wordt uitgevoerd, dan is de uitkomst gelijk aan $2$. 
 
-Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $123f$. Een bijkomend nadeel hiervan is wel dat het aantal argumenten van de functie van tevoren wel aan duidelijk moet zijn.
+Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $123f$. Wel is een  nadeel hiervan dat het aantal argumenten van de functie van tevoren duidelijk moet zijn.
 
 Gebruikers zullen hun invoer over het algemeen liever in de infix notatie doen. Daarom is er een algoritme nodig om de infix notatie om te schrijven naar postfix notatie en deze daarna in een expressieboom om te zetten. Hiervoor is het shunting-yard algortime ge\"implementeerd.
 
@@ -57,16 +64,16 @@ We gaan niet het algoritme in volledig detail beschrijven, we behandelen het sle
 Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tokens heen en volgen de volgende procedure uit:
 \begin{enumerate}
 \item Indien de token een getal is, stop hem in de \ttt{output}.
-\item Als de token een comma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
+\item Als de token een komma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
 \item Als de token een binaire operator (\ttt{-,+,*,/,\%,**}) is,  blijf dan aan de hand van de precedentie operatoren van de \ttt{stack} naar de \ttt{output} verplaatsen totdat het laatste element van de \ttt{stack} geen operator meer is. De \ttt- token wordt dan op een speciale manier behandeld, omdat het zowel negatie als aftrekken kan betekenen.
 \item Als de token \ttt{`('} is, kijk dan of het laatste element op de \ttt{output} een functie is. Zo ja, verplaats dan de functie naar de \ttt{stack}. Stop het haakje op de \ttt{output}.
-\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{'('} wordt tegengekomen. Verwijder dan de \ttt{'('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
+\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{`('} wordt tegengekomen. Verwijder dan de \ttt{`('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
 \item Als de token een bekende variabele (e.g. \ttt{`pi'}) is, voeg zijn waarden dan toe aan de \ttt{output}.
 \item Als de token in geen van de bovenstaande gevallen zit, voeg hem dan als onbekende variabele toe aan de \ttt{output}.
 \item Als we door de lijst van tokens heen zijn, voeg dan alle elementen van de \ttt{stack} toe aan de \ttt{output}.
 \end{enumerate}
 
-Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende alrogritme word dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
+Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende algoritme wordt dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
 \begin{enumerate}
 \item Als de token een functie is, haal dan $n$ elementen van de \ttt{stack} af, waar $n$ de hoeveelheid argumenten is die de functie aanneemt. Voeg vervolgens de functie als knoop toe de \ttt{stack} met als kinderen de $n$ argumenten. 
 \item Als de token een binaire operator is, voeg de operator als knoop toe aan de \ttt{stack} met als kinderen de twee operanden.
@@ -201,7 +208,7 @@ In het verslag is de volgende taakverdeling gehanteerd:
 \com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
 
 \com{Rik} {Stukje theorie over Shunting-yard, grootste deel van de documentatie, stukje over user interface}
-\com{Jan-Willem} {Introductie geschreven}
+\com{Jan-Willem} {Introductie en theorie over expressie-bomen geschreven}
 
 De volgende taakverdeling was van toepassing bij het schrijven van de software:
 
@@ -209,7 +216,7 @@ De volgende taakverdeling was van toepassing bij het schrijven van de software:
 
 \com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, Shunting yard uitgebreid, differentieren ingevoerd, user variables en functions toegevoegd.}
 
-\com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd}
+\com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd.}
 
 
 \begin{thebibliography}{99}
