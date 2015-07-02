@@ -25,14 +25,14 @@ def prepareSolutions(var, solutions):
     answers = []
     for i in range(0, len(solutions)):
             solutions[i] = simplify(solutions[i])
-            answers.append(frost(var + str(i) + ' == ' + str(solutions[i])))
+            answers.append(frost(var.symbol + str(i) + ' == ' + str(solutions[i])))
     return answers        
 
 #Solves a linear polynomial requiring the variable and the coefficients    
 def solveLinear(var, coef):
     sol =  Constant(0) - coef[0] / coef[1] 
     sol = simplify(sol)
-    answer = frost(var + ' == ' + str(sol))
+    answer = frost(var.symbol + ' == ' + str(sol))
     return([answer])
 
 #Solves a quadratic polynomial requiring the variable and the coefficients
@@ -75,28 +75,29 @@ def solvePolynomial(eq, var):
     
     #Define the variable and check the degree of the equation and find the list of coefficients.
     #If the expression has negative powers of x, multiply to remove this negative factor
-    var = str(var)
     mindeg = exp.mindeg(var)
     if mindeg <= -1:
-        exp = simplify(exp * frost(var) ** Constant(-mindeg) )
+        exp = simplify(exp * frost(var.symbol) ** Constant(-mindeg) )
     elif mindeg >= 1 and exp.deg(var) >= 4:
         exp = simplify(exp * frost(var) ** Constant(-mindeg) )
         solutions.append(Constant(0))
         
         
-    
-    deg = exp.deg(Variable(var))
+    print(exp)
+    deg = exp.deg(var)
     #Find the list of coefficients.
     #For a polynomial a x^3 + b x^2 + c, a = coef[3]
     coef = [0 for i in range(0, deg+1)]
     for i in range(0, deg+1):
-        coef[i] = coefficient(exp, i, Variable(var))
+        coef[i] = coefficient(exp, i, var)
     
     #checks if the expression is of the simple form x^k = constant, then solves it if this is true.
-    checkstr = [int(str(coef[i])) for i in range(1, deg) ]
-    if checkstr == [0 for i in range(1, deg) ]:
-        ans = simplify(((Constant(0) - coef[0] ) / coef[-1] ) ** (Constant(1) / Constant(deg) ))
-        solutions.append(ans)
+    checkstr = [num(str(coef[i])) for i in range(1, deg) ]
+    if checkstr == [0 for i in range(1, deg) ] :
+        
+        for k in range(0, deg):
+            ans = simplify(((Constant(0) - coef[0] ) / coef[-1] ) ** (Constant(1 / deg)  ) * ExpNode( Constant((2j * math.pi) / deg ) * Constant(k)  )  )
+            solutions.append(ans)
         return prepareSolutions(var, solutions)
 
         
@@ -129,3 +130,6 @@ def solvePolynomial(eq, var):
         
         
 methodList.append(["solvePolynomial", solvePolynomial, 2])        
+
+
+#1/x -x+ 1
