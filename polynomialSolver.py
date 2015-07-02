@@ -117,3 +117,8 @@ def solvePolynomial(eq, var):
         print("Polynomial is of degree " + str(deg) + "." )
         print("This software doesn't solve polynomials of this degree.")
         return []
+        
+        
+        
+        
+methodList.append(["solvePolynomial", solvePolynomial, 2])        
