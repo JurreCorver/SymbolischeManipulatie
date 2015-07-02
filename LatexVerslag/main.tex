@@ -71,6 +71,16 @@ Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volge
 \end{enumerate}
 Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tokens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tokens).
 
+\subsection{solvePolynomial algoritme}
+Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen.
+\begin{enumerate}
+\item Test of er wel een vergelijking is ingevoerd. Als dit zo is, haal dan de rechterkant van de vergelijking naar de linkerkant via gewoonlijke algebra. Is dit niet het geval neem dan aan dat de wortel van de vergelijking wordt bedoeld.
+\item Sla de polynoom op als een lijst met co\"effici\"enten. 
+\item Controleer wat de kleinste macht in de vergelijking is. Als deze kleiner is dan 0, vermenigvuldig dan met deze macht. Is hij groter dan 0, deel door deze macht. Voeg in het tweede geval 0 toe als oplossing van de vergelijking.
+\item Controleer nu de graad van de vergelijking. Is de graad 0, dan bestaat er geen oplossing. Is de graad 1, 2 of 3 geef dan de oplossing gebruikmakend van bekende algoritmes. In andere gevallen is er geen oplossing.
+\item Return de oplossing
+\end{enumerate}
+
 \section{Documentatie}
 %Documentatie over het gebruik van de code
 \subsection{Installatie}
@@ -161,7 +171,7 @@ $\cos(x)$
 \rcom{misschien ook nog even round en ceil toevoegen voor compleetheid?}
 
 \rcom{nog toevoegen:\\}
-\com{solvePolynomial(eq, var)}{}
+\com{solvePolynomial(eq, var)}{Geeft de oplossing van een polynomiale vergelijking in de variabele \textit{var}. Bijvoorbeeld $x^{10} = 1024$ of $x^2 + 1/x = 10$}
 \com{numIntegrate(expressie, x, l, r, numsteps)}{Numeriek bepalen van $\int_{\texttt{l}}^\texttt{r} \texttt{expressie} \; \mathrm{d}\texttt{x}$ door middel van een Riemann benadering in \texttt{numsteps} stappen.}
 \com{gcd(n,m)}{Geeft de grootste gemene deler van twee gehele getallen \texttt{n} en \texttt{m}.}
 \com{polQuotient(pol1, pol2, x)}{Geeft het quotient van de deling van \texttt{pol1} door \texttt{pol2} met rest, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
@@ -172,12 +182,10 @@ $\cos(x)$
 \com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
 \com{deg(pol,x)}{Geeft de graad van \texttt{pol} als polynoom in \texttt{x}.}
 
-\section{Resultaten}
-%Eventuele resultate die behaald zijn met de code
-
 \section{Taakverdeling}
-%De taakverdeling binnen je groepje.
+In het verslag is de volgende taakverdeling gehanteerd:
 
+\com{Jurre} {Taakverdeling}
 
 
 
