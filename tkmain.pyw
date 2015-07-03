@@ -5,7 +5,7 @@ import time
 from PIL import Image
 from expression_template import *
 
-root = tk.Tk() #initialize the window
+root = tk.Tk() #initialize the window 
 root.wm_title("Ruben is Trojaanse Manipulator")
 root.geometry('800x600')
 
@@ -31,6 +31,7 @@ evaluateButton.grid(column=4,row=0)
 noneButton = tk.Radiobutton(inpFrame,text='None',variable=outputSetting,value='none')
 noneButton.grid(column=5,row=0)
 
+#place the frame of options on the top
 inpFrame.pack(side=tk.TOP, fill=tk.X)
 
 def sendCommand(self): #Command used to parse content of inpBox when Return is pressed
@@ -50,19 +51,19 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
         try: #process input based on settings and catch+print any errors
             outSet = outputSetting.get()
             outExpr = frost(inpText)
-            if type(outExpr)!=list:
+            if type(outExpr)!=list: #solvePolynomial can output lists, so we need an exception for this
                 if outSet == 'simplify':
                     outExpr = sfrost(inpText)
                 elif outSet == 'evaluate':
                     outExpr = frost(inpText).evaluate()
                 elif outSet == 'none':
                     outExpr = frost(inpText)
-        except Exception as err:
+        except Exception as err: #report any errors found when evaluating the input
             outBox.insert(tk.END,err.__class__.__name__+': '+str(err)+'\n')
         else: #if there were no errors convert the output to tex if the option is enabled
             if useTex.get()==1:
-                try: #catch errors that converting to LaTeX may produce
-                    if type(outExpr)==list:
+                try: 
+                    if type(outExpr)==list: #exceptions for lists
                         if len(outExpr)==1:
                             texToImage(outExpr[0].tex())
                         else:
@@ -70,18 +71,18 @@ def sendCommand(self): #Command used to parse content of inpBox when Return is p
                             outTex=''
                             for i in range(len(texList)):
                                 if i==0:
-                                    outTex+="["+texList[i]+", "
+                                    outTex+="["+texList[i]+",\\,"
                                 elif i!=len(texList)-1:
-                                    outTex+=texList[i]+", "
+                                    outTex+=texList[i]+",\\,"
                                 else:
                                     outTex+=texList[i]+"]"
                             texToImage(outTex)
-                    else:
-                        texToImage(outExpr.tex())
-                except Exception as err:
+                    else: 
+                        texToImage(outExpr.tex()) #send the TeX of the output expression to texToImage
+                except Exception as err: #catch errors that converting to LaTeX may produce
                     outBox.insert(tk.END,'Error evaluating LaTeX: '+str(err))
                 outBox.insert(tk.END,'\n')
-            else:
+            else: #no LaTeX so just print the string
                 if type(outExpr)==list:
                     for exp in outExpr:
                         outBox.insert(tk.END, str(exp)+'\n')
@@ -119,7 +120,7 @@ inpFrame = tk.Frame(root)
 scrollbar = tk.Scrollbar(root)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-#create the box where the output goes
+#create the box where the output goes at the bottom of the screen
 outBox = tk.Text(root,height=10000,state=tk.DISABLED,yscrollcommand=scrollbar.set)
 scrollbar.config(command=outBox.yview)
 outBox.pack(side=tk.TOP, fill=tk.BOTH)
@@ -134,7 +135,7 @@ class latexError(Exception): #create an exception class for LaTeX errors
     def __str__(self):
         return self.message
 
-def texToImage(string):
+def texToImage(string): #this function takes a string of LaTeX codes and then puts an image of the LaTeX in the output box
     outputTex = open('equation.tex','w')
     outputTex.write('\\documentclass[border=1pt,convert={density=600}]{standalone}\n')#changing density will change the DPI of the image, creating a linearly larger image
     outputTex.write('\\begin{document}\n')
@@ -152,7 +153,7 @@ def texToImage(string):
     texLog = open('equation.log','r')
     texErrors=''
     for line in texLog:
-        if line[0]=='!': #the line containing  errors in the log always start with an exclamation mark
+        if line[0]=='!': #the line containing  errors in the log always starts with an exclamation mark
             texErrors+=line[1:-1]
     if texErrors!='':
         raise latexError(texErrors)
