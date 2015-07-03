@@ -580,16 +580,16 @@ class PowNode(BinaryNode):
         if self.rhs.deg(var)==-float('inf'):
             return 0
         #x^2 heeft graad 2
-        elif self.rhs.deg(var)==0:
-            return self.lhs.deg(var)*self.rhs.value
+        elif type(self.rhs.evaluate())==Constant:
+            return self.lhs.deg(var)*num(self.rhs.evaluate())
         #x^x heeft geen gedefinieerde graad
         else:
             raise TypeError('%s is not a polynomial' % (self.lhs**self.rhs))
 
     def mindeg(self, var):
         #x^n heeft graad n als n een constant is
-        if self.rhs.mindeg(var)==0:
-            return self.lhs.mindeg(var)*self.rhs.value
+        if type(self.rhs.evaluate())==Constant:
+            return self.lhs.mindeg(var)*num(self.rhs.evaluate())
         #x^x heeft geen goed gedefineerde graad
         else:
             raise TypeError('%s is not a polynomial' % (self.lhs**self.rhs))

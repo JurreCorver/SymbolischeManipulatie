@@ -71,7 +71,7 @@ def solvePolynomial(eq, var):
     #If the expression has negative powers of x, multiply to remove this negative factor
     mindeg = exp.mindeg(var)
     if mindeg <= -1:
-        exp = simplify(exp * var.symbol ** Constant(-mindeg) )
+        exp = simplify(exp * var ** Constant(-mindeg) )
     elif mindeg >= 1 and exp.deg(var) >= 4:
         exp = simplify(exp * var ** Constant(-mindeg) )
         solutions.append(Constant(0))
