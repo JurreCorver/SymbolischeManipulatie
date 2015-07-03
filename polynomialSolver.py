@@ -1,6 +1,6 @@
 from polynomials import *
 
-
+#Class that returns error.
 class solveError(Exception):
     def __init__(self,message):
         self.message = message
@@ -15,8 +15,6 @@ def eqtoexp(eq):
         exp = simplify(eq.lhs - eq.rhs)
         return exp
     else:
-        #print("Input is not an equation. Try something in the form of 'a == b'.")
-        #print("Interpreting input as " + str(eq) + " == " + str(0) + ".")
         exp = eq
         return exp
 
@@ -41,15 +39,11 @@ def solveQuadratic(var, coef):
     sol = [0 for i in range(0, deg)]
     #solutions using the quadratic formula
     Dscr =  (coef[1]) ** Constant(2) - Constant(4) * coef[2] * coef[0]
-    
-    #if int(Dscr.evaluate()) < 0:
-    #    return []
-    #else:     
     sol[0] = simplify((Constant(0) - coef[1] + (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
     sol[1] = simplify((Constant(0) - coef[1] - (Dscr) ** Constant(0.5) ) / ( Constant(2) * coef[2] ))
     return(sol)
     
-#Add extra functionality for special cases -> https://en.wikipedia.org/wiki/Cubic_function
+#Solve cubic roots using the Cardano formula
 def solveCubic(var, coef):
     deg = 3
     sol = [0 for i in range(0, deg)]
@@ -98,7 +92,6 @@ def solvePolynomial(eq, var):
         return prepareSolutions(var, solutions)
 
         
-        
     #Return error when the degree is 0
     if deg == 0:
         #print("No solutions exist for an equation of degree " + str(deg) + ".")
@@ -108,25 +101,20 @@ def solvePolynomial(eq, var):
     elif deg == 1:
         return solveLinear(var, coef)
     
-    #Calculate solution for degree 2 polynomial    
+    #Calculate solution for a degree 2 polynomial    
     elif deg == 2:
         solutions += solveQuadratic(var, coef)
         return prepareSolutions(var, solutions)
-    
+    #Calculate solution for a degree 3 polynomial
     elif deg == 3:
         solutions += solveCubic(var, coef)
         return prepareSolutions(var, solutions)
     
-        
     #Return error message for polynomials of degree greater than 2.
     else:
         raise solveError("This software doesn't solve polynomials of this degree.")
         return []
         
-        
-        
-        
+#Adds solvePolynomial to the methodList so it can be used in the gui.        
 methodList.append(["solvePolynomial", solvePolynomial, 2])        
 
-
-#1/x -x+ 1
