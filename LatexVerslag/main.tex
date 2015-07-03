@@ -31,6 +31,7 @@ Begeleider: Joost Houben}
 %\end{abstract}
 
 \setcounter{page}{1}
+
 \section{Introductie}
 In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om symbolisch te kunnen rekenen zoals dat bijvoorbeeld in Mathematica gebeurt. Wiskundige formules worden hiervoor opgeslagen in een zogenaamde expressie-boom. Behalve dat deze representatie kan worden gebruikt om berekeningen te doen, is deze geschikt voor symbolische manipulaties, zoals optellen, vermenigvuldigen, maar ook differenti\"eren en oplossen van sommige polynoom~vergelijkingen. De code behordende bij dit project kan gevonden worden op \url{https://github.com/JurreCorver/SymbolischeManipulatie}.
 
@@ -39,18 +40,18 @@ In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om 
 %Beschrijving van de theorie
 Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. De knopen waarop de uitgaande zijden van een interne knoop uitmonden, heten \textit{de kinderen} van die interne knoop.
 
-In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in figuur \ref{fig:boom}. \rcom{JW: Ik zou het mooier vinden als de `x' in de expressieboom een `*' is, zoals in ons programma.}
+In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in figuur \ref{fig:boom}. 
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.25\textwidth]{expressionTree}
-	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3\times \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in \cref{sec:postfix}, wordt deze expressie weergegeven als $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.} \label{fig:boom}
+	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3 * \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in sectie \ref{sec:postfix}, wordt deze expressie weergegeven als $2\, \mathrm{neg}\,3\,\pi*\sin +$. \rcom{JW: er gaat iets fout met Engels/Nederlands in de figuren, ze heten nu `figure'}} \label{fig:boom}
 \end{figure}
 
 \subsection{Infix en postfix notatie}\label{sec:postfix}
 De wiskundige notatie waaraan wij gewend zijn, waarbij operatoren tussen operanden worden geplaatst, noemen we ook wel de infix notatie. Een simpel voorbeeld hiervan is $1 + 2$  waarbij $1$ en $2$ de operanden zijn en $+$ de operator. Het nadeel van deze notatie is dat de volgorde waarin de operatoren moeten worden toegepast niet altijd direct duidelijk is, waardoor er haakjes gezet moeten worden. Een voorbeeld hiervan is $3+3 / 3$ . Als delen eerst wordt uitgevoerd, is de uitkomst van deze expressie gelijk aan $3$. Als optellen eerst wordt uitgevoerd, dan is de uitkomst gelijk aan $2$. 
 
-Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $123f$. Wel is een  nadeel hiervan dat het aantal argumenten van de functie van tevoren duidelijk moet zijn.
+Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $1\,2\,3\,f$. Wel is een  nadeel hiervan dat het aantal argumenten van de functie van tevoren duidelijk moet zijn.
 
 Gebruikers zullen hun invoer over het algemeen liever in de infix notatie doen. Daarom is er een algoritme nodig om de infix notatie om te schrijven naar postfix notatie en deze daarna in een expressieboom om te zetten. Hiervoor is het shunting-yard algortime ge\"implementeerd.
 
@@ -59,56 +60,58 @@ Gebruikers zullen hun invoer over het algemeen liever in de infix notatie doen. 
 \subsection{Shunting-yardalgoritme}
 Een gebruiker vindt infix notatie het makkelijkst te gebruiken, en zal graag zijn invoer dus ook in infix notatie aan een programma willen doorvoeren. De meest nuttige manier om een expressie op te slaan en te bewerken blijkt echter in de vorm van een expressieboom te zijn. Het Shunting-yardalgoritme maakt de vertaalslag van de infix notatie van de gebruiker naar postfix notatie, en de vertaling van postfix notatie naar een expressieboom is vrij gemakkelijk. Het algoritme is gepubliceerd door Dijkstra in 1961. 
 
-We gaan niet het algoritme in volledig detail beschrijven, we behandelen het slechts in grove lijnen aan de hand van voorbeelden. We beginnen met een string met een expressie in infix notatie, bijvoorbeeld \texttt{`2-3*3'}. Dit splitsen we dan op in kleine stukken genaamd `tokens'. In dit geval: \texttt{`2',`-',`3',`*'}. 
+We gaan niet het algoritme in volledig detail beschrijven, we behandelen het slechts in grove lijnen aan de hand van voorbeelden. \rcom{JW: dat is niet wat je hier beneden doet: daar behandel je juist het algoritme in detail en geef je geen voorbeelden.} We beginnen met een string met een expressie in infix notatie, bijvoorbeeld \texttt{`2-3*3'}. Dit splitsen we dan op in kleine stukken genaamd `tekens'. In dit geval: \texttt{`2',`-',`3',`*'}. 
 
-Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tokens heen en volgen de volgende procedure uit:
+Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tekens heen en volgen de volgende procedure uit:
 \begin{enumerate}
-\item Indien de token een getal is, stop hem in de \ttt{output}.
-\item Als de token een komma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
-\item Als de token een binaire operator (\ttt{-,+,*,/,\%,**}) is,  blijf dan aan de hand van de precedentie operatoren van de \ttt{stack} naar de \ttt{output} verplaatsen totdat het laatste element van de \ttt{stack} geen operator meer is. De \ttt- token wordt dan op een speciale manier behandeld, omdat het zowel negatie als aftrekken kan betekenen.
-\item Als de token \ttt{`('} is, kijk dan of het laatste element op de \ttt{output} een functie is. Zo ja, verplaats dan de functie naar de \ttt{stack}. Stop het haakje op de \ttt{output}.
-\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{`('} wordt tegengekomen. Verwijder dan de \ttt{`('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
-\item Als de token een bekende variabele (e.g. \ttt{`pi'}) is, voeg zijn waarden dan toe aan de \ttt{output}.
-\item Als de token in geen van de bovenstaande gevallen zit, voeg hem dan als onbekende variabele toe aan de \ttt{output}.
-\item Als we door de lijst van tokens heen zijn, voeg dan alle elementen van de \ttt{stack} toe aan de \ttt{output}.
+\item Indien het teken een getal is, stop hem in de \ttt{output}.
+\item Als het teken een komma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
+\item Als het teken een binaire operator \ttt{-,+,*,/,\%} of \ttt{**} is,  blijf dan aan de hand van de \textit{prioriteit} van de operatoren van de \ttt{stack} naar de \ttt{output} verplaatsen totdat het laatste element van de \ttt{stack} geen operator meer is. De prioriteit is een getal dat er voor zorgt dat de standaard volgorde van de operatoren (Meneer Van Dalen Wacht Op Antwoord) wordt uitgevoerd. De \ttt- teken wordt dan op een speciale manier behandeld, omdat het zowel negatie als aftrekken kan betekenen.
+\item Als het teken \ttt{`('} is, kijk dan of het laatste element op de \ttt{output} een functie is. Zo ja, verplaats dan de functie naar de \ttt{stack}. Stop het haakje op de \ttt{output}.
+\item Als het teken \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{`('} wordt tegengekomen. Verwijder dan de \ttt{`('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
+\item Als het teken een bekende variabele (e.g. \ttt{`pi'}) is, voeg zijn waarden dan toe aan de \ttt{output}.
+\item Als het teken in geen van de bovenstaande gevallen zit, voeg hem dan als onbekende variabele toe aan de \ttt{output}.
+\item Als we door de lijst van tekens heen zijn, voeg dan alle elementen van de \ttt{stack} toe aan de \ttt{output}.
 \end{enumerate}
 
-Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende algoritme wordt dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
+Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende algoritme wordt dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tekens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
 \begin{enumerate}
-\item Als de token een functie is, haal dan $n$ elementen van de \ttt{stack} af, waar $n$ de hoeveelheid argumenten is die de functie aanneemt. Voeg vervolgens de functie als knoop toe de \ttt{stack} met als kinderen de $n$ argumenten. 
-\item Als de token een binaire operator is, voeg de operator als knoop toe aan de \ttt{stack} met als kinderen de twee operanden.
-\item Als de token geen functie of operator is, voeg hem dan aan de \ttt{stack} toe.
+\item Als het teken een functie is, haal dan $n$ elementen van de \ttt{stack} af, waar $n$ de hoeveelheid argumenten is die de functie aanneemt. Voeg vervolgens de functie als knoop toe de \ttt{stack} met als kinderen de $n$ argumenten. 
+\item Als het teken een binaire operator is, voeg de operator als knoop toe aan de \ttt{stack} met als kinderen de twee operanden.
+\item Als het teken geen functie of operator is, voeg hem dan aan de \ttt{stack} toe.
 \end{enumerate}
-Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tokens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tokens).
+Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tekens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tekens).
 
-\subsection{Simplify algoritme}
+\subsection{Simplify algoritme}\rcom{JW: zullen we hier ook \ttt{evaluate} noemen? Die is nu nog nergens gedefinieerd.}
 Voor vele andere functies in het programma is het erg nuttig om symbolische vergelijkingen te kunnen versimpelen. Denk hier bijvoorbeeld aan expressies als \ttt{x-x} naar \ttt{0} te versimpelen. Daarom is de functie \ttt{simplify(expression)} ge\"implementeerd die de expressie \ttt{expression} zoveel mogelijk probeert te versimpelen. We zullen hier een summiere omschrijving geven over de werking van deze functie. De \ttt{simplify} functie roept de \ttt{simplifyStep} functie net zo vaak, met een maximum van 20 keer, aan tot dat de uitdrukking niet meer veranderd na verdere toepassing van \ttt{simplifyStep}. De \ttt{simplifyStep} functie gebruikt standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. De functie \ttt{simplifyStep} bestaat dan ook uit het toepassen van een reeks functies die allemaal \'e\'en keer door de boom itereren en een specifieke rekenregel gebruiken om de expressie te versimpelen. Elk zo'n versimpelende functie itereerd precies een keer over alle knopen, en zijn dus orde $\mathcal O(n)$. De functie \ttt{simplifyStep} roept echter zichzelf ook bij zijn kinderen aan, en daarom zijn \ttt{simplifyStep} en \ttt{simplify} orde $\mathcal O(n)$. Bij functies versimpeld de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
 
 \subsection{Grafische omgeving}
 De grafische omgeving maakt gebruik van  \ttt{tk} voor de weergave. Deze interpreteert dan de invoer van de gebruiker en voert deze uit door \ttt{expression\_template.py} in te laden. De gebruiker heeft dan de optie om de uitvoer weer te geven met \LaTeX. Dit werkt door de expressie om te vormen tot \LaTeX code. Dit omzetten naar \LaTeX code wordt recursief gedaan, en iedere soort knoop in de expressieboom heeft een methode om de \LaTeX code van zichzelf terug te geven. Deze \LaTeX code wordt vervolgens naar een \ttt{.tex} bestand geschreven en uitgevoerd door \ttt{latex} aan te roepen, wat dan weer een \ttt{.dvi} bestand als uitvoer geeft. Dit \ttt{.dvi} bestand wordt dan met behulp van \textit{GhostScript} omgevormd naar een \ttt{.png} bestand die wordt weergegeven door \ttt{tk}. 
 
-\subsection{Functies}
-Het programma heeft een implementatie van enkele standaard numerieke functies zoals \ttt{sin, cos, exp}. Deze functies als knopen in de expressieboom. Als methode kunnen deze functies dan een numerieke waarden teruggeven van de functie toegepast op zijn kinderen. Verder hebben de functies ook een speciale differentiatie functie de de afgeleide van de functie ten opzichte van een variabele terug geeft. verder is het ook voor de gebruiker mogelijk om tijdens het draaien van het programma classen aan te maken die functie knopen representeren. Deze knopen kunnen dan door de gebruiker weer worden gebruikt in expressies.  
+\subsection{Functies}\rcom{JW: hoort deze sectie hier wel thuis? Je beschrijft hier geen algoritmes, ik vind dit eerder in de documentatie passen.}
+Het programma heeft een implementatie van enkele standaard numerieke functies zoals \ttt{sin, cos} en \ttt{exp}. Deze functies zijn interne knopen in de expressieboom. Als methode kunnen deze functies dan een numerieke waarden teruggeven van de functie toegepast op zijn kinderen. Verder is het mogelijk om de functies te differenti\"eren naar een variabele. Ook is het ook voor de gebruiker mogelijk om tijdens het draaien van het programma classen aan te maken die functie knopen representeren. \rcom{JW: bedoel je in de vorige zin dat users zelf functies kunnen defini\"eren?} Deze knopen kunnen dan door de gebruiker weer worden gebruikt in expressies.  
 
 
 \subsection{solvePolynomial algoritme}
-Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen.
+Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen. \rcom{JW: Heb wat kleine dingen hieronder gewijzigd, kan je checken of het nog steeds klopt?}
 \begin{enumerate}
-\item Test of er wel een vergelijking is ingevoerd. Als dit zo is, haal dan de rechterkant van de vergelijking naar de linkerkant via gewoonlijke algebra. Is dit niet het geval neem dan aan dat de wortel van de vergelijking wordt bedoeld.
-\item Sla de polynoom op als een lijst met co\"effici\"enten. 
-\item Controleer wat de kleinste macht in de vergelijking is. Als deze kleiner is dan 0, vermenigvuldig dan met deze macht. Is hij groter dan 0, deel door deze macht. Voeg in het tweede geval 0 toe als oplossing van de vergelijking.
-\item Controleer nu de graad van de vergelijking. Is de graad 0, dan bestaat er geen oplossing. Is de graad 1, 2 of 3 geef dan de oplossing gebruikmakend van bekende algoritmes. In andere gevallen is er geen oplossing.
-\item Return de oplossing
+\item Test of er wel een vergelijking is ingevoerd. Als dit zo is, haal dan de rechterkant van de vergelijking naar de linkerkant via gewoonlijke algebra. Is dit niet het geval, neem dan aan dat een nulpunt van de ingevoerde expressie moet worden bepaald.
+\item Sla de linkerkant van de vergelijk op als een lijst met co\"effici\"enten voor de machten van de variabele. 
+\item Controleer wat de kleinste macht $k$ in de vergelijking is. Als $k<0$, vermenigvuldig dan met de variabele tot de macht $-k$. Is $k>0$, deel dan door de variabele tot de macht $k$. Voeg in het tweede geval 0 toe als oplossing van de vergelijking.
+\item Controleer nu de graad van de vergelijking. Is de graad 0, dan bestaat er geen oplossing. Is de graad 1, 2 of 3 geef dan de oplossing gebruikmakend van bekende algoritmes. In andere gevallen geeft het algoritme geen oplossing.
+\item Return de oplossing. \rcom{JW: wat is de oplossing? Een lijst met alle nulpunten? Staan meervoudige nulpunten daar ook meervoudig in?}
 \end{enumerate}
+
+\rcom{JW: heb je enig idee wat de looptijd is van dit algoritme?}
 
 \section{Documentatie}
 %Documentatie over het gebruik van de code
 \subsection{Installatie}
 Om dit programma te gebruiken zijn naast een werkende Python 3.4 distributie enkele Python packages nodig. De niet-standaard packages zijn: \texttt{numpy, pillow, scipy, tkinter}.
-Verder heeft de grafische gebruikers omgeving onderstuining voor het weergeven van de output met behulp van \LaTeX. Hiervoor is dus een werkende \LaTeX~distributie vereist. Daarbij is het ook benodigd om \emph{GhostScript} geinstalleerd te hebben. Voor \emph{Windows} gebruikers is het verder specifiek vereist om de 32-bit versie van \emph{GhostScript} te gebruiken en het pad naar \texttt{gswin32c.exe} toe te voegen aan de \texttt{\%path\%} systeemvariabele.
+Verder heeft de grafische gebruikersomgeving ondersteuning nodig voor het weergeven van de output met behulp van \LaTeX. Hiervoor is een werkende \LaTeX~distributie vereist. Daarbij is het ook benodigd om \emph{GhostScript} ge\"installeerd te hebben. Voor \emph{Windows} gebruikers is het verder specifiek vereist om de 32-bit versie van \emph{GhostScript} te gebruiken en het pad naar \texttt{gswin32c.exe} toe te voegen aan de \texttt{\%path\%} systeemvariabele.
 
 \subsection{Grafische omgeving}
-De grafische omgeving kan gebruikt worden door \texttt{tkmain.pyw} uit te voeren. Dit kan ook vanuit de command-line door \texttt{python tkmain.pyw} uit te voeren.  De verschillende componenten van de omgeving zullen worden uitgelegd met referentie naar figuur \ref{fig:screenshot}
+De grafische omgeving kan gebruikt worden door \texttt{tkmain.pyw} uit te voeren. Dit kan ook vanuit de command-line door middel van het commando\texttt{python tkmain.pyw}.  De verschillende componenten van de omgeving zullen worden uitgelegd met referentie naar figuur~\ref{fig:screenshot}.
 
 \begin{figure}[!htb]
   \centering
@@ -119,13 +122,13 @@ De grafische omgeving kan gebruikt worden door \texttt{tkmain.pyw} uit te voeren
 
 \begin{enumerate}
 \item Met de \texttt{Use LaTeX} wordt gespecificeerd of de output door \LaTeX wordt verwerkt voor dat deze wordt weergegeven. Indien deze optie niet geselecteerd is zal de output als plain-text worden weergegeven.
-\item De \texttt{Output processing} optie specificeerd hoe de input wordt verwerkt. Indien \texttt{Simplify} is aangevinkt zal de expressie zo veel mogelijk versimpeld worden. Terwijl bij het aanvinken van \texttt{Evaluate} de expressie wordt uitgerekend indien deze numeriek is, en anders onversimpeld wordt weergegeven. Als laatste zorgt de \texttt{None} optie juist dat de expressie niet wordt berekend en direct wordt weergegeven.
-\item Dit is het scherm waar de output wordt weergegeven. Hier wordt de input van de gebruiker met \texttt{>>>} er voor weergegeven, en telkens op de regel daarna de output bij de regel input erboven. Indien er fouten optraden tijdens het uitvoeren van de input wordt dit hier ook weergegeven.
+\item De \texttt{Output processing} optie specificeerd hoe de input wordt verwerkt. Indien \texttt{Simplify} is aangevinkt zal de expressie zo veel mogelijk versimpeld worden. Bij het aanvinken van \texttt{Evaluate} wordt de expressie uitgerekend indien deze numeriek is, maar zal deze verder niet versimpeld worden weergegeven. Als laatste zorgt de \texttt{None} optie juist dat de expressie niet wordt berekend en direct wordt weergegeven.
+\item Dit is het scherm waar de output wordt weergegeven. Hier wordt de input van de gebruiker met te tekens \texttt{>>>} ervoor weergegeven. Op de regel na de input wordt de bijbehorende output weergegeven. Indien er fouten optraden tijdens het uitvoeren van de input wordt dit hier ook weergegeven.
 \item In dit scherm kan de gebruiker zijn input invoeren. Als de gebruiker de \texttt{Enter} toets indrukt wordt de input ge\"evaluaeerd. De pijltjestoetsen naar boven en onder kunnen worden gebruikt om de vorige input nog een keer te gebruiken.
 \end{enumerate}
 
 \subsection{Syntax}
-De invoer ondersteund standaard operaties op getallen die met symbolen \texttt{*, +, -, **, /, \%} kunnen worden ingevoerd. Verder kunnen ronde haaken \texttt{( )} worden gebruikt. Enkele voorbeelden:
+De invoer ondersteund standaard operaties op getallen die met symbolen \texttt{*, +, -, **, /, \%} kunnen worden ingevoerd. Verder kunnen ronde haaken \texttt{( )} worden gebruikt. Enkele voorbeelden: \rcom{JW: Heb je nu simplify, evaluate of None aanstaan?}
 \begin{adjustwidth}{1.5cm}{}
 \setstretch{0.9}
 \texttt{>>> 2+2-1}\\
@@ -160,11 +163,11 @@ $\mathrm{sin}(x)\,\mathrm{cos}(y)$\\
 \texttt{>>> f(pi/2,pi)}\\
 $-1$
 \end{adjustwidth}
-Als laatste is er ondersteuning voor een gelijkheids operator met \texttt{==} als symbool. Deze kan bijvoorbeeld worden gebruikt bij invoeren van vergelijkingen.
+Als laatste is er ondersteuning voor een gelijkheids operator met \texttt{==} als symbool. Deze kan bijvoorbeeld worden gebruikt bij invoeren van vergelijkingen. \rcom{JW: Wat moet je doen als je een of andere expressie hebt in `x' en deze wil evalueren in, zeg, $x=5$? Werkt expressie.evaluate{dictionary}?}	
 
 
 \subsection{Lijst van commando's}
-\rcom{na afloop op alfabetische volgorde zetten\\}
+\rcom{Rik: na afloop op alfabetische volgorde zetten\\}
 \com{exit()}{Sluit het programma af.}
 \com{d(f(x),x)}{Berekent de afgeleide van \texttt{f(x)} naar de variabele \texttt{x}. Indien de afgeleide van de functie niet bekend is wordt een foutmelding gegeven. Voorbeeld:\vspace{-0.5ex}}
 \begin{adjustwidth}{1.5cm}{}
@@ -188,16 +191,13 @@ $\cos(x)$
 \com{log(x,y)}{Geeft het logaritme van \texttt{x} in basis \texttt{y}. Equivalent aan \texttt{ln(x)/ln(y)}.}
 \com{polygamma(x,y)}{Geeft de \texttt{y}'de orde polygamma functie van \texttt{x}.}
 
-\rcom{misschien ook nog even round en ceil toevoegen voor compleetheid?}
+\rcom{Rik: misschien ook nog even round en ceil toevoegen voor compleetheid?}
 
-\rcom{nog toevoegen:\\}
-\com{solvePolynomial(eq, var)}{Geeft de oplossing van een polynomiale vergelijking in de variabele \textit{var}. Bijvoorbeeld $x^{10} = 1024$ of $x^2 + 1/x = 10$}
+\com{solvePolynomial(vergelijking, var)}{Geeft de oplossing van een polynomiale \ttt{vergelijking} in de variabele \ttt{var}. Bijvoorbeeld $x^{10} = 1024$ of $x^2 + 1/x = 10$. \rcom{JW: liever geef je een voorbeeld met wat de user moet invoeren en wat je dan als output krijgt} }
 \com{numIntegrate(expressie, x, l, r, numsteps)}{Numeriek bepalen van $\int_{\texttt{l}}^\texttt{r} \texttt{expressie} \; \mathrm{d}\texttt{x}$ door middel van een Riemann benadering in \texttt{numsteps} stappen.}
 \com{gcd(n,m)}{Geeft de grootste gemene deler van twee gehele getallen \texttt{n} en \texttt{m}.}
-\com{polQuotient(pol1, pol2, x)}{Geeft het quotient van de deling van \texttt{pol1} door \texttt{pol2} met rest, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
-\com{polRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2}, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
-\com{polIntQuotient(pol1, pol2, x)}{Geeft het quotient van de deling van het polynoom \texttt{pol1} door het polynoom \texttt{pol2} met rest over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen met gehele co\"effici\"enten in \texttt{x} zijn.}
-\com{polIntRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2} over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
+\com{polQuotient(pol1, pol2, x), polRemainder(pol1, pol2, x)}{Geeft het quotient respectievelijk de rest van de deling van \texttt{pol1} door \texttt{pol2} met rest, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
+\com{polIntQuotient(pol1, pol2, x), polIntRemainder(pol1, pol2, x)}{Geeft het quotient respectievelijk de rest van de deling van het polynoom \texttt{pol1} door het polynoom \texttt{pol2} met rest \textit{over de gehele getallen}, waarbij \texttt{pol1} en \texttt{pol2} polynomen met gehele co\"effici\"enten in \texttt{x} zijn.}
 \com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
 \com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
 
@@ -205,20 +205,20 @@ $\cos(x)$
 \section{Taakverdeling}
 In het verslag is de volgende taakverdeling gehanteerd:
 
-\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
+\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando \rcom{JW: wat heb je met solvePolynomial gedaan?}, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
 
-\com{Rik} {Stukje theorie over Shunting-yard, grootste deel van de documentatie, stukje over user interface}
-\com{Jan-Willem} {Introductie en theorie over expressie-bomen geschreven}
+\com{Rik} {Stukje theorie over shunting-yardalgoritme, grootste deel van de documentatie, stukje over user interface geschreven.}
+\com{Jan-Willem} {Introductie en theorie over expressie-bomen geschreven, polynoomfuncties toegevoegd aan documentatie, controle op spelling en stijl.}
 
 De volgende taakverdeling was van toepassing bij het schrijven van de software:
 
 \com{Jurre} {solvePolynomial geschreven, aantal simpele nodes toegevoegd vergelijkbaar met MulNode,Simpele functies toegevoegd. Mindeg functie toegevoegd, Shunting-yard ietwat aangepast}
 
-\com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, Shunting yard uitgebreid, differentieren ingevoerd, user variables en functions toegevoegd.}
+\com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, shunting-yardalgoritme uitgebreid, differenti\"eren ingevoerd, user variables en functions toegevoegd, opsporen van bugs in de gehele code.}
 
 \com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd.}
 
-
+\rcom{JW: References is geen Nederlands woord.}
 \begin{thebibliography}{99}
 
 \bibitem{c1} Wikipedia - Shunting-yard algorithm:
