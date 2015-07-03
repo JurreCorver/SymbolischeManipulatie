@@ -1,5 +1,5 @@
 \documentclass[a4paper]{article}
-%\usepackage[dutch]{babel}
+\usepackage[dutch]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath,graphicx,hyperref,parskip,setspace,fancyhdr,changepage}
 \usepackage[margin=1in]{geometry}
@@ -45,7 +45,7 @@ In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad i
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.25\textwidth]{expressionTree}
-	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3 * \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in sectie \ref{sec:postfix}, wordt deze expressie weergegeven als $2\, \mathrm{neg}\,3\,\pi*\sin +$. \rcom{JW: er gaat iets fout met Engels/Nederlands in de figuren, ze heten nu `figure'}} \label{fig:boom}
+	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3 * \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in sectie \ref{sec:postfix}, wordt deze expressie weergegeven als $2\, \mathrm{neg}\,3\,\pi*\sin +$.} \label{fig:boom}
 \end{figure}
 
 \subsection{Infix en postfix notatie}\label{sec:postfix}
@@ -93,16 +93,16 @@ Het programma heeft een implementatie van enkele standaard numerieke functies zo
 
 
 \subsection{solvePolynomial algoritme}
-Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen. \rcom{JW: Heb wat kleine dingen hieronder gewijzigd, kan je checken of het nog steeds klopt?}
+Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabele als argument en probeert dan een oplossing te vinden via de volgende stappen.
 \begin{enumerate}
 \item Test of er wel een vergelijking is ingevoerd. Als dit zo is, haal dan de rechterkant van de vergelijking naar de linkerkant via gewoonlijke algebra. Is dit niet het geval, neem dan aan dat een nulpunt van de ingevoerde expressie moet worden bepaald.
 \item Sla de linkerkant van de vergelijk op als een lijst met co\"effici\"enten voor de machten van de variabele. 
 \item Controleer wat de kleinste macht $k$ in de vergelijking is. Als $k<0$, vermenigvuldig dan met de variabele tot de macht $-k$. Is $k>0$, deel dan door de variabele tot de macht $k$. Voeg in het tweede geval 0 toe als oplossing van de vergelijking.
 \item Controleer nu de graad van de vergelijking. Is de graad 0, dan bestaat er geen oplossing. Is de graad 1, 2 of 3 geef dan de oplossing gebruikmakend van bekende algoritmes. In andere gevallen geeft het algoritme geen oplossing.
-\item Return de oplossing. \rcom{JW: wat is de oplossing? Een lijst met alle nulpunten? Staan meervoudige nulpunten daar ook meervoudig in?}
+\item Return nu een lijst met oplossingen. Een n-voudig nulpunt wordt nu $n$ keer weergeven.
 \end{enumerate}
 
-\rcom{JW: heb je enig idee wat de looptijd is van dit algoritme?}
+Dit alles gebeurt in een looptijd van orde $n$. 
 
 \section{Documentatie}
 %Documentatie over het gebruik van de code
@@ -212,13 +212,12 @@ In het verslag is de volgende taakverdeling gehanteerd:
 
 De volgende taakverdeling was van toepassing bij het schrijven van de software:
 
-\com{Jurre} {solvePolynomial geschreven, aantal simpele nodes toegevoegd vergelijkbaar met MulNode,Simpele functies toegevoegd. Mindeg functie toegevoegd, Shunting-yard ietwat aangepast}
+\com{Jurre} {solvePolynomial geschreven(lost polynomiale vergelijkingen op), aantal simpele nodes toegevoegd vergelijkbaar met MulNode,Simpele functies toegevoegd. Mindeg functie toegevoegd, Shunting-yard ietwat aangepast}
 
 \com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, shunting-yardalgoritme uitgebreid, differenti\"eren ingevoerd, user variables en functions toegevoegd, opsporen van bugs in de gehele code.}
 
 \com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd.}
 
-\rcom{JW: References is geen Nederlands woord.}
 \begin{thebibliography}{99}
 
 \bibitem{c1} Wikipedia - Shunting-yard algorithm:
