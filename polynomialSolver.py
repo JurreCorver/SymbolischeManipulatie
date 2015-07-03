@@ -82,8 +82,6 @@ def solvePolynomial(eq, var):
         exp = simplify(exp * frost(var) ** Constant(-mindeg) )
         solutions.append(Constant(0))
         
-        
-    print(exp)
     deg = exp.deg(var)
     #Find the list of coefficients.
     #For a polynomial a x^3 + b x^2 + c, a = coef[3]
@@ -94,7 +92,6 @@ def solvePolynomial(eq, var):
     #checks if the expression is of the simple form x^k = constant, then solves it if this is true.
     checkstr = [num(str(coef[i])) for i in range(1, deg) ]
     if checkstr == [0 for i in range(1, deg) ] :
-        
         for k in range(0, deg):
             ans = simplify(((Constant(0) - coef[0] ) / coef[-1] ) ** (Constant(1 / deg)  ) * ExpNode( Constant((2j * math.pi) / deg ) * Constant(k)  )  )
             solutions.append(ans)
