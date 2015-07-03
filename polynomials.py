@@ -28,6 +28,7 @@ def polQuotRem(exp1,exp2, var):
     if exp2 == Constant(0):
         return [Constant(0),exp1]
 
+    #trek exp2 zo veel mogelijk van exp1 af, zodat de graad van exp1 kleiner wordt dan die van exp2.
     totquot = Constant(0)
     while exp1.deg(var)>= exp2.deg(var):
         deg1 = exp1.deg(var)
@@ -43,6 +44,7 @@ def polQuotRemInt(exp1, exp2, var):
     if exp2 == Constant(0):
         return [Constant(0),exp1]
 
+    #trek exp2 zo vaak, maar wel een geheel aantal keer, van exp1 af zodat de coefficienten voor de machten van exp1 die een hogere graad hebben dan exp1 minimaal en niet-negatief zijn
     totquot = Constant(0)
     for d in range(exp1.deg(var),exp2.deg(var)-1,-1):
         deg2 = exp2.deg(var)
@@ -51,6 +53,8 @@ def polQuotRemInt(exp1, exp2, var):
         exp1 = simplify(exp1 - quot * exp2)
         totquot = totquot + quot
     return [simplify(totquot), exp1]
+
+#de functies polQuot, polRem, polQuotInt en polRemInt volgen direct uit polQuotRem en polQuotRemInt
 
 def polQuot(exp1,exp2, var):
     return polQuotRem(exp1, exp2, var)[0]
@@ -64,6 +68,7 @@ def polQuotInt(exp1,exp2, var):
 def polRemInt(exp1, exp2, var):
     return polQuotRemInt(exp1, exp2, var)[1]
 
+#add functions to methodList such that they can be used in user interface
 methodList.append(['polQuotient',polQuot,3])
 methodList.append(['polRemainder',polRem,3])
 methodList.append(['polIntQuotient',polQuotInt,3])
@@ -115,7 +120,7 @@ def polContent(exp1,var):
     if exp1==Constant(0):
         return Constant(0)
 
-    #calculate the gcd of all the terms
+    #calculate the gcd of all the terms, which is the content
     content = Constant(0)
     for i in range(0,exp1.deg(var)+1):
         coef=coefficient(exp1,i,var)
@@ -144,6 +149,7 @@ def polGcd(exp1, exp2, var):
         exp2=simplify(NegNode(exp2))
     return exp2
 
+#add functions to methodList such that they can be used in user interface
 methodList.append(['gcd',gcd,2])
 methodList.append(['polContent',polContent,2])
 methodList.append(['polGcd',polGcd,3])
