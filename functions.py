@@ -2,8 +2,8 @@ from expression_template import *
 
 class FuncNode(Expression):
     """A node in the expression tree representing a function."""
-    numargs = 1
-    precedence = 15
+    numargs = 1 #standard assume the function has only one argument
+    precedence = 15 #precedence is high 
 
     def __init__(self, *args):
         self.args=args
@@ -20,7 +20,7 @@ class FuncNode(Expression):
     def __str__(self):
         return '%s(%s)' % (self.name, ", ".join(map(str,self.args)))
 
-    def tex(self):
+    def tex(self): #lots of \left's and \right's
         return r'\mathrm{'+self.name+r'}\!\left('+", ".join([arg.tex() for arg in self.args])+r'\right)'
 
     #allow for evaluation
@@ -35,7 +35,7 @@ class FuncNode(Expression):
     def evaluate(self,dic={}): #let eval figure out what the op_symbol means for evaluation
         onlyConstants = True
         newArgs = [arg.evaluate(dic) for arg in self.args]
-        for arg in newArgs:
+        for arg in newArgs: #check if all the arugments are constant, if so return a constant else just return a FuncNode
             if type(arg)!=Constant:
                 onlyConstants = False
                 break
@@ -109,7 +109,7 @@ class ArcTanNode(FuncNode):
         super(ArcTanNode, self).__init__(arg)
 
     def diff(self,var):
-        return self.args[0].diff(var)/(self.args[0]**2+1)
+        return self.args[0].diff(var)/(self.args[0]**Constant(2)+Constant(1))
 
 class LogNode(FuncNode):
     """Represents the logarithm"""
@@ -121,7 +121,7 @@ class LogNode(FuncNode):
         super(LogNode, self).__init__(arg1, arg2)
 
     def diff(self,var):
-        return (LnNode(args[0])/LnNode(args[1])).diff(var)
+        return (LnNode(self.args[0])/LnNode(self.args[1])).diff(var)
 
 class LnNode(FuncNode):
     """Represents the natural logarithm"""

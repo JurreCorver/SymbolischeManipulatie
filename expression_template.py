@@ -6,7 +6,7 @@ from scipy import special
 # returns a list of numbers, operators, parantheses and commas
 # output will not contain spaces
 def tokenize(string):
-    splitchars = list("+-*/(),%")
+    splitchars = list("+-*/(),%=")
     
     # surround any splitchar by spaces
     tokenstring = []
@@ -19,27 +19,21 @@ def tokenize(string):
     #split on spaces - this gives us our tokens
     tokens = tokenstring.split()
     
-    #special casing for **:
+    #special casing for ** and ==:
     ans = []
     for t in tokens:
-        if len(ans) > 0 and t == ans[-1] == '*':
+        if len(ans) > 0 and t == ans[-1] == '=':
+            ans[-1] = '=='
+        elif len(ans) > 0 and t == ans[-1] == '*':
             ans[-1] = '**'
         else:
             ans.append(t)
     return ans
     
-# check if a string represents a numeric value
+# check if a string represents a real number
 def isnumber(string):
     try:
         float(string)
-        return True
-    except ValueError:
-        return False
-
-# check if a string represents an integer value        
-def isint(string):
-    try:
-        int(string)
         return True
     except ValueError:
         return False
@@ -129,7 +123,7 @@ class Expression():
         funcdic = {eval(func).name:eval(func) for func in funcList}
         funcnamelist = [eval(func).name for func in funcList]
 
-        #list of methods
+        #list of global methods
         metnamelist = [met[0] for met in methodList]
         metdic = {met[0]:(met[1],met[2]) for met in methodList}
 
@@ -137,10 +131,7 @@ class Expression():
         for token in tokens:
             if isnumber(token):
                 # numbers go directly to the output
-                if isint(token):
-                    output.append(Constant(int(token)))
-                else:
-                    output.append(Constant(float(token)))
+                output.append(Constant(num(token)))
 
             elif token == ',':
                 while not stack[-1] == '(':
@@ -149,13 +140,15 @@ class Expression():
             elif token in oplist:
                 # pop operators from the stack to the output until the top is no longer an operator
 
-                #add neg to the stack when encountering a -, later we will check if it was subtraction or negation
+                #add neg to the stack when encountering a - if the preceding token is a bracket or operator
                 if token == '-' and (index==0 or tokens[index-1] in (['(']+oplist)):
                     stack.append('neg')
                 else:
                     while True:
                         while len(stack)>0 and stack[-1]=='neg': #the previous token was a negation so add it to the output
                             output.append(stack.pop())
+
+                        #stop if the stack is empty or the top is not an operator
                         if len(stack) == 0 or stack[-1] not in oplist:
                             break
 
@@ -194,7 +187,7 @@ class Expression():
         # pop any tokens still on the stack to the output
         while len(stack) > 0:
             output.append(stack.pop())
-        
+
         # convert RPN to an actual expression tree
         for t in output:
             if t in metnamelist+funcnamelist: #check whether the token is a method/function and pop the right amount of arguments from the stack
@@ -204,17 +197,22 @@ class Expression():
                 else:
                     numargs = funcdic[t].numargs
                 while len(args)<numargs:
-                    if len(stack)==0:
+                    if len(stack)==0: #if the stack is empty the function has not been supplied enough arguments
                         raise InputError('%s arguments excpected of function %s' % (numargs, t))
                     args.append(stack.pop())
-                if t in metnamelist:
+                if t in metnamelist: #append the function/method to the stack
                     stack.append(metdic[t][0](*args[::-1]))
                 else:
                     stack.append(funcdic[t](*args[::-1]))
 
+            #exception for neg and ==
             elif t == 'neg':
                 stack.append(NegNode(stack.pop()))
-
+            elif t == '==':
+                y = stack.pop()
+                x = stack.pop()
+                stack.append(EqNode(x,y))
+                
             elif t in oplist:
                 # let eval and operator overloading take care of figuring out what to do
                 y = stack.pop()
@@ -223,7 +221,9 @@ class Expression():
             else:
                 # a constant, push it to the stack
                 stack.append(t)
-        # the resulting expression tree is what's left on the stack
+        # the resulting expression tree is what's left on the stack, therefore we raise an error if the stack is greater than length 1
+        if len(stack)>1:
+            raise InputError('Syntax error! You probably tried to use an undefined function.')
         return stack[0]
 
 
@@ -234,10 +234,6 @@ methodList.append(['d',diff,2])
 methodList.append(['exit',exit,0])#make it possible for the user to exit
 
 def frost(string):
-    if '==' in string: #always put an EqNode at the trunk
-        stringSplit = string.split('==')
-        return EqNode(frost(stringSplit[0]),frost(stringSplit[1])) #parse left and right side seperately
-    
     if ':=' in string: #handle user vars/functions differently
         stringSplit = string.split(':=')
         if '(' in stringSplit[0]: #if the expression on the left of := contains a left bracket, it must be a function
@@ -245,7 +241,7 @@ def frost(string):
         else:
             userVarDict.update({stringSplit[0]:frost(stringSplit[1])}) #it's not a function so add the variable to a global dictionary
         return frost(stringSplit[1]) #return the string on the right hand side for display
-    return Expression.fromString(string) #if there was no '==' or ':=' just parse the string normally
+    return Expression.fromString(string) #if there was ':=' just parse the string normally
 
 def sfrost(exp): #macro for simplifying and optionally differtiating frost(string)
     return simplify(frost(exp))
@@ -263,7 +259,7 @@ class Constant(Expression):
         else:
             return False
         
-    def __str__(self):
+    def __str__(self): #convert to strings for display
         val = num(self.value)
         if complex(val).imag == 0:
             return str(val)
@@ -275,10 +271,10 @@ class Constant(Expression):
         
     # allow conversion to numerical values
     def __int__(self):
-        return int(self.value)
+        return int(num(self.value))
         
     def __float__(self):
-        return float(self.value)
+        return float(num(self.value))
 
     def __complex__(self):
         return complex(self.value)
@@ -310,7 +306,6 @@ userVarDict.update({'phi':Constant(0.5*(1+5**0.5))})
 class Variable(Expression):
     """Represents a variable"""
     def __init__(self, symbol):
-        #TODO: check whether the value is a string
         self.symbol = symbol
         self.precedence = 15 #never add brackets for variables
         
@@ -462,7 +457,7 @@ class BinaryNode(Expression):
         r = self.rhs.evaluate(dic)
 
         if type(l)==Constant and type(r)==Constant:
-            val =  eval('(%s) %s (%s)' % (complex(l),self.op_symbol,complex(r)))
+            val =  eval('(%s) %s (%s)' % (num(l),self.op_symbol,num(r)))
             return(Constant(num(val)))
         else:
             return self.__class__(l,r)
@@ -483,7 +478,7 @@ class AddNode(BinaryNode):
         return self.lhs.diff(var)+self.rhs.diff(var)
 
     def deg(self, var):
-        #x**2-x**2 has degree -infinity
+        #x**2+(-x**2) has degree -infinity
         if simplify(self.lhs+self.rhs)==Constant(0):
             return -float('inf')
         return max(self.lhs.deg(var),self.rhs.deg(var))
@@ -615,10 +610,11 @@ class EqNode(BinaryNode): #egg node
     """Represents the equality operator"""
     leftass=True
     rightass=True
-    precedence=0
-    op_symbol = '='
+    precedence=-1
+    op_symbol = '=='
     tex_symbol = '='
 
+    binNodeList.append("EqNode")
     def __init__(self,lhs,rhs):
         super(EqNode,self).__init__(lhs,rhs)
 

@@ -1,9 +1,10 @@
 \documentclass[a4paper]{article}
-\usepackage[dutch]{babel}
+%\usepackage[dutch]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath,graphicx,hyperref,parskip,setspace,fancyhdr,changepage}
 \usepackage[margin=1in]{geometry}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{cleveref}
 
 \setlength{\parindent}{0mm}
 \linespread{1.4}
@@ -14,33 +15,44 @@
 
 \pagestyle{fancy}
 
+
 \title{Symbolische manipulatie}
 \author{Rik~Voorhaar~(3888169) - Jan-Willem~van~Ittersum~(3992942) - Jurre~Corver~(3905985)\\
 Begeleider: Joost Houben}
+\date{3 juli 2015}
 
 \begin{document}
 \maketitle
+\thispagestyle{empty}
 \clearpage
 
 %\begin{abstract}
 %Your abstract.
 %\end{abstract}
 
+\setcounter{page}{1}
 \section{Introductie}
 In deze opdracht hebben we een eigen computeralgebrasysteem (CAS) ontwikkeld om symbolisch te kunnen rekenen zoals dat bijvoorbeeld in Mathematica gebeurt. Wiskundige formules worden hiervoor opgeslagen in een zogenaamde expressie-boom. Behalve dat deze representatie kan worden gebruikt om berekeningen te doen, is deze geschikt voor symbolische manipulaties, zoals optellen, vermenigvuldigen, maar ook differenti\"eren en oplossen van sommige polynoom~vergelijkingen. De code behordende bij dit project kan gevonden worden op \url{https://github.com/JurreCorver/SymbolischeManipulatie}.
 
 
 \section{Theorie}
 %Beschrijving van de theorie
-Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in \ref{fig:boom}.
+Een expressie-boom is een samenhangende, gerichte graaf, waarbij elke knoop (op \'e\'en knoop na) exact \'e\'en inkomende zijde heeft en een willekeurig aantal uitgaande zijden. De unieke knoop zonder inkomende zijde noemen we \textit{de wortel}, een knoop met minstens \'e\'en uitgaande zijde noemen we \textit{een interne knoop} en een knoop zonder uitgaande zijde noemen we \textit{een blad}. De knopen waarop de uitgaande zijden van een interne knoop uitmonden, heten \textit{de kinderen} van die interne knoop.
+
+In de knopen van deze expressie-boom wordt een berekening opgeslagen. Een blad is een constante of een variabele, bijvoorbeeld $3$ of $x$. Een interne knoop (de wortel is ook een interne knoop) is een operator of een functie. Naast de binaire operatoren optellen $+$, aftrekken $-$, vermenigvuldigen $*$, delen $/$, modulo $\%$ en machtsverheffing $**$ die gekenmerkt worden door het feit dat er zowel links als rechts van de operator \'e\'en argument nodig is, is er een negatie operator $-$ die alleen een argument rechts heeft. Vergelijk bijvoorbeeld de binaire operator $-$ in $5-x$ met de negatie operator $-$ in $-x+2$. Een voorbeeld van een expressieboom zie je in figuur \ref{fig:boom}. \rcom{JW: Ik zou het mooier vinden als de `x' in de expressieboom een `*' is, zoals in ons programma.}
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[width=0.25\textwidth]{expressionTree}
-	\caption{Voorbeeld van een expressieboom. In infix notatie  kan de expressie weergegeven in deze boom gegeven worden door $-2+\sin(3\times \pi)$. In postfix notatie is het $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.}\label{fig:boom}
+	\caption{Voorbeeld van een expressieboom die de expressie $-2+\sin(3\times \pi)$ voorstelt. In de zogenaamde postfix notatie, gedefinieerd in \cref{sec:postfix}, wordt deze expressie weergegeven als $3\,\pi\times\sin 2\, \mathrm{neg}\,+$.} \label{fig:boom}
 \end{figure}
 
-\rcom{Iets over infix (normale wiskunde) versus postfix (RPN) notatie. Shunting-yard doet infix->postfix->boom.}
+\subsection{Infix en postfix notatie}\label{sec:postfix}
+De wiskundige notatie waaraan wij gewend zijn, waarbij operatoren tussen operanden worden geplaatst, noemen we ook wel de infix notatie. Een simpel voorbeeld hiervan is $1 + 2$  waarbij $1$ en $2$ de operanden zijn en $+$ de operator. Het nadeel van deze notatie is dat de volgorde waarin de operatoren moeten worden toegepast niet altijd direct duidelijk is, waardoor er haakjes gezet moeten worden. Een voorbeeld hiervan is $3+3 / 3$ . Als delen eerst wordt uitgevoerd, is de uitkomst van deze expressie gelijk aan $3$. Als optellen eerst wordt uitgevoerd, dan is de uitkomst gelijk aan $2$. 
+
+Om dit probleem op te lossen kan de postfix ofwel reversed Polish notation worden ingevoerd. Hierbij volgt de operator direct op haar operanden en bestaat er geen onduidelijkheid over de volgorde van toepassing. Een voorbeeld hiervan is $3\text{ } 3 + 3 \text{ } /$, dat eenduidig $2$ als antwoord heeft. Ook voor functies kan deze notatie worden toegepast. Zo kunnen we de infix notatie gegeven door $f(1,2,3)$ in postfix notatie schrijven als $123f$. Wel is een  nadeel hiervan dat het aantal argumenten van de functie van tevoren duidelijk moet zijn.
+
+Gebruikers zullen hun invoer over het algemeen liever in de infix notatie doen. Daarom is er een algoritme nodig om de infix notatie om te schrijven naar postfix notatie en deze daarna in een expressieboom om te zetten. Hiervoor is het shunting-yard algortime ge\"implementeerd.
 
 \section{Algoritmen}
 %Beschrijving van de gebruikte algoritmen, denk hierbij ook aan bijvoorbeeld de complexiteit en de gebruikte datastructuren
@@ -52,16 +64,16 @@ We gaan niet het algoritme in volledig detail beschrijven, we behandelen het sle
 Dan maken we vervolgens twee lijsten aan, de \ttt{stack} en de \ttt{output}. We gaan dan van links naar rechts door de lijst van tokens heen en volgen de volgende procedure uit:
 \begin{enumerate}
 \item Indien de token een getal is, stop hem in de \ttt{output}.
-\item Als de token een comma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
+\item Als de token een komma is, verplaats dan steeds het bovenste element van de \ttt{stack} naar de \ttt{output} totdat het laatste element van de \ttt{stack} een \ttt{`('} is.
 \item Als de token een binaire operator (\ttt{-,+,*,/,\%,**}) is,  blijf dan aan de hand van de precedentie operatoren van de \ttt{stack} naar de \ttt{output} verplaatsen totdat het laatste element van de \ttt{stack} geen operator meer is. De \ttt- token wordt dan op een speciale manier behandeld, omdat het zowel negatie als aftrekken kan betekenen.
 \item Als de token \ttt{`('} is, kijk dan of het laatste element op de \ttt{output} een functie is. Zo ja, verplaats dan de functie naar de \ttt{stack}. Stop het haakje op de \ttt{output}.
-\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{'('} wordt tegengekomen. Verwijder dan de \ttt{'('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
+\item Als de token \ttt{`)'} is, verplaats dan elementen van de \ttt{stack} naar de \ttt{output} totdat er een \ttt{`('} wordt tegengekomen. Verwijder dan de \ttt{`('} van de \ttt{stack}. Indien de bovenkant van de \ttt{stack} nu een functie is, voeg hem dan toe aan de output.
 \item Als de token een bekende variabele (e.g. \ttt{`pi'}) is, voeg zijn waarden dan toe aan de \ttt{output}.
 \item Als de token in geen van de bovenstaande gevallen zit, voeg hem dan als onbekende variabele toe aan de \ttt{output}.
 \item Als we door de lijst van tokens heen zijn, voeg dan alle elementen van de \ttt{stack} toe aan de \ttt{output}.
 \end{enumerate}
 
-Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende alrogritme word dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
+Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volgende algoritme wordt dan de postfix notatie naar een expressieboom veranderd. We itereren de volgende procedure over de \ttt{output} heen, en noemen de elementen van \ttt{output} weer tokens. We hebben om te beginnen eerst weer een lege \ttt{stack}.
 \begin{enumerate}
 \item Als de token een functie is, haal dan $n$ elementen van de \ttt{stack} af, waar $n$ de hoeveelheid argumenten is die de functie aanneemt. Voeg vervolgens de functie als knoop toe de \ttt{stack} met als kinderen de $n$ argumenten. 
 \item Als de token een binaire operator is, voeg de operator als knoop toe aan de \ttt{stack} met als kinderen de twee operanden.
@@ -70,10 +82,13 @@ Deze procedure geeft dan een uitdrukking in postfix notatie terug. Met het volge
 Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en element over in de \ttt{stack}. Dit element is dan de expressieboom met als bovenste knoop de wortel van de boom. Het gehele algoritme om infix notatie om te zetten in postfix notatie en vervolgens in een expressieboom is van orde $\mathcal{O}(n)$, aangezien er precies \'e\'en keer over de lijst van tokens word ge\"itereerd, en ook precies \'e\'en keer over de \ttt{output} wordt ge\"itereerd (en de output is vervolgens maximaal even lang als de lijst van tokens).
 
 \subsection{Simplify algoritme}
-Voor vele andere functies in het programma is het erg nuttig om symbolische vergelijkingen te kunnen versimpelen. Denk hier bijvoorbeeld aan expressies als \ttt{x-x} naar \ttt{0} te versimpelen. Daarom is de functie \ttt{simplify(expression)} ge\"implementeerd die de expressie \ttt{expression} zoveel mogelijk probeert te versimpelen. We zullen hier een summiere omschrijving geven over de werking van deze functie. De \ttt{simplify} functie roept de \ttt{simplifyStep} functie net zo vaak, met een maximum van 20 keer, aan tot dat de uitdrukking niet meer veranderd na verdere toepassing van \ttt{simplifyStep}. De \ttt{simplifyStep} functie gebruikt standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. Bij functies versimpeld de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
+Voor vele andere functies in het programma is het erg nuttig om symbolische vergelijkingen te kunnen versimpelen. Denk hier bijvoorbeeld aan expressies als \ttt{x-x} naar \ttt{0} te versimpelen. Daarom is de functie \ttt{simplify(expression)} ge\"implementeerd die de expressie \ttt{expression} zoveel mogelijk probeert te versimpelen. We zullen hier een summiere omschrijving geven over de werking van deze functie. De \ttt{simplify} functie roept de \ttt{simplifyStep} functie net zo vaak, met een maximum van 20 keer, aan tot dat de uitdrukking niet meer veranderd na verdere toepassing van \ttt{simplifyStep}. De \ttt{simplifyStep} functie gebruikt standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. De functie \ttt{simplifyStep} bestaat dan ook uit het toepassen van een reeks functies die allemaal \'e\'en keer door de boom itereren en een specifieke rekenregel gebruiken om de expressie te versimpelen. Elk zo'n versimpelende functie itereerd precies een keer over alle knopen, en zijn dus orde $\mathcal O(n)$. De functie \ttt{simplifyStep} roept echter zichzelf ook bij zijn kinderen aan, en daarom zijn \ttt{simplifyStep} en \ttt{simplify} orde $\mathcal O(n)$. Bij functies versimpeld de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
 
 \subsection{Grafische omgeving}
-De grafische omgeving maakt gebruik van  \ttt{tk} voor de weergave. Deze interpreteert dan de invoer van de gebruiker en voert deze uit door \ttt{expression\_template.py} in te laden. De gebruiker heeft dan de optie om de uitvoer weer te geven met \LaTeX. Dit werkt door de expressie om te vormen tot \LaTeX code. Deze \LaTeX code wordt vervolgens naar een \ttt{.tex} bestand geschreven en uitgevoerd door \ttt{latex} aan te roepen, wat dan weer een \ttt{.dvi} bestand als uitvoer geeft. Dit \ttt{.dvi} bestand wordt dan met behulp van \textit{GhostScript} omgevormd naar een \ttt{.png} bestand die wordt weergegeven door \ttt{tk}.
+De grafische omgeving maakt gebruik van  \ttt{tk} voor de weergave. Deze interpreteert dan de invoer van de gebruiker en voert deze uit door \ttt{expression\_template.py} in te laden. De gebruiker heeft dan de optie om de uitvoer weer te geven met \LaTeX. Dit werkt door de expressie om te vormen tot \LaTeX code. Dit omzetten naar \LaTeX code wordt recursief gedaan, en iedere soort knoop in de expressieboom heeft een methode om de \LaTeX code van zichzelf terug te geven. Deze \LaTeX code wordt vervolgens naar een \ttt{.tex} bestand geschreven en uitgevoerd door \ttt{latex} aan te roepen, wat dan weer een \ttt{.dvi} bestand als uitvoer geeft. Dit \ttt{.dvi} bestand wordt dan met behulp van \textit{GhostScript} omgevormd naar een \ttt{.png} bestand die wordt weergegeven door \ttt{tk}. 
+
+\subsection{Functies}
+Het programma heeft een implementatie van enkele standaard numerieke functies zoals \ttt{sin, cos, exp}. Deze functies als knopen in de expressieboom. Als methode kunnen deze functies dan een numerieke waarden teruggeven van de functie toegepast op zijn kinderen. Verder hebben de functies ook een speciale differentiatie functie de de afgeleide van de functie ten opzichte van een variabele terug geeft. verder is het ook voor de gebruiker mogelijk om tijdens het draaien van het programma classen aan te maken die functie knopen representeren. Deze knopen kunnen dan door de gebruiker weer worden gebruikt in expressies.  
 
 
 \subsection{solvePolynomial algoritme}
@@ -185,15 +200,23 @@ $\cos(x)$
 \com{polIntRemainder(pol1, pol2, x)}{Geeft de rest van de deling van \texttt{pol1} door \texttt{pol2} over de gehele getallen, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
 \com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
-\com{deg(pol,x)}{Geeft de graad van \texttt{pol} als polynoom in \texttt{x}.}
+
 
 \section{Taakverdeling}
 In het verslag is de volgende taakverdeling gehanteerd:
 
-\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd, theorie over postfix notatie, schrijven stukje over taakverdeling}
-\com{Rik} {Stukje theorie over Shunting-yard}
+\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
 
+\com{Rik} {Stukje theorie over Shunting-yard, grootste deel van de documentatie, stukje over user interface}
+\com{Jan-Willem} {Introductie en theorie over expressie-bomen geschreven}
 
+De volgende taakverdeling was van toepassing bij het schrijven van de software:
+
+\com{Jurre} {solvePolynomial geschreven, aantal simpele nodes toegevoegd vergelijkbaar met MulNode,Simpele functies toegevoegd. Mindeg functie toegevoegd, Shunting-yard ietwat aangepast}
+
+\com{Rik} {Neg-, eq-, funcNode toegevoegd, User Interface toegevoegd, simplifier gebouwd, Shunting yard uitgebreid, differentieren ingevoerd, user variables en functions toegevoegd.}
+
+\com{Jan-Willem} {Aantal simpele nodes toegevoegd vergelijkbaar met SubNode, de deg functie toegevoegd, het Shunting-yard algoritme aangepast, het bestand polynomials geschreven, numeriek integreren toegevoegd.}
 
 
 \begin{thebibliography}{99}

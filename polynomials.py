@@ -67,7 +67,8 @@ def polRemInt(exp1, exp2, var):
 methodList.append(['polQuotient',polQuot,3])
 methodList.append(['polRemainder',polRem,3])
 methodList.append(['polIntQuotient',polQuotInt,3])
-methodList.append(['polIntRem',polRemInt,3])
+methodList.append(['polIntRemainder',polRemInt,3])
+methodList.append(['polIntRemainder',polRemInt,3])
 
 def gcd(exp1, exp2):
     '''calculate the gcd of two integers'''
@@ -135,4 +136,4 @@ def polGcd(exp1, exp2, var):
 
 methodList.append(['gcd',gcd,2])
 methodList.append(['polContent',polContent,2])
-methodList.append(['polGcd',gcd,2])
+methodList.append(['polGcd',polGcd,3])
