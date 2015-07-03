@@ -86,7 +86,7 @@ Na deze procedure hebben we bij invoer van geldige syntax slechts \'e\'en elemen
 \subsection{Simplify algoritme}
 Voor vele andere functies in het programma is het erg nuttig om symbolische vergelijkingen te kunnen versimpelen. Denk hier bijvoorbeeld aan expressies als \ttt{x-x} naar \ttt{0} te versimpelen. Daarom is de functie \ttt{simplify(expression)} ge\"implementeerd die de expressie \ttt{expression} zoveel mogelijk probeert te versimpelen. We zullen hier een summiere omschrijving geven over de werking van deze functie. De \ttt{simplify} functie roept een \ttt{simplifyStep} functie net zo vaak, met een maximum van 20 keer, aan tot dat de uitdrukking niet meer veranderd na verdere toepassing van \ttt{simplifyStep}. Allereerst kijkt \ttt{simplifyStep} of de gegeven expressie een getal is (en dus al volledig versimpeld). Hiervoor is op alle expressies een \ttt{evaluate(dic)} functie gedefinieerd die probeert de epxressie numeriek te bepalen. Hiervoor gebruikt \ttt{evaluate} een dictionary \ttt{dic} als optioneel argument. Elke variabele die in \ttt{dic} staat wordt gesubstitueerd door de expressie opgeslagen in \ttt{dic}.
 
-De \ttt{simplifyStep} functie gebruikt verder standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. De functie \ttt{simplifyStep} bestaat dan ook uit het toepassen van een reeks functies die allemaal \'e\'en keer door de boom itereren en een specifieke rekenregel gebruiken om de expressie te versimpelen. Elk zo'n versimpelende functie itereerd precies een keer over alle knopen, en zijn dus orde $\mathcal O(n)$. De functie \ttt{simplifyStep} roept echter zichzelf ook bij zijn kinderen aan, en daarom zijn \ttt{simplifyStep} en \ttt{simplify} orde $\mathcal O(n)$. Bij functies versimpeld de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
+De \ttt{simplifyStep} functie gebruikt verder standaard rekenregels voor r\"eele getallen om polynomiale uitdrukkingen zo ver mogelijk te versimpelen. De functie \ttt{simplifyStep} bestaat dan ook uit het toepassen van een reeks functies die allemaal \'e\'en keer door de boom itereren en een specifieke rekenregel gebruiken om de expressie te versimpelen. Elk zo'n versimpelende functie itereerd precies een keer over alle knopen, en zijn dus orde $\mathcal O(n)$ met $n$ het aantal knopen in de expressie. De functie \ttt{simplifyStep} roept echter zichzelf ook bij zijn kinderen aan, en daarom zijn \ttt{simplifyStep} en \ttt{simplify} in het ergste geval orde $\mathcal O(n^2)$. Bij functies versimpelt de functie enkel de argumenten. Verder heeft \ttt{simplify} een optioneel argument die bepaald of bij elke toepassing van \ttt{simplifyStep} de expressie wordt ge\"expandeerd. 
 
 \subsection{Grootste gemene deler}
 Voor de bepaling van de grootste gemene deler \ttt{gcd} is het Euclidisch algoritme ge\"implementeerd. De volgende stappen worden uitgevoerd.
@@ -101,8 +101,8 @@ De looptijd is in het slechtste geval $\mathcal{O}(n+m)$ \cite{gcd}.
 \subsection{Grafische omgeving}
 De grafische omgeving maakt gebruik van  \ttt{tk} voor de weergave. Deze interpreteert dan de invoer van de gebruiker en voert deze uit door \ttt{expression\_template.py} in te laden. De gebruiker heeft dan de optie om de uitvoer weer te geven met \LaTeX. Dit werkt door de expressie om te vormen tot \LaTeX code. Dit omzetten naar \LaTeX code wordt recursief gedaan, en iedere soort knoop in de expressieboom heeft een methode om de \LaTeX code van zichzelf terug te geven. Deze \LaTeX code wordt vervolgens naar een \ttt{.tex} bestand geschreven en uitgevoerd door \ttt{latex} aan te roepen, wat dan weer een \ttt{.dvi} bestand als uitvoer geeft. Dit \ttt{.dvi} bestand wordt dan met behulp van \textit{GhostScript} omgevormd naar een \ttt{.png} bestand die wordt weergegeven door \ttt{tk}. 
 
-\subsection{Functies}\rcom{Rik: tja, ik wil wel wat zeggen over hoe functies werken, maar als ik het bondig wil houden komt het meer  neer op een omschrijving van wat functies zijn dat hoe ze werken. Weet niet wat ik hier mee moet eigenlijk}
-Het programma heeft een implementatie van enkele standaard numerieke functies zoals \ttt{sin, cos} en \ttt{exp}. Deze functies zijn interne knopen in de expressieboom, en iedere functie heeft zijn eigen klasse. Als methode kunnen deze functies dan een numerieke waarden teruggeven van de functie toegepast op zijn kinderen. Verder is het mogelijk om de functies te differenti\"eren naar een variabele. Differentiatie werkt door voor elke klasse een mehtode aan te maken die zijn afgeleide ten opzichte van een van een variabele terug geeft.
+\subsection{Functies}
+Het programma heeft een implementatie van enkele standaard numerieke functies zoals \ttt{sin, cos} en \ttt{exp}. Deze functies zijn interne knopen in de expressieboom, en iedere functie heeft zijn eigen klasse. Als methode kunnen deze functies dan een numerieke waarden teruggeven van de functie toegepast op zijn kinderen. Verder is het mogelijk om de functies te differenti\"eren naar een variabele. Differentiatie werkt door voor elke klasse een methode aan te maken die zijn afgeleide ten opzichte van een van een variabele terug geeft. Op dezelfde wijze zijn ook \ttt{deg} en \ttt{mindeg} ge\"implementeerd: voor elke knoop in de expressieboom is de graad gedefini\"eerd ten opzichte van de graad van de eventuele kinderen. 
 
  Verder is het mogelijk voor de gebruiker om zelf functies te defini\"eren. Hiervoor wordt een nieuwe functie klasse aangemaakt aan de hand van de input van de gebruiker. Neem bijvoorbeeld \ttt{f(x):=sin(x)*cos(x)}. Dit maakt een nieuwe functie klasse aan die bij evaluatie de expressie \ttt{sin(x)*cos(x)} neemt en de variabele \ttt{x} vervangt voor het argument van \ttt{f}. 
 
@@ -117,7 +117,6 @@ Het solvePolynomial algoritme neemt een polynomiale vergelijking en een variabel
 \item Return nu een lijst met oplossingen. Een n-voudig nulpunt wordt nu $n$ keer weergeven.
 \end{enumerate}
 
-Dit alles gebeurt in een looptijd van orde $n$. 
 
 \section{Documentatie}
 %Documentatie over het gebruik van de code
@@ -180,22 +179,17 @@ $-1$
 \end{adjustwidth}
 Als laatste is er ondersteuning voor een gelijkheids operator met \texttt{==} als symbool. Deze kan bijvoorbeeld worden gebruikt bij invoeren van vergelijkingen. 
 
-\rcom{JW: Wat moet je doen als je een of andere expressie hebt in `x' en deze wil evalueren in, zeg, $x=5$? Werkt expressie.evaluate{dictionary}?}	
-
-\rcom{Rik: evaluate heeft de gebruiker geen toegang tot. Je kan altijd een expressie in \ttt{x} opslaan als functie \ttt{f(x)} en daarna de functie uitvoeren voor een waarde, e.g. \ttt{f(5)}. Of je kan voor de expressie eerst \ttt{x:=5} neerzetten. Dit is allemaal behandeld in de documentatie, dus ik vind het zo prima}
-
 
 \subsection{Lijst van commando's}
-\rcom{Rik: na afloop op alfabetische volgorde zetten\\}
-\com{exit()}{Sluit het programma af.}
 \com{d(f(x),x)}{Berekent de afgeleide van \texttt{f(x)} naar de variabele \texttt{x}. Indien de afgeleide van de functie niet bekend is wordt een foutmelding gegeven. Voorbeeld:\vspace{-0.5ex}}
 \begin{adjustwidth}{1.5cm}{}
 \setstretch{1}
 \texttt{>>> d(sin(x)+2,x)}\\
 $\cos(x)$
 \end{adjustwidth}
-
-\com{sin(x), arcsin(x), cos(x), arccos(x), tan(x), arctan(x), ln(x), exp(x), floor(x), gamma(x)}{Geeft de bijbehorende standaardfunctie als functie van \texttt{x}.}
+\com{exit()}{Sluit het programma af.}
+\com{exp(x), ln(x),sin(x), arcsin(x), cos(x), arccos(x), tan(x), arctan(x), floor(x), gamma(x)}{Geeft de bijbehorende standaardfunctie als functie van \texttt{x}.}
+\com{gcd(n,m)}{Geeft de grootste gemene deler van twee gehele getallen \texttt{n} en \texttt{m}.}
 %\com{sin(x)}{Geeft de sinus van \texttt{x}.}
 %\com{arcsin(x)}{Geeft de arcsinus van \texttt{x}.}
 %\com{cos(x)}{Geeft de cosinus van \texttt{x}.}
@@ -208,23 +202,18 @@ $\cos(x)$
 %\com{floor(x)}{Neemt de floor van \texttt{x}.}
 %\com{gamma(x)}{Geeft de gamma functie van \texttt{x}.}
 \com{log(x,y)}{Geeft het logaritme van \texttt{x} in basis \texttt{y}. Equivalent aan \texttt{ln(x)/ln(y)}.}
-\com{polygamma(x,y)}{Geeft de \texttt{y}'de orde polygamma functie van \texttt{x}.}
-
-\rcom{Rik: misschien ook nog even round en ceil toevoegen voor compleetheid?}
-
-\com{solvePolynomial(vergelijking, var)}{Geeft de oplossing van een polynomiale \ttt{vergelijking} in de variabele \ttt{var}.\rcom{Hoe voor je een vergelijking in? Met een = of een ==? Zou ik wel ergens in het verlsag noemen} Bijvoorbeeld $x^{10} = 1024$ of $x^2 + 1/x = 10$. \rcom{JW: liever geef je een voorbeeld met wat de user moet invoeren en wat je dan als output krijgt} }
 \com{numIntegrate(expressie, x, l, r, numsteps)}{Numeriek bepalen van $\int_{\texttt{l}}^\texttt{r} \texttt{expressie} \; \mathrm{d}\texttt{x}$ door middel van een Riemann benadering in \texttt{numsteps} stappen.}
-\com{gcd(n,m)}{Geeft de grootste gemene deler van twee gehele getallen \texttt{n} en \texttt{m}.}
+\com{polygamma(x,y)}{Geeft de \texttt{y}'de orde polygamma functie van \texttt{x}.}
+\com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
 \com{polQuotient(pol1, pol2, x), polRemainder(pol1, pol2, x)}{Geeft het quotient respectievelijk de rest van de deling van \texttt{pol1} door \texttt{pol2} met rest, waarbij \texttt{pol1} en \texttt{pol2} polynomen in \texttt{x} zijn.}
 \com{polIntQuotient(pol1, pol2, x), polIntRemainder(pol1, pol2, x)}{Geeft het quotient respectievelijk de rest van de deling van het polynoom \texttt{pol1} door het polynoom \texttt{pol2} met rest \textit{over de gehele getallen}, waarbij \texttt{pol1} en \texttt{pol2} polynomen met gehele co\"effici\"enten in \texttt{x} zijn.}
-\com{polContent(pol,x)}{Geeft de content van het polynoom \texttt{pol} in \texttt{x}.}
 \com{polGcd(pol1,pol2,x)}{Geeft de grootste gemene deler van twee polynomen \texttt{pol1} en \texttt{pol1} met gehele co\"effici\"enten in \texttt{x}.}
-
+\com{solvePolynomial(vergelijking, var)}{Geeft de oplossing van een polynomiale \ttt{vergelijking} in de variabele \ttt{var}. Bijvoorbeeld $x^{10} = 1024$ of $x^2 + 1/x = 10$.}
 
 \section{Taakverdeling}
 In het verslag is de volgende taakverdeling gehanteerd:
 
-\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd en als commando \rcom{JW: wat heb je met solvePolynomial gedaan?}, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
+\com{Jurre} {Outline van het verslag gemaakt, solvePolynomial aan het verslag toegevoegd, theorie over postfix notatie geschreven, taakverdeling geschreven, bronvermeldingen toegevoegd.}
 
 \com{Rik} {Stukje theorie over shunting-yardalgoritme, grootste deel van de documentatie, stukje over user interface geschreven.}
 \com{Jan-Willem} {Introductie en theorie over expressie-bomen geschreven, polynoomfuncties toegevoegd aan documentatie, controle op spelling en stijl.}
