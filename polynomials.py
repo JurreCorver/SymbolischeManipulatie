@@ -73,6 +73,16 @@ methodList.append(['polIntRemainder',polRemInt,3])
 def gcd(exp1, exp2):
     '''calculate the gcd of two integers'''
 
+    #evaluate exp1 and exp2 such that they are constants
+    exp1=exp1.evaluate()
+    exp2=exp2.evaluate()
+
+    #check wheter both exp1 and exp2 are constants
+    if not isinstance(exp1,Constant):
+        raise TypeError('%s is not a constant' % str(exp1))
+    if not isinstance(exp2,Constant):
+        raise TypeError('%s is not a constant' % str(exp2))
+
     #check whether both exp1 and exp2 are integers
     if int(exp1) != float(exp1):
         raise ValueError('%s is not an integer' % str(exp1))
